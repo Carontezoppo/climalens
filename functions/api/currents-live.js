@@ -16,9 +16,9 @@
  * Uses KV binding CLIMATE_CACHE (12-hour TTL) when available.
  */
 
-const CACHE_TTL  = 60 * 60 * 12; // 12 hours — data updates once daily
-const GRID_STEP  = 2;            // output degrees (stride 8 on 0.25° native grid)
-const GRID_STRIDE = 8;           // 8 × 0.25° = 2° per output cell
+const CACHE_TTL   = 60 * 60 * 12; // 12 hours — data updates once daily
+const GRID_STEP   = 4;            // output degrees (stride 16 on 0.25° native grid)
+const GRID_STRIDE = 16;           // 16 × 0.25° = 4° per output cell → ~260 KB response
 
 const ERDDAP_BASE  = 'https://coastwatch.pfeg.noaa.gov/erddap/griddap';
 const DATASET_ID   = 'nesdisSSH1day';
@@ -85,8 +85,8 @@ export async function onRequestGet({ env }) {
  */
 function buildGrid(raw) {
   const step   = GRID_STEP;
-  const width  = Math.round((LON_MAX - LON_MIN) / step) + 1; // 181
-  const height = Math.round((LAT_MAX - LAT_MIN) / step) + 1; // 81
+  const width  = Math.round((LON_MAX - LON_MIN) / step) + 1; // 91  (at 4°)
+  const height = Math.round((LAT_MAX - LAT_MIN) / step) + 1; // 41  (at 4°)
 
   const u = new Float32Array(width * height); // default 0
   const v = new Float32Array(width * height);
