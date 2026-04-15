@@ -24,7 +24,7 @@ const GRID_STEP    = 2;            // degrees — downsample to 2° for browser 
 // Subset returns JSON with lat/lon/uo/vo arrays for the requested bounding box.
 const CMEMS_BASE = 'https://nrt.cmems-du.eu/motu-web/Motu';
 const DATASET_ID = 'GLOBAL_ANALYSISFORECAST_PHY_001_024-TDS';
-const PRODUCT_ID = 'cmems_mod_glo_phy_anfc_0.083deg_P1D-m';
+const PRODUCT_ID = 'cmems_mod_glo_phy-cur_anfc_0.083deg_P1D-m';
 
 export async function onRequestGet({ env }) {
   try {
