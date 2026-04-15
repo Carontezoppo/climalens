@@ -176,11 +176,30 @@ async function initLiveCurrentsMap() {
     liveCurrentsMap.setView([10, 0], Math.max(2, Math.log2(Math.max(w, h) / 256)));
   }, 200);
 
-  // ── Coastlines (shared world-atlas approach) ───────────────────────────────
+  // ── Particle canvas overlay ────────────────────────────────────────────────
+  // z-index 300 = above tile layer (200) but below Leaflet's overlayPane (400)
+  // so land fill and coastlines render on top of the particles.
+  liveCurrentsCanvas = document.createElement('canvas');
+  liveCurrentsCanvas.style.cssText =
+    'position:absolute;top:0;left:0;pointer-events:none;z-index:300;';
+  liveCurrentsMap.getContainer().appendChild(liveCurrentsCanvas);
+  liveCurrentsCtx = liveCurrentsCanvas.getContext('2d');
+  resizeCanvas();
+
+  liveCurrentsMap.on('resize move zoom', resizeCanvas);
+
+  // ── Land fill + coastlines (overlayPane z-400, above canvas z-300) ─────────
   fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-50m.json')
     .then(r => r.json())
     .then(topo => {
-      const raw   = topojson.mesh(topo, topo.objects.land);
+      // Solid land fill — same colour as map background so ocean stands out
+      L.geoJSON(topojson.feature(topo, topo.objects.land), {
+        style: { fill: true, fillColor: '#141821', fillOpacity: 1, stroke: false },
+        interactive: false,
+      }).addTo(liveCurrentsMap);
+
+      // Coastline strokes on top of the fill
+      const raw = topojson.mesh(topo, topo.objects.land);
       const lines = [];
       raw.coordinates.forEach(line => {
         let seg = [line[0]];
@@ -194,20 +213,9 @@ async function initLiveCurrentsMap() {
       });
       L.geoJSON(
         { type: 'Feature', geometry: { type: 'MultiLineString', coordinates: lines }, properties: {} },
-        { style: { fill: false, color: 'rgba(255,255,255,0.22)', weight: 0.8, opacity: 1 }, interactive: false }
+        { style: { fill: false, color: 'rgba(255,255,255,0.55)', weight: 1.0, opacity: 1 }, interactive: false }
       ).addTo(liveCurrentsMap);
     });
-
-  // ── Particle canvas overlay ────────────────────────────────────────────────
-  // Sits above the Leaflet panes, below the coastline SVG layer
-  liveCurrentsCanvas = document.createElement('canvas');
-  liveCurrentsCanvas.style.cssText =
-    'position:absolute;top:0;left:0;pointer-events:none;z-index:400;';
-  liveCurrentsMap.getContainer().appendChild(liveCurrentsCanvas);
-  liveCurrentsCtx = liveCurrentsCanvas.getContext('2d');
-  resizeCanvas();
-
-  liveCurrentsMap.on('resize move zoom', resizeCanvas);
 
   // ── Fetch velocity grid ────────────────────────────────────────────────────
   // /api/currents-live proxies NOAA CoastWatch ERDDAP (nesdisSSH1day):
