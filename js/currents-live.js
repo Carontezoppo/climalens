@@ -284,7 +284,14 @@ async function initLiveCurrentsMap() {
   // SSH-derived geostrophic surface currents, 0.25°, daily NRT, no auth needed.
   const statusEl = document.getElementById('liveCurrentsStatus');
   try {
-    const res  = await fetch('/api/currents-live');
+    const res = await fetch('/api/currents-live');
+    const ct  = res.headers.get('content-type') || '';
+    if (!ct.includes('json')) {
+      const preview = await res.text();
+      console.error('/api/currents-live returned non-JSON:', res.status, preview.slice(0, 300));
+      if (statusEl) statusEl.textContent = `Current data unavailable (HTTP ${res.status} — check console)`;
+      return;
+    }
     const data = await res.json();
 
     if (!res.ok || data.error) {
