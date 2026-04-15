@@ -17,3 +17,4 @@
 # Cloudflare
 .wrangler/
 node_modules/
+wrangler.toml
