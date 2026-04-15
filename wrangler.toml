@@ -1,0 +1,21 @@
+# Cloudflare Pages + Workers configuration
+# Used for local development with: npx wrangler pages dev .
+#
+# Production KV bindings are set in the Cloudflare dashboard:
+#   Pages project → Settings → Functions → KV namespace bindings
+#   Variable name: CLIMATE_CACHE
+
+name = "climalens"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "."
+
+# ── KV namespace bindings ────────────────────────────────────────────────────
+# After creating a KV namespace in the Cloudflare dashboard, paste its
+# ID and preview ID here for local development.
+#
+# Dashboard path: Workers & Pages → KV → Create namespace → "ClimalensCache"
+
+[[kv_namespaces]]
+binding     = "CLIMATE_CACHE"
+id          = "REPLACE_WITH_KV_NAMESPACE_ID"
+preview_id  = "REPLACE_WITH_KV_PREVIEW_NAMESPACE_ID"

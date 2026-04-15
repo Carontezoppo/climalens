@@ -8,32 +8,20 @@ let climateCurrentData = null;
 const climateCache = {};
 
 async function fetchClimateData() {
+  // In-memory cache: instant on same-session location revisits
   const cacheKey = `${currentLocation.lat}_${currentLocation.lon}`;
   if (climateCache[cacheKey]) return climateCache[cacheKey];
-  const today = new Date().toISOString().slice(0, 10);
-  const lsKey = `climate_${cacheKey}_${today}`;
-  try {
-    const stored = localStorage.getItem(lsKey);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      climateCache[cacheKey] = parsed;
-      return parsed;
-    }
-  } catch { }
-  const endYear = new Date().getFullYear() - 1;
-  const qs = [
-    `latitude=${currentLocation.lat}`,
-    `longitude=${currentLocation.lon}`,
-    'start_date=1970-01-01',
-    `end_date=${endYear}-12-31`,
-    'daily=temperature_2m_max,temperature_2m_min',
-    'timezone=UTC',
-  ].join('&');
-  const res = await fetch('https://archive-api.open-meteo.com/v1/archive?' + qs);
+
+  // Route through the Cloudflare Worker (/api/climate), which handles
+  // KV server-side caching (24 h TTL) so Open-Meteo's daily rate limit
+  // is only hit once per city per day across all visitors.
+  const res = await fetch(
+    `/api/climate?lat=${currentLocation.lat}&lon=${currentLocation.lon}`
+  );
   const json = await res.json();
   if (!res.ok || json.error) throw new Error(json.reason || 'HTTP ' + res.status);
+
   climateCache[cacheKey] = json;
-  try { localStorage.setItem(lsKey, JSON.stringify(json)); } catch { }
   return json;
 }
 
