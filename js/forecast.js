@@ -10,7 +10,7 @@ async function fetchForecast() {
     'forecast_days=7',
     'timezone=Europe%2FLondon',
   ].join('&');
-  const res = await fetch('https://api.open-meteo.com/v1/forecast?' + qs);
+  const res = await fetch(`/api/forecast?lat=${currentLocation.lat}&lon=${currentLocation.lon}`);
   const json = await res.json();
   if (!res.ok || json.error) throw new Error(json.reason || 'HTTP ' + res.status);
   return json;

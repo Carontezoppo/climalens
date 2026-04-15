@@ -1,0 +1,12 @@
+{
+  "name": "climalens",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler pages dev .",
+    "deploy": "echo 'Deployments are automatic via Cloudflare Pages on push to main'"
+  },
+  "devDependencies": {
+    "wrangler": "^3"
+  }
+}

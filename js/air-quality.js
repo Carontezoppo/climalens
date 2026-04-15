@@ -12,7 +12,7 @@ async function fetchAirQuality() {
     'forecast_days=2',
     'timezone=auto',
   ].join('&');
-  const res = await fetch('https://air-quality-api.open-meteo.com/v1/air-quality?' + qs);
+  const res = await fetch(`/api/air-quality?lat=${currentLocation.lat}&lon=${currentLocation.lon}`);
   const json = await res.json();
   if (!res.ok || json.error) throw new Error(json.reason || 'HTTP ' + res.status);
   return json;
