@@ -323,27 +323,44 @@ async function initLiveCurrentsMap() {
     });
 
   // ── Fetch velocity grid ────────────────────────────────────────────────────
-  // /api/currents-live proxies NOAA CoastWatch ERDDAP (nesdisSSH1day):
-  // SSH-derived geostrophic surface currents, 0.25°, daily NRT, no auth needed.
+  // Strategy: try the Worker cache proxy first (fast on KV hit).
+  // If the Worker is unavailable (NOAA blocks Cloudflare IPs → 502, timeout),
+  // fall back to fetching ERDDAP directly from the browser.
+  // NOAA CoastWatch returns Access-Control-Allow-Origin: * on public datasets.
+  const ERDDAP_DIRECT =
+    'https://coastwatch.pfeg.noaa.gov/erddap/griddap/nesdisSSH1day.json' +
+    '?ugos[(last):1:(last)][(-80.0):16:(80.0)][(-180.0):16:(180.0)]' +
+    ',vgos[(last):1:(last)][(-80.0):16:(80.0)][(-180.0):16:(180.0)]';
+
   const statusEl = document.getElementById('liveCurrentsStatus');
   try {
-    const res = await fetch('/api/currents-live');
-    const ct  = res.headers.get('content-type') || '';
-    if (!ct.includes('json')) {
-      const preview = await res.text();
-      console.error('/api/currents-live returned non-JSON:', res.status, preview.slice(0, 300));
-      if (statusEl) statusEl.textContent = `Current data unavailable (HTTP ${res.status} — check console)`;
-      return;
-    }
-    const data = await res.json();
+    let data = null;
 
-    if (!res.ok || data.error) {
-      if (statusEl) statusEl.textContent = 'Current data unavailable: ' + (data.error || `HTTP ${res.status}`);
-      return;
+    // ── 1. Try Worker proxy (KV-cached, 8 s timeout) ───────────────────────
+    try {
+      const ctrl = new AbortController();
+      const tid  = setTimeout(() => ctrl.abort(), 8000);
+      const res  = await fetch('/api/currents-live', { signal: ctrl.signal });
+      clearTimeout(tid);
+      const ct = res.headers.get('content-type') || '';
+      if (res.ok && ct.includes('json')) {
+        const j = await res.json();
+        if (!j.error) data = j;
+      }
+    } catch (proxyErr) {
+      console.warn('Worker proxy unavailable, falling back to direct ERDDAP fetch:', proxyErr.message);
     }
 
-    // API now returns the raw ERDDAP table; build the velocity grid in the browser
-    // (avoids JSON.parse + grid-building inside the 10 ms CPU-limited Worker).
+    // ── 2. Fallback: fetch ERDDAP directly from the browser ────────────────
+    if (!data) {
+      if (statusEl) statusEl.textContent = 'Loading current data…';
+      const res = await fetch(ERDDAP_DIRECT, { headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error(`ERDDAP HTTP ${res.status}`);
+      const ct = res.headers.get('content-type') || '';
+      if (!ct.includes('json')) throw new Error(`ERDDAP returned unexpected content-type: ${ct}`);
+      data = await res.json();
+    }
+
     velocityGrid = data.table ? buildGrid(data) : data;
     if (statusEl) statusEl.style.display = 'none';
 
