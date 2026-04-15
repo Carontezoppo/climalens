@@ -1,11 +1,16 @@
 // Live ocean current particle animation
-// Powered by CMEMS Global Ocean Physics Forecast (uo/vo surface velocity)
+// Powered by NOAA CoastWatch SSH-derived geostrophic currents (ugos/vgos)
 
 /* ── Constants ──────────────────────────────────────────────────────────────── */
 const PARTICLE_COUNT  = 4000;
-const MAX_AGE         = 80;    // frames before a particle respawns
-const SPEED_SCALE     = 18;    // pixels per m/s per frame (tune for visual feel)
-const TRAIL_OPACITY   = 0.92;  // how much each frame fades (higher = longer trails)
+const MAX_AGE         = 90;    // frames before a particle respawns
+// Geographic speed scale: degrees-per-frame per (m/s) at zoom level 2.
+// Higher = faster animation. Divided by 2^(zoom-2) to keep pixel velocity
+// roughly constant across zoom levels.
+// Target: ~0.4 px/frame for a 1 m/s current at zoom 2 (2.84 px/°).
+// 0.4px / 2.84px_per_deg / 1_m_s × 111320_m_per_deg ≈ 15,700 → use 15000.
+const SPEED_SCALE     = 15000;
+const TRAIL_OPACITY   = 0.93;  // how much each frame fades (higher = longer trails)
 const PARTICLE_WIDTH  = 1.5;   // stroke width in px
 const FADE_COLOR      = '20, 24, 33'; // matches --bg-card (#141821) in RGB
 
@@ -109,9 +114,10 @@ function animateCurrents() {
     const ptA = map.latLngToContainerPoint([p.lat, p.lon]);
 
     // Advance position — u is east (+lon), v is north (+lat)
-    // Scale speed relative to current zoom so particles don't fly off at high zoom
+    // Divide by 2^(zoom-2) so pixel velocity stays roughly constant:
+    // higher zoom = more px/° so we need fewer degrees per frame.
     const zoom  = map.getZoom();
-    const scale = SPEED_SCALE * Math.pow(2, zoom - 2);
+    const scale = SPEED_SCALE / Math.pow(2, zoom - 2);
     p.lon += (u / speed) * speed * scale / (111320 * Math.cos(p.lat * Math.PI / 180));
     p.lat += (v / speed) * speed * scale / 111320;
 
@@ -204,6 +210,8 @@ async function initLiveCurrentsMap() {
   liveCurrentsMap.on('resize move zoom', resizeCanvas);
 
   // ── Fetch velocity grid ────────────────────────────────────────────────────
+  // /api/currents-live proxies NOAA CoastWatch ERDDAP (nesdisSSH1day):
+  // SSH-derived geostrophic surface currents, 0.25°, daily NRT, no auth needed.
   const statusEl = document.getElementById('liveCurrentsStatus');
   try {
     const res  = await fetch('/api/currents-live');

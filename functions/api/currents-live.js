@@ -1,90 +1,73 @@
 /**
  * GET /api/currents-live
  *
- * Fetches surface ocean current velocity (u, v components) from the
- * Copernicus Marine Service (CMEMS) and returns a compact JSON grid
- * for the browser particle animation engine.
- *
- * Required Cloudflare secrets (set in Pages → Settings → Variables):
- *   CMEMS_USERNAME   your Copernicus Marine username
- *   CMEMS_PASSWORD   your Copernicus Marine password
+ * Fetches surface ocean geostrophic current velocity (ugos, vgos) from the
+ * NOAA CoastWatch ERDDAP server and returns a compact JSON grid for the
+ * browser particle animation engine.
  *
  * Data source:
- *   Product:  GLOBAL_ANALYSISFORECAST_PHY_001_024
- *   Dataset:  cmems_mod_glo_phy_anfc_0.083deg_P1D-m  (daily mean)
- *   Variables: uo (eastward, m/s), vo (northward, m/s)
- *   Depth:    surface layer (~0.49 m)
+ *   Dataset:    nesdisSSH1day (NOAA CoastWatch)
+ *   Product:    Sea Surface Height Anomalies & Geostrophic Currents (altimetry)
+ *   Variables:  ugos (eastward, m/s), vgos (northward, m/s)
+ *   Resolution: 0.25°, daily, global, NRT (~3-5 day lag)
+ *   Auth:       none — public ERDDAP endpoint
+ *
+ * No Cloudflare secrets required.
+ * Uses KV binding CLIMATE_CACHE (12-hour TTL) when available.
  */
 
-const CACHE_TTL    = 60 * 60 * 12; // 12 hours — data updates once daily
-const GRID_STEP    = 2;            // degrees — downsample to 2° for browser efficiency (~16 KB)
+const CACHE_TTL  = 60 * 60 * 12; // 12 hours — data updates once daily
+const GRID_STEP  = 2;            // output degrees (stride 8 on 0.25° native grid)
+const GRID_STRIDE = 8;           // 8 × 0.25° = 2° per output cell
 
-// ── CMEMS Copernicus Marine REST API ─────────────────────────────────────────
-// Endpoint format confirmed from Copernicus Marine Toolbox v2 API docs.
-// Subset returns JSON with lat/lon/uo/vo arrays for the requested bounding box.
-const CMEMS_BASE = 'https://nrt.cmems-du.eu/motu-web/Motu';
-const DATASET_ID = 'GLOBAL_ANALYSISFORECAST_PHY_001_024-TDS';
-const PRODUCT_ID = 'cmems_mod_glo_phy-cur_anfc_0.083deg_P1D-m';
+const ERDDAP_BASE  = 'https://coastwatch.pfeg.noaa.gov/erddap/griddap';
+const DATASET_ID   = 'nesdisSSH1day';
+
+// Grid bounds (SSH altimetry covers ~80S–80N)
+const LAT_MIN = -80, LAT_MAX = 80;
+const LON_MIN = -180, LON_MAX = 180;
 
 export async function onRequestGet({ env }) {
   try {
-    // ── Credentials check ───────────────────────────────────────────────────
-    if (!env.CMEMS_USERNAME || !env.CMEMS_PASSWORD) {
-      return json({ error: 'CMEMS credentials not configured' }, 503);
-    }
-
-    // ── KV cache ────────────────────────────────────────────────────────────
+    // ── KV cache ─────────────────────────────────────────────────────────────
     const today    = new Date().toISOString().slice(0, 10);
-    const cacheKey = `currents_${today}_${GRID_STEP}deg`;
+    const cacheKey = `currents_ssh_${today}_${GRID_STEP}deg`;
 
     if (env.CLIMATE_CACHE) {
       const cached = await env.CLIMATE_CACHE.get(cacheKey);
       if (cached) return json(cached, 200, { 'X-Cache': 'HIT' });
     }
 
-    // ── Fetch from CMEMS ─────────────────────────────────────────────────────
-    // Request yesterday's daily mean (today's may not be published yet)
-    const d = new Date();
-    d.setUTCDate(d.getUTCDate() - 1);
-    const dateStr = d.toISOString().slice(0, 10);
+    // ── Build ERDDAP griddap URL ──────────────────────────────────────────────
+    // (last) = latest available timestep; stride = GRID_STRIDE for downsampling
+    const latRange = `(${LAT_MIN}.0):${GRID_STRIDE}:(${LAT_MAX}.0)`;
+    const lonRange = `(${LON_MIN}.0):${GRID_STRIDE}:(${LON_MAX}.0)`;
+    const sel      = `[(last):1:(last)][${latRange}][${lonRange}]`;
+    const query    = `ugos${sel},vgos${sel}`;
+    const url      = `${ERDDAP_BASE}/${DATASET_ID}.json?${encodeURIComponent(query)}`;
 
-    const params = new URLSearchParams({
-      action:    'productdownload',
-      service:   DATASET_ID,
-      product:   PRODUCT_ID,
-      x_lo:      '-180',
-      x_hi:      '180',
-      y_lo:      '-90',
-      y_hi:      '90',
-      t_lo:      `${dateStr} 12:00:00`,
-      t_hi:      `${dateStr} 12:00:00`,
-      depth_lo:  '0.49',
-      depth_hi:  '0.49',
-      variable:  'uo',
-      // Note: MOTU needs variable twice for two variables
-      out_fmt:   'json',
-      mode:      'console',
-    });
-
-    // MOTU uses Basic Auth
-    const auth = btoa(`${env.CMEMS_USERNAME}:${env.CMEMS_PASSWORD}`);
-    const upstream = await fetch(`${CMEMS_BASE}?${params}&variable=vo`, {
-      headers: { Authorization: `Basic ${auth}` },
+    const upstream = await fetch(url, {
+      headers: { Accept: 'application/json' },
     });
 
     if (!upstream.ok) {
       const err = await upstream.text();
-      return json({ error: `CMEMS error ${upstream.status}: ${err.slice(0, 200)}` }, 502);
+      return json(
+        { error: `ERDDAP ${upstream.status}: ${err.slice(0, 300)}` },
+        502,
+      );
     }
 
     const raw  = await upstream.json();
     const grid = buildGrid(raw);
 
+    const payload = JSON.stringify(grid);
     if (env.CLIMATE_CACHE) {
-      env.CLIMATE_CACHE.put(cacheKey, JSON.stringify(grid), { expirationTtl: CACHE_TTL });
+      // fire-and-forget — don't block the response
+      env.CLIMATE_CACHE.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
     }
 
-    return json(JSON.stringify(grid), 200, { 'X-Cache': 'MISS' });
+    return json(payload, 200, { 'X-Cache': 'MISS' });
 
   } catch (err) {
     return json({ error: err.message }, 500);
@@ -92,49 +75,61 @@ export async function onRequestGet({ env }) {
 }
 
 /**
- * Downsample the raw CMEMS JSON response to a regular 2° grid.
- * Output: { date, step, width, height, latMin, latMax, lonMin, lonMax, u, v }
- * u and v are flat Float32-compatible arrays (serialised as plain arrays).
+ * Convert an ERDDAP griddap JSON table to a regular 2° grid.
+ *
+ * ERDDAP format:
+ *   { table: { columnNames: [...], rows: [[time, lat, lon, u, v], ...] } }
+ *
+ * Output:
+ *   { step, width, height, latMin, latMax, lonMin, lonMax, u[], v[] }
  */
 function buildGrid(raw) {
   const step   = GRID_STEP;
-  const latMin = -80, latMax = 80;
-  const lonMin = -180, lonMax = 180;
-  const width  = Math.round((lonMax - lonMin) / step) + 1; // 181
-  const height = Math.round((latMax - latMin) / step) + 1; // 81
+  const width  = Math.round((LON_MAX - LON_MIN) / step) + 1; // 181
+  const height = Math.round((LAT_MAX - LAT_MIN) / step) + 1; // 81
 
-  // Build lookup from the raw data points
-  const lookup = new Map();
-  if (raw.latitude && raw.longitude && raw.uo && raw.vo) {
-    for (let i = 0; i < raw.latitude.length; i++) {
-      const key = `${Math.round(raw.latitude[i])}_${Math.round(raw.longitude[i])}`;
-      lookup.set(key, { u: raw.uo[i], v: raw.vo[i] });
-    }
+  const u = new Float32Array(width * height); // default 0
+  const v = new Float32Array(width * height);
+
+  const cols = raw.table.columnNames;
+  const latI = cols.indexOf('latitude');
+  const lonI = cols.indexOf('longitude');
+  const uI   = cols.indexOf('ugos');
+  const vI   = cols.indexOf('vgos');
+
+  for (const row of raw.table.rows) {
+    const lat = row[latI];
+    const lon = row[lonI];
+    const uv  = row[uI];
+    const vv  = row[vI];
+    if (lat == null || lon == null || uv == null || vv == null) continue;
+
+    // North-at-top convention so bilinear() in the browser matches toGridXY()
+    // which returns y=0 for latMax and y=(height-1) for latMin.
+    const col  = Math.round((lon - LON_MIN) / step);
+    const rowI = Math.round((LAT_MAX - lat) / step); // row 0 = north
+    if (col < 0 || col >= width || rowI < 0 || rowI >= height) continue;
+
+    u[rowI * width + col] = uv;
+    v[rowI * width + col] = vv;
   }
 
-  const u = new Array(width * height).fill(0);
-  const v = new Array(width * height).fill(0);
-
-  for (let row = 0; row < height; row++) {
-    const lat = latMin + row * step;
-    for (let col = 0; col < width; col++) {
-      const lon = lonMin + col * step;
-      // Find nearest point in raw data (within ±step tolerance)
-      const key = `${Math.round(lat)}_${Math.round(lon)}`;
-      const pt  = lookup.get(key);
-      if (pt) {
-        u[row * width + col] = pt.u ?? 0;
-        v[row * width + col] = pt.v ?? 0;
-      }
-    }
-  }
-
-  return { step, width, height, latMin, latMax, lonMin, lonMax, u, v };
+  return {
+    step, width, height,
+    latMin: LAT_MIN, latMax: LAT_MAX,
+    lonMin: LON_MIN, lonMax: LON_MAX,
+    u: Array.from(u),
+    v: Array.from(v),
+  };
 }
 
 function json(body, status = 200, extra = {}) {
   return new Response(body, {
     status,
-    headers: { 'Content-Type': 'application/json;charset=UTF-8', 'Access-Control-Allow-Origin': '*', ...extra },
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8',
+      'Access-Control-Allow-Origin': '*',
+      ...extra,
+    },
   });
 }
