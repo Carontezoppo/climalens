@@ -8,15 +8,9 @@ async function fetchWeatherData(startYr, startMo, endYr, endMo) {
   const startDate = `${startYr}-${pad2(startMo)}-01`;
   const lastDay = daysInMonth(endYr, endMo);
   const endDate = `${endYr}-${pad2(endMo)}-${pad2(lastDay)}`;
-  const base = 'https://archive-api.open-meteo.com/v1/archive';
-  const qs = [
-    `latitude=${currentLocation.lat}`, `longitude=${currentLocation.lon}`,
-    `start_date=${startDate}`, `end_date=${endDate}`,
-    'daily=temperature_2m_max,temperature_2m_min,precipitation_sum,snowfall_sum,sunshine_duration,wind_speed_10m_max,wind_gusts_10m_max,precipitation_hours',
-    'hourly=pressure_msl,relative_humidity_2m',
-    'timezone=Europe%2FLondon',
-  ].join('&');
-  const res = await fetch(base + '?' + qs);
+  const res = await fetch(
+    `/api/weather?lat=${currentLocation.lat}&lon=${currentLocation.lon}&start=${startDate}&end=${endDate}`
+  );
   const json = await res.json();
   if (!res.ok || json.error) throw new Error(json.reason || 'HTTP ' + res.status);
   if (!json.daily?.time) throw new Error('API response missing daily data');
