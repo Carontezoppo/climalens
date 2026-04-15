@@ -50,7 +50,8 @@ export async function onRequestGet({ env }) {
       headers: { Accept: 'application/json' },
     });
 
-    if (!upstream.ok) {
+    const ct = upstream.headers.get('content-type') || '';
+    if (!upstream.ok || !ct.includes('json')) {
       const err = await upstream.text();
       return json(
         { error: `ERDDAP ${upstream.status}: ${err.slice(0, 300)}` },
@@ -124,7 +125,8 @@ function buildGrid(raw) {
 }
 
 function json(body, status = 200, extra = {}) {
-  return new Response(body, {
+  const text = typeof body === 'string' ? body : JSON.stringify(body);
+  return new Response(text, {
     status,
     headers: {
       'Content-Type': 'application/json;charset=UTF-8',

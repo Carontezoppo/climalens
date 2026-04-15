@@ -59,7 +59,8 @@ function halfHourKey() {
 }
 
 function json(body, status = 200, extra = {}) {
-  return new Response(body, {
+  const text = typeof body === 'string' ? body : JSON.stringify(body);
+  return new Response(text, {
     status,
     headers: { 'Content-Type': 'application/json;charset=UTF-8', 'Access-Control-Allow-Origin': '*', ...extra },
   });
