@@ -41,6 +41,11 @@ const OCEAN_CURRENTS = [
     coords: [[-180,-57],[-160,-59],[-140,-59],[-120,-58],[-100,-57],[-80,-58],[-60,-59],[-40,-58],[-20,-57],[0,-56],[20,-56],[40,-57],[60,-58],[80,-58],[100,-57],[120,-57],[140,-58],[160,-58],[180,-57]] },
 ];
 
+/* ── Grid bounds (must match functions/api/currents-live.js) ────────────────── */
+const GRID_LAT_MIN = -80, GRID_LAT_MAX = 80;
+const GRID_LON_MIN = -180, GRID_LON_MAX = 180;
+const GRID_STEP    = 4; // degrees per output cell (stride 16 × 0.25°)
+
 /* ── Constants ──────────────────────────────────────────────────────────────── */
 const PARTICLE_COUNT  = 6000;
 const MAX_AGE         = 100;   // frames before a particle respawns
@@ -64,6 +69,44 @@ let animFrameId        = null;
 let velocityGrid       = null;  // { width, height, latMin, latMax, lonMin, lonMax, u, v }
 let particles          = [];
 let liveCurrentsActive = false;
+
+/* ── ERDDAP → velocity grid ─────────────────────────────────────────────────── */
+// Converts the raw ERDDAP griddap JSON table returned by /api/currents-live
+// into the flat { step, width, height, latMin, latMax, lonMin, lonMax, u[], v[] }
+// object used by the particle animation engine.
+function buildGrid(raw) {
+  const step   = GRID_STEP;
+  const width  = Math.round((GRID_LON_MAX - GRID_LON_MIN) / step) + 1;
+  const height = Math.round((GRID_LAT_MAX - GRID_LAT_MIN) / step) + 1;
+
+  const u = new Float32Array(width * height);
+  const v = new Float32Array(width * height);
+
+  const cols = raw.table.columnNames;
+  const latI = cols.indexOf('latitude');
+  const lonI = cols.indexOf('longitude');
+  const uI   = cols.indexOf('ugos');
+  const vI   = cols.indexOf('vgos');
+
+  for (const row of raw.table.rows) {
+    const lat = row[latI], lon = row[lonI];
+    const uv  = row[uI],   vv  = row[vI];
+    if (lat == null || lon == null || uv == null || vv == null) continue;
+    const col  = Math.round((lon - GRID_LON_MIN) / step);
+    const rowI = Math.round((GRID_LAT_MAX - lat) / step); // row 0 = north
+    if (col < 0 || col >= width || rowI < 0 || rowI >= height) continue;
+    u[rowI * width + col] = uv;
+    v[rowI * width + col] = vv;
+  }
+
+  return {
+    step, width, height,
+    latMin: GRID_LAT_MIN, latMax: GRID_LAT_MAX,
+    lonMin: GRID_LON_MIN, lonMax: GRID_LON_MAX,
+    u: Array.from(u),
+    v: Array.from(v),
+  };
+}
 
 /* ── Grid interpolation ─────────────────────────────────────────────────────── */
 function bilinear(field, width, height, x, y) {
@@ -299,7 +342,9 @@ async function initLiveCurrentsMap() {
       return;
     }
 
-    velocityGrid = data;
+    // API now returns the raw ERDDAP table; build the velocity grid in the browser
+    // (avoids JSON.parse + grid-building inside the 10 ms CPU-limited Worker).
+    velocityGrid = data.table ? buildGrid(data) : data;
     if (statusEl) statusEl.style.display = 'none';
 
     initParticles();

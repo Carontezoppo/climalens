@@ -1,134 +1,76 @@
 /**
  * GET /api/currents-live
  *
- * Fetches surface ocean geostrophic current velocity (ugos, vgos) from the
- * NOAA CoastWatch ERDDAP server and returns a compact JSON grid for the
- * browser particle animation engine.
+ * CORS proxy for NOAA CoastWatch ERDDAP (nesdisSSH1day).
+ * Returns the raw ERDDAP JSON table — the browser does all parsing and
+ * grid-building so the Worker stays well within the free-tier 10 ms CPU limit.
  *
  * Data source:
- *   Dataset:    nesdisSSH1day (NOAA CoastWatch)
- *   Product:    Sea Surface Height Anomalies & Geostrophic Currents (altimetry)
- *   Variables:  ugos (eastward, m/s), vgos (northward, m/s)
- *   Resolution: 0.25°, daily, global, NRT (~3-5 day lag)
- *   Auth:       none — public ERDDAP endpoint
+ *   Dataset:   nesdisSSH1day (NOAA CoastWatch)
+ *   Variables: ugos (eastward, m/s), vgos (northward, m/s)
+ *   Res:       0.25°, daily NRT, global (~80S–80N)
+ *   Auth:      none — public ERDDAP endpoint
  *
- * No Cloudflare secrets required.
  * Uses KV binding CLIMATE_CACHE (12-hour TTL) when available.
  */
 
-const CACHE_TTL   = 60 * 60 * 12; // 12 hours — data updates once daily
-const GRID_STEP   = 4;            // output degrees (stride 16 on 0.25° native grid)
-const GRID_STRIDE = 16;           // 16 × 0.25° = 4° per output cell → ~260 KB response
+const CACHE_TTL   = 60 * 60 * 12; // 12 hours
+const GRID_STRIDE = 16;            // 16 × 0.25° = 4° output resolution
 
-const ERDDAP_BASE  = 'https://coastwatch.pfeg.noaa.gov/erddap/griddap';
-const DATASET_ID   = 'nesdisSSH1day';
+const ERDDAP_BASE = 'https://coastwatch.pfeg.noaa.gov/erddap/griddap';
+const DATASET_ID  = 'nesdisSSH1day';
 
-// Grid bounds (SSH altimetry covers ~80S–80N)
 const LAT_MIN = -80, LAT_MAX = 80;
 const LON_MIN = -180, LON_MAX = 180;
 
 export async function onRequestGet({ env }) {
   try {
-    // ── KV cache ─────────────────────────────────────────────────────────────
+    // ── KV cache (stores raw ERDDAP response text) ────────────────────────────
     const today    = new Date().toISOString().slice(0, 10);
-    const cacheKey = `currents_ssh_${today}_${GRID_STEP}deg`;
+    const cacheKey = `currents_erddap_raw_${today}_s${GRID_STRIDE}`;
 
     if (env.CLIMATE_CACHE) {
       const cached = await env.CLIMATE_CACHE.get(cacheKey);
-      if (cached) return json(cached, 200, { 'X-Cache': 'HIT' });
+      if (cached) return respond(cached, 200, { 'X-Cache': 'HIT' });
     }
 
-    // ── Build ERDDAP griddap URL ──────────────────────────────────────────────
-    // (last) = latest available timestep; stride = GRID_STRIDE for downsampling
+    // ── Fetch from ERDDAP ─────────────────────────────────────────────────────
+    // Literal brackets required — encodeURIComponent breaks ERDDAP griddap syntax.
     const latRange = `(${LAT_MIN}.0):${GRID_STRIDE}:(${LAT_MAX}.0)`;
     const lonRange = `(${LON_MIN}.0):${GRID_STRIDE}:(${LON_MAX}.0)`;
     const sel      = `[(last):1:(last)][${latRange}][${lonRange}]`;
     const query    = `ugos${sel},vgos${sel}`;
-    // ERDDAP griddap syntax uses literal brackets — do NOT encodeURIComponent here.
-    // Encoding [, ], ( and : produces %5B%5D%3A which ERDDAP cannot parse and
-    // returns an HTML error page instead of JSON.
     const url      = `${ERDDAP_BASE}/${DATASET_ID}.json?${query}`;
 
-    const upstream = await fetch(url, {
-      headers: { Accept: 'application/json' },
-    });
+    const upstream = await fetch(url, { headers: { Accept: 'application/json' } });
+
+    if (!upstream.ok) {
+      const msg = await upstream.text();
+      return error(`ERDDAP HTTP ${upstream.status}: ${msg.slice(0, 300)}`);
+    }
 
     const ct = upstream.headers.get('content-type') || '';
-    if (!upstream.ok) {
-      const err = await upstream.text();
-      return json({ error: `ERDDAP HTTP ${upstream.status} (ct: ${ct}): ${err.slice(0, 300)}` }, 502);
-    }
     if (!ct.includes('json')) {
-      const err = await upstream.text();
-      return json({ error: `ERDDAP unexpected content-type "${ct}": ${err.slice(0, 200)}` }, 502);
+      const msg = await upstream.text();
+      return error(`ERDDAP unexpected content-type "${ct}": ${msg.slice(0, 200)}`);
     }
 
-    const raw  = await upstream.json();
-    const grid = buildGrid(raw);
+    // Read as plain text — avoids JSON.parse in the Worker (CPU-intensive).
+    // The browser parses and builds the velocity grid instead.
+    const body = await upstream.text();
 
-    const payload = JSON.stringify(grid);
     if (env.CLIMATE_CACHE) {
-      // fire-and-forget — don't block the response
-      env.CLIMATE_CACHE.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
+      env.CLIMATE_CACHE.put(cacheKey, body, { expirationTtl: CACHE_TTL });
     }
 
-    return json(payload, 200, { 'X-Cache': 'MISS' });
+    return respond(body, 200, { 'X-Cache': 'MISS' });
 
   } catch (err) {
-    return json({ error: err.message }, 500);
+    return error(err.message);
   }
 }
 
-/**
- * Convert an ERDDAP griddap JSON table to a regular 2° grid.
- *
- * ERDDAP format:
- *   { table: { columnNames: [...], rows: [[time, lat, lon, u, v], ...] } }
- *
- * Output:
- *   { step, width, height, latMin, latMax, lonMin, lonMax, u[], v[] }
- */
-function buildGrid(raw) {
-  const step   = GRID_STEP;
-  const width  = Math.round((LON_MAX - LON_MIN) / step) + 1; // 91  (at 4°)
-  const height = Math.round((LAT_MAX - LAT_MIN) / step) + 1; // 41  (at 4°)
-
-  const u = new Float32Array(width * height); // default 0
-  const v = new Float32Array(width * height);
-
-  const cols = raw.table.columnNames;
-  const latI = cols.indexOf('latitude');
-  const lonI = cols.indexOf('longitude');
-  const uI   = cols.indexOf('ugos');
-  const vI   = cols.indexOf('vgos');
-
-  for (const row of raw.table.rows) {
-    const lat = row[latI];
-    const lon = row[lonI];
-    const uv  = row[uI];
-    const vv  = row[vI];
-    if (lat == null || lon == null || uv == null || vv == null) continue;
-
-    // North-at-top convention so bilinear() in the browser matches toGridXY()
-    // which returns y=0 for latMax and y=(height-1) for latMin.
-    const col  = Math.round((lon - LON_MIN) / step);
-    const rowI = Math.round((LAT_MAX - lat) / step); // row 0 = north
-    if (col < 0 || col >= width || rowI < 0 || rowI >= height) continue;
-
-    u[rowI * width + col] = uv;
-    v[rowI * width + col] = vv;
-  }
-
-  return {
-    step, width, height,
-    latMin: LAT_MIN, latMax: LAT_MAX,
-    lonMin: LON_MIN, lonMax: LON_MAX,
-    u: Array.from(u),
-    v: Array.from(v),
-  };
-}
-
-function json(body, status = 200, extra = {}) {
+function respond(body, status = 200, extra = {}) {
   const text = typeof body === 'string' ? body : JSON.stringify(body);
   return new Response(text, {
     status,
@@ -138,4 +80,8 @@ function json(body, status = 200, extra = {}) {
       ...extra,
     },
   });
+}
+
+function error(msg, status = 502) {
+  return respond({ error: msg }, status);
 }
