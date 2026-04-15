@@ -985,3 +985,25 @@
     to { opacity: 1; transform: translateY(0); }
   }
   .panel-animate { animation: panelFadeIn 0.3s ease both; }
+
+/* ── LIVE OCEAN CURRENTS ─────────────────────────────────────────────────── */
+.live-currents-section { margin-bottom: 36px; }
+.live-currents-map-card {
+  border: 1px solid var(--border); border-radius: 12px;
+  overflow: hidden; margin-bottom: 12px; position: relative;
+}
+.live-currents-map-wrap { height: 550px; background: #141821; position: relative; }
+.live-currents-map-wrap .leaflet-container { background: #141821 !important; }
+.live-currents-map-wrap .leaflet-control-zoom a {
+  background: var(--bg-card) !important; border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+}
+.live-currents-map-wrap .leaflet-control-zoom a:hover { color: var(--text-primary) !important; }
+.live-currents-map-wrap .leaflet-control-attribution {
+  background: rgba(7,10,15,0.75) !important;
+  color: rgba(136,145,165,0.6) !important; font-size: 9px !important;
+}
+.live-currents-legend-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 24px;
+}

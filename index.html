@@ -69,6 +69,7 @@
     <a class="section-nav-btn" href="#section-historical"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Historical Data</a>
     <a class="section-nav-btn" href="#section-climate"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Climate Trends (1970-Today)</a>
     <a class="section-nav-btn" href="#section-sst"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Sea Temperature</a>
+    <a class="section-nav-btn" href="#section-currents-live"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Live Currents</a>
     <a class="section-nav-btn" href="#section-currents"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Ocean Currents</a>
   </nav>
 
@@ -245,6 +246,29 @@
     </div>
   </div>
 
+  <div class="section-title" id="section-currents-live" style="margin-top:8px;">
+    Live Ocean Currents
+    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Real-time · CMEMS Global Ocean Physics</span>
+  </div>
+  <div class="live-currents-section">
+    <div class="live-currents-map-card">
+      <div class="live-currents-map-wrap" id="liveCurrentsMap">
+        <div id="liveCurrentsStatus" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);text-align:center;z-index:500;pointer-events:none;">Loading current data…</div>
+      </div>
+    </div>
+    <div class="live-currents-legend-card">
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);">Current Speed</div>
+        <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:200px;">
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">Slow</span>
+          <div style="flex:1;height:6px;border-radius:3px;background:linear-gradient(to right,rgba(80,100,120,0.5),rgba(40,200,220,1),rgba(255,255,255,1));"></div>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">Fast</span>
+        </div>
+      </div>
+      <div class="currents-source" style="margin-top:12px;">Copernicus Marine Service · GLOBAL_ANALYSISFORECAST_PHY_001_024 · Surface velocity (uo, vo) · Updated daily</div>
+    </div>
+  </div>
+
   <footer class="footer">
     <p>MeteoScope Dashboard · ERA5 / CAMS data via Open-Meteo &amp; Copernicus C3S</p>
   </footer>
@@ -264,5 +288,6 @@
 <script src="js/sst.js"></script>
 <script src="js/currents.js"></script>
 <script src="js/init.js"></script>
+<script src="js/currents-live.js"></script>
 </body>
 </html>

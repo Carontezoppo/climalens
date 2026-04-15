@@ -154,6 +154,7 @@ function init() {
   initClimate();
   setTimeout(initSSTMap, 0); // defer so Leaflet measures the container after first paint
   setTimeout(initCurrentsMap, 0);
+  setTimeout(initLiveCurrentsMap, 0);
   loadForecast();
   loadAirQuality();
   loadClimateData();
