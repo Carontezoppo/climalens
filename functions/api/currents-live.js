@@ -54,12 +54,13 @@ export async function onRequestGet({ env }) {
     });
 
     const ct = upstream.headers.get('content-type') || '';
-    if (!upstream.ok || !ct.includes('json')) {
+    if (!upstream.ok) {
       const err = await upstream.text();
-      return json(
-        { error: `ERDDAP ${upstream.status}: ${err.slice(0, 300)}` },
-        502,
-      );
+      return json({ error: `ERDDAP HTTP ${upstream.status} (ct: ${ct}): ${err.slice(0, 300)}` }, 502);
+    }
+    if (!ct.includes('json')) {
+      const err = await upstream.text();
+      return json({ error: `ERDDAP unexpected content-type "${ct}": ${err.slice(0, 200)}` }, 502);
     }
 
     const raw  = await upstream.json();
