@@ -44,7 +44,10 @@ export async function onRequestGet({ env }) {
     const lonRange = `(${LON_MIN}.0):${GRID_STRIDE}:(${LON_MAX}.0)`;
     const sel      = `[(last):1:(last)][${latRange}][${lonRange}]`;
     const query    = `ugos${sel},vgos${sel}`;
-    const url      = `${ERDDAP_BASE}/${DATASET_ID}.json?${encodeURIComponent(query)}`;
+    // ERDDAP griddap syntax uses literal brackets — do NOT encodeURIComponent here.
+    // Encoding [, ], ( and : produces %5B%5D%3A which ERDDAP cannot parse and
+    // returns an HTML error page instead of JSON.
+    const url      = `${ERDDAP_BASE}/${DATASET_ID}.json?${query}`;
 
     const upstream = await fetch(url, {
       headers: { Accept: 'application/json' },
