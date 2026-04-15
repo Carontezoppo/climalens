@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment / secrets (for when we add the Worker)
+.env
+.env.local
+.dev.vars
+
+# Cloudflare
+.wrangler/
+node_modules/
