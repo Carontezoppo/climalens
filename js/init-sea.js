@@ -5,18 +5,27 @@ function init() {
   const navHamburger = document.getElementById('navHamburger');
   const pageTabsNav  = document.getElementById('pageTabsNav');
   if (navHamburger && pageTabsNav) {
-    navHamburger.addEventListener('click', () => {
-      const isOpen = pageTabsNav.classList.toggle('open');
-      document.getElementById('navHamburgerIcon').textContent = isOpen ? '✕' : '☰';
-      navHamburger.setAttribute('aria-expanded', String(isOpen));
-    });
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 768) {
-        pageTabsNav.classList.remove('open');
-        document.getElementById('navHamburgerIcon').textContent = '☰';
-        navHamburger.setAttribute('aria-expanded', 'false');
-      }
-    });
+    const navOverlay = document.createElement('div');
+    navOverlay.className = 'nav-overlay';
+    document.body.appendChild(navOverlay);
+
+    const openMenu = () => {
+      pageTabsNav.classList.add('open');
+      navOverlay.classList.add('open');
+      document.getElementById('navHamburgerIcon').textContent = '✕';
+      navHamburger.setAttribute('aria-expanded', 'true');
+    };
+    const closeMenu = () => {
+      pageTabsNav.classList.remove('open');
+      navOverlay.classList.remove('open');
+      document.getElementById('navHamburgerIcon').textContent = '☰';
+      navHamburger.setAttribute('aria-expanded', 'false');
+    };
+
+    navHamburger.addEventListener('click', () =>
+      pageTabsNav.classList.contains('open') ? closeMenu() : openMenu());
+    navOverlay.addEventListener('click', closeMenu);
+    window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
   }
 
   // ── Section nav — smooth scroll ──────────────────────────────────────────

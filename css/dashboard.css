@@ -202,11 +202,24 @@
   }
   .range-apply:hover { background: rgba(99,102,241,0.25); }
 
+  /* Mobile nav overlay */
+  .nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 100;
+  }
+  .nav-overlay.open { display: block; }
+
   /* PAGE TABS BAR */
   .page-tabs {
     display: flex;
     align-items: center;
     gap: 0;
+    position: relative;   /* anchor for absolute dropdown */
     border-bottom: 1px solid var(--border);
     margin-bottom: 16px;
   }
@@ -819,18 +832,17 @@
   /* ── Mobile: ≤ 768px ── */
   @media (max-width: 768px) {
     /* Layout */
-    .dashboard { padding: 16px 14px 48px; }
+    .dashboard { padding: 24px 14px 48px; }
 
     /* Header */
     .header { flex-direction: column; align-items: flex-start; gap: 16px; }
     .header-title { font-size: 40px; }
     .header-period { margin-bottom: 10px; }
 
-    /* Nav bar — hamburger collapse */
-    /* Row 1 (always visible): hamburger left, location picker right */
+    /* Nav bar — hamburger + always-visible location row */
     .nav-hamburger {
       display: flex; align-items: center; gap: 6px;
-      order: 1; /* anchored left in row 1 */
+      order: 1;
       font-family: 'DM Mono', monospace; font-size: 11px;
       letter-spacing: 1.5px; text-transform: uppercase;
       padding: 8px 2px 10px; border: none; background: none;
@@ -839,26 +851,34 @@
     }
     .nav-hamburger:hover { color: var(--text-primary); }
     .nav-location {
-      order: 2; /* anchored right in row 1 */
-      display: block; /* always visible */
-      margin-left: auto;
-      width: auto;
-      padding-bottom: 6px;
+      order: 2; display: block; margin-left: auto; width: auto; padding-bottom: 6px;
     }
-    /* Row 2 (collapsible): tab links */
-    .page-tabs { flex-wrap: wrap; }
-    .page-tabs-links {
-      display: none; flex-direction: column; width: 100%; order: 3;
-      padding: 6px 0 10px; border-top: 1px solid var(--border); margin-top: 2px;
+
+    /* Collapsible tab links — absolute panel below nav bar */
+    .page-tabs { z-index: 200; }
+    .page-tabs-links { display: none; }
+    .page-tabs.open .page-tabs-links {
+      display: flex; flex-direction: column;
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border); border-top: none;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+      padding: 8px 0 20px;
+      z-index: 200;
     }
-    .page-tabs.open .page-tabs-links { display: flex; }
     .page-tabs .page-tab {
+      font-size: 15px; font-family: 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: 0; font-weight: 500;
+      padding: 16px 24px; line-height: 1.4;
       border-bottom: none; margin-bottom: 0;
-      padding: 10px 12px; border-radius: 6px; width: 100%;
+      border-radius: 0; width: 100%; text-transform: none;
     }
+    .page-tabs .page-tab:hover { background: var(--bg-card-hover); }
     .page-tabs .page-tab.active {
-      border-bottom-color: transparent;
+      color: var(--accent);
       background: rgba(99,102,241,0.08);
+      border-bottom-color: transparent;
     }
 
     /* Range picker */
