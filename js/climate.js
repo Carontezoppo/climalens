@@ -18,8 +18,12 @@ async function fetchClimateData() {
   const res = await fetch(
     `/api/climate?lat=${currentLocation.lat}&lon=${currentLocation.lon}`
   );
-  const json = await res.json();
-  if (!res.ok || json.error) throw new Error(json.reason || 'HTTP ' + res.status);
+  const text = await res.text();
+  let json;
+  try { json = JSON.parse(text); } catch {
+    throw new Error(`HTTP ${res.status}: unexpected response from climate API`);
+  }
+  if (!res.ok || json.error) throw new Error(json.reason || json.error || 'HTTP ' + res.status);
 
   climateCache[cacheKey] = json;
   return json;

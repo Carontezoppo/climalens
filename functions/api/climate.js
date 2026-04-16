@@ -50,7 +50,11 @@ export async function onRequestGet({ request, env }) {
     const upstream = await fetch(`${UPSTREAM}?${params}`);
     const body     = await upstream.text();
 
-    if (!upstream.ok) return json(body, upstream.status, { 'X-Cache': 'MISS' });
+    if (!upstream.ok) {
+      let reason = `HTTP ${upstream.status}`;
+      try { reason = JSON.parse(body).reason || reason; } catch { /* non-JSON upstream error */ }
+      return json({ error: reason }, upstream.status, { 'X-Cache': 'MISS' });
+    }
 
     // ── KV cache write (fire-and-forget) ─────────────────────────────────────
     if (env.CLIMATE_CACHE) {

@@ -229,6 +229,11 @@
     color: var(--accent);
     background: rgba(99,102,241,0.08);
   }
+  .section-nav-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(99,102,241,0.12);
+  }
 
   /* KPI ROW */
   .kpi-row {

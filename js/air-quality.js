@@ -13,8 +13,12 @@ async function fetchAirQuality() {
     'timezone=auto',
   ].join('&');
   const res = await fetch(`/api/air-quality?lat=${currentLocation.lat}&lon=${currentLocation.lon}`);
-  const json = await res.json();
-  if (!res.ok || json.error) throw new Error(json.reason || 'HTTP ' + res.status);
+  const text = await res.text();
+  let json;
+  try { json = JSON.parse(text); } catch {
+    throw new Error(`HTTP ${res.status}: unexpected response from air quality API`);
+  }
+  if (!res.ok || json.error) throw new Error(json.reason || json.error || 'HTTP ' + res.status);
   return json;
 }
 

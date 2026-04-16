@@ -3,25 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MeteoScope — 6-Month ClimaLens</title>
+<title>MeteoScope — Weather &amp; Forecast</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
 <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
-
-<!-- DRILL-DOWN PANEL -->
-<div class="panel-overlay" id="panelOverlay"></div>
-<div class="drill-panel" id="drillPanel">
-  <div class="panel-top-bar">
-    <div class="panel-breadcrumb" id="panelBreadcrumb"></div>
-    <button class="panel-close" id="panelClose">&#x2715;</button>
-  </div>
-  <div class="panel-body" id="panelBody"></div>
-</div>
 
 <div class="dashboard">
   <header class="header">
@@ -45,31 +31,16 @@
           </div>
         </div>
       </div>
-      <div class="header-period" id="headerPeriod"></div>
-      <div class="range-picker">
-        <div class="range-presets">
-          <button class="preset-btn" data-months="3">3 mo</button>
-          <button class="preset-btn active" data-months="6">6 mo</button>
-          <button class="preset-btn" data-months="12">12 mo</button>
-          <button class="preset-btn" data-months="24">24 mo</button>
-        </div>
-        <div class="range-custom">
-          <label>From</label>
-          <input type="month" id="rangeFrom">
-          <label>To</label>
-          <input type="month" id="rangeTo">
-          <button class="range-apply" id="rangeApply">Apply</button>
-        </div>
-      </div>
     </div>
   </header>
 
   <nav class="section-nav">
+    <a class="section-nav-btn active" href="index.html">Weather &amp; Forecast</a>
+    <a class="section-nav-btn" href="history.html">Historical Climate</a>
+    <a class="section-nav-btn" href="sea.html">Sea Data</a>
     <a class="section-nav-btn" href="#section-forecast"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> 7-Day Forecast</a>
-    <a class="section-nav-btn" href="#section-historical"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Historical Data</a>
-    <a class="section-nav-btn" href="#section-climate"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Climate Trends (1970-Today)</a>
-    <a class="section-nav-btn" href="#section-sst"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Sea Temperature</a>
-    <a class="section-nav-btn" href="#section-currents-live"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Ocean Currents</a>
+    <a class="section-nav-btn" href="#section-map"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Weather Map</a>
+    <a class="section-nav-btn" href="#section-aq"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Air Quality</a>
   </nav>
 
   <div class="forecast-section" id="section-forecast">
@@ -77,7 +48,7 @@
     <div id="forecastContent" style="font-size:12px;padding:20px 0">Loading forecast&hellip;</div>
   </div>
 
-  <div class="map-section">
+  <div class="map-section" id="section-map">
     <div class="map-section-header">
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
         <div class="section-title" style="margin-bottom:0">Weather Map</div>
@@ -96,7 +67,7 @@
     </div>
   </div>
 
-  <div class="aq-section">
+  <div class="aq-section" id="section-aq">
     <div class="aq-section-header">
       <div class="section-title" style="margin-bottom:0">Air Quality</div>
       <button class="aq-toggle-btn" id="aqToggleBtn">Hide</button>
@@ -106,171 +77,16 @@
     </div>
   </div>
 
-  <div id="loadingMsg" style="text-align:center;padding:60px 0;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)">Loading weather data&hellip;</div>
-
-  <div class="forecast-section" id="section-historical">
-    <div class="section-title">Historical Data</div>
-  </div>
-
-  <div class="kpi-row" id="kpiRow"></div>
-
-  <div class="section-title">Trends &amp; Patterns</div>
-  <div class="chart-grid">
-    <div class="chart-card full-width">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title">Temperature Range</div>
-          <div class="chart-subtitle">Monthly high &amp; low averages (°C)</div>
-        </div>
-        <div class="chart-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--temp-high)"></div>Avg High</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--temp-low)"></div>Avg Low</div>
-        </div>
-      </div>
-      <div class="chart-container"><canvas id="tempChart"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-header"><div><div class="chart-title">Precipitation</div><div class="chart-subtitle">Rainfall in mm per month</div></div></div>
-      <div class="chart-container"><canvas id="rainChart"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-header"><div><div class="chart-title">Sunshine Hours</div><div class="chart-subtitle">Total hours of sunlight per month</div></div></div>
-      <div class="chart-container"><canvas id="sunChart"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-header">
-        <div><div class="chart-title">Wind Speed</div><div class="chart-subtitle">Average &amp; peak gusts (km/h)</div></div>
-        <div class="chart-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--wind)"></div>Avg</div>
-          <div class="legend-item"><div class="legend-dot" style="background:rgba(126,232,168,0.35)"></div>Gusts</div>
-        </div>
-      </div>
-      <div class="chart-container"><canvas id="windChart"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-header"><div><div class="chart-title">Atmospheric Pressure</div><div class="chart-subtitle">Mean sea-level pressure (hPa)</div></div></div>
-      <div class="chart-container"><canvas id="pressureChart"></canvas></div>
-    </div>
-  </div>
-
-  <div class="section-title">Monthly Breakdown</div>
-  <div class="table-card"><table id="detailTable"></table></div>
-
-  <div class="section-title" id="section-climate" style="margin-top:8px;">
-    Climate Trends
-    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">1970 – present · ERA5 / C3S</span>
-  </div>
-  <div class="climate-section">
-    <div id="climatePrompt" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:40px;text-align:center;margin-bottom:0;">
-      <div id="climateLoading" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);">Loading ERA5 data&hellip; this may take a moment</div>
-    </div>
-    <div id="climateContent" style="display:none;">
-      <div class="climate-stats-row" id="climateStatsRow"></div>
-      <div class="chart-card full-width">
-        <div class="chart-header">
-          <div>
-            <div class="chart-title">Annual Temperature Anomaly</div>
-            <div class="chart-subtitle" id="climateChartSub">Deviation from 1981–2010 WMO baseline · ERA5 reanalysis · Copernicus C3S</div>
-          </div>
-          <div class="chart-legend">
-            <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Warmer</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#38bdf8"></div>Cooler</div>
-            <div class="legend-item"><div style="width:20px;height:2.5px;background:#fb923c;border-radius:1px;margin-right:6px;"></div>Trend</div>
-          </div>
-        </div>
-        <div class="chart-container" style="height:320px;"><canvas id="climateChart"></canvas></div>
-        <canvas class="climate-stripes" id="climateStripes"></canvas>
-        <div class="climate-note" id="climateNote"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section-title" id="section-sst" style="margin-top:8px;">
-    Sea Surface Temperature
-    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Global · 2003 – present · GHRSST</span>
-  </div>
-    <div class="chart-subtitle" style="margin-bottom: 12px;"><b>Note:</b>Where the ocean surface is frozen the areas are shown in grey. </div>
-  <div class="sst-section">
-    <div class="sst-map-card">
-      <div class="sst-map-wrap" id="sstMap"></div>
-    </div>
-    <div class="sst-controls-card">
-      <div class="sst-top-row">
-        <div class="sst-date-display" id="sstDateDisplay">—</div>
-        <button class="sst-play-btn" id="sstPlayBtn">&#9654; Play</button>
-      </div>
-      <input type="range" class="sst-slider" id="sstSlider" min="0" max="0" value="0">
-      <div class="sst-tick-row" id="sstTickRow"></div>
-      <div class="sst-legend">
-        <span class="sst-legend-label">−2°C</span>
-        <div class="sst-legend-bar"></div>
-        <span class="sst-legend-label">35°C</span>
-      </div>
-      <div class="sst-source">Map tiles · NASA GIBS / GHRSST MUR L4 · PODAAC/JPL &nbsp;·&nbsp; Point values · Open-Meteo Marine API / ERA5</div>
-    </div>
-  </div>
-
-  <div class="section-title" id="section-currents-live" style="margin-top:8px;">
-    Ocean Currents
-    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Live · Geostrophic Surface Velocity</span>
-  </div>
-  <div class="live-currents-section">
-    <div class="live-currents-map-card">
-      <div class="live-currents-map-wrap" id="liveCurrentsMap">
-        <div id="liveCurrentsStatus" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);text-align:center;z-index:500;pointer-events:none;">Loading current data…</div>
-      </div>
-    </div>
-    <div class="live-currents-legend-card">
-      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;">
-        <div>
-          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Particle Speed</div>
-          <div style="display:flex;align-items:center;gap:8px;min-width:200px;">
-            <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">Slow</span>
-            <div style="flex:1;height:6px;border-radius:3px;background:linear-gradient(to right,rgba(80,100,120,0.5),rgba(40,200,220,1),rgba(255,255,255,1));"></div>
-            <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">Fast</span>
-          </div>
-        </div>
-        <div style="display:flex;gap:28px;flex-wrap:wrap;">
-          <div>
-            <div class="currents-legend-title" style="color:#fb923c;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">▲ Warm Currents</div>
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:var(--text-secondary);line-height:1.9;">
-              Gulf Stream / N. Atlantic Drift<br>Kuroshio &amp; N. Pacific Current<br>
-              East Australian Current<br>Agulhas Current<br>Brazil Current<br>
-              N. &amp; S. Equatorial Currents
-            </div>
-          </div>
-          <div>
-            <div class="currents-legend-title" style="color:#38bdf8;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">▽ Cold Currents</div>
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:var(--text-secondary);line-height:1.9;">
-              Labrador Current<br>Canary Current<br>California Current<br>
-              Benguela Current<br>Humboldt (Peru) Current<br>
-              Oyashio Current<br>Antarctic Circumpolar Current
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="currents-source" style="margin-top:14px;">Hover over any ocean region to identify the current · Particle colour = speed · NOAA CoastWatch · SSH-derived geostrophic surface velocity · ~3-day lag · Schematic current paths: NOAA, GEBCO, Tomczak &amp; Godfrey (2003)</div>
-    </div>
-  </div>
-
   <footer class="footer">
-    <p>MeteoScope Dashboard · ERA5 / CAMS data via Open-Meteo &amp; Copernicus C3S</p>
+    <p>MeteoScope Dashboard · Forecast data via Open-Meteo · Air quality via CAMS / Copernicus</p>
   </footer>
 </div>
 
-
 <script src="js/config.js"></script>
 <script src="js/state.js"></script>
-<script src="js/weather-data.js"></script>
-<script src="js/dashboard.js"></script>
-<script src="js/panels.js"></script>
 <script src="js/weather-map.js"></script>
 <script src="js/forecast.js"></script>
 <script src="js/air-quality.js"></script>
-<script src="js/climate.js"></script>
-<script src="js/range.js"></script>
-<script src="js/sst.js"></script>
-<script src="js/currents-live.js"></script>
-<script src="js/init.js"></script>
+<script src="js/init-weather.js"></script>
 </body>
 </html>

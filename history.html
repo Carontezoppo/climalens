@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeteoScope — Historical Climate</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+<!-- DRILL-DOWN PANEL -->
+<div class="panel-overlay" id="panelOverlay"></div>
+<div class="drill-panel" id="drillPanel">
+  <div class="panel-top-bar">
+    <div class="panel-breadcrumb" id="panelBreadcrumb"></div>
+    <button class="panel-close" id="panelClose">&#x2715;</button>
+  </div>
+  <div class="panel-body" id="panelBody"></div>
+</div>
+
+<div class="dashboard">
+  <header class="header">
+    <div class="header-left">
+      <div class="header-label">MeteoScope Dashboard</div>
+      <h1 class="header-title">Clima<span>Lens</span></h1>
+      <p class="header-subtitle">Weather and climate trends from 1970 to today</p>
+      <div class="link" style="margin: 16px 0;"><a href="../index.html"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">←</span> Back to AM Website</a></div>
+    </div>
+    <div class="header-right">
+      <div class="location-select-wrapper">
+        <button class="location-select" id="locationSelectBtn" type="button">
+          <span id="locationSelectLabel"></span>
+        </button>
+        <div class="location-dropdown" id="locationDropdown">
+          <div class="location-search-wrap">
+            <input class="location-search" id="locationSearch" type="text" placeholder="Search city…" autocomplete="off">
+          </div>
+          <div class="location-list" id="locationList">
+            <div class="location-no-results" id="locationNoResults">No results</div>
+          </div>
+        </div>
+      </div>
+      <div class="header-period" id="headerPeriod"></div>
+      <div class="range-picker">
+        <div class="range-presets">
+          <button class="preset-btn" data-months="3">3 mo</button>
+          <button class="preset-btn active" data-months="6">6 mo</button>
+          <button class="preset-btn" data-months="12">12 mo</button>
+          <button class="preset-btn" data-months="24">24 mo</button>
+        </div>
+        <div class="range-custom">
+          <label>From</label>
+          <input type="month" id="rangeFrom">
+          <label>To</label>
+          <input type="month" id="rangeTo">
+          <button class="range-apply" id="rangeApply">Apply</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="section-nav">
+    <a class="section-nav-btn" href="index.html">Weather &amp; Forecast</a>
+    <a class="section-nav-btn active" href="history.html">Historical Climate</a>
+    <a class="section-nav-btn" href="sea.html">Sea Data</a>
+    <a class="section-nav-btn" href="#section-climate"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Climate Trends (1970-Today)</a>
+    <a class="section-nav-btn" href="#section-historical"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Historical Data</a>
+  </nav>
+
+  <div class="section-title" id="section-climate" style="margin-top:8px;">
+    Climate Trends
+    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">1970 – present · ERA5 / C3S</span>
+  </div>
+  <div class="climate-section">
+    <div id="climatePrompt" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:40px;text-align:center;margin-bottom:0;">
+      <div id="climateLoading" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);">Loading ERA5 data&hellip; this may take a moment</div>
+    </div>
+    <div id="climateContent" style="display:none;">
+      <div class="climate-stats-row" id="climateStatsRow"></div>
+      <div class="chart-card full-width">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Annual Temperature Anomaly</div>
+            <div class="chart-subtitle" id="climateChartSub">Deviation from 1981–2010 WMO baseline · ERA5 reanalysis · Copernicus C3S</div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Warmer</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#38bdf8"></div>Cooler</div>
+            <div class="legend-item"><div style="width:20px;height:2.5px;background:#fb923c;border-radius:1px;margin-right:6px;"></div>Trend</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height:320px;"><canvas id="climateChart"></canvas></div>
+        <canvas class="climate-stripes" id="climateStripes"></canvas>
+        <div class="climate-note" id="climateNote"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loadingMsg" style="text-align:center;padding:60px 0;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)">Loading weather data&hellip;</div>
+
+  <div class="forecast-section" id="section-historical">
+    <div class="section-title">Historical Data</div>
+  </div>
+
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <div class="section-title">Trends &amp; Patterns</div>
+  <div class="chart-grid">
+    <div class="chart-card full-width">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Temperature Range</div>
+          <div class="chart-subtitle">Monthly high &amp; low averages (°C)</div>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--temp-high)"></div>Avg High</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--temp-low)"></div>Avg Low</div>
+        </div>
+      </div>
+      <div class="chart-container"><canvas id="tempChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header"><div><div class="chart-title">Precipitation</div><div class="chart-subtitle">Rainfall in mm per month</div></div></div>
+      <div class="chart-container"><canvas id="rainChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header"><div><div class="chart-title">Sunshine Hours</div><div class="chart-subtitle">Total hours of sunlight per month</div></div></div>
+      <div class="chart-container"><canvas id="sunChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Wind Speed</div><div class="chart-subtitle">Average &amp; peak gusts (km/h)</div></div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--wind)"></div>Avg</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(126,232,168,0.35)"></div>Gusts</div>
+        </div>
+      </div>
+      <div class="chart-container"><canvas id="windChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header"><div><div class="chart-title">Atmospheric Pressure</div><div class="chart-subtitle">Mean sea-level pressure (hPa)</div></div></div>
+      <div class="chart-container"><canvas id="pressureChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="section-title">Monthly Breakdown</div>
+  <div class="table-card"><table id="detailTable"></table></div>
+
+  <footer class="footer">
+    <p>MeteoScope Dashboard · ERA5 / CAMS data via Open-Meteo &amp; Copernicus C3S</p>
+  </footer>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/state.js"></script>
+<script src="js/weather-data.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/panels.js"></script>
+<script src="js/climate.js"></script>
+<script src="js/range.js"></script>
+<script src="js/init-history.js"></script>
+</body>
+</html>
