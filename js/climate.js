@@ -235,7 +235,9 @@ async function loadClimateData() {
   }
   try {
     const json = await fetchClimateData();
-    const data = processClimateData(json);
+    // _v:2 = Worker pre-computed the stats; render directly.
+    // Older raw responses (daily.time array) go through processClimateData as fallback.
+    const data = json._v === 2 ? json : processClimateData(json);
     renderClimateData(data);
   } catch (err) {
     if (climateLoaded) {

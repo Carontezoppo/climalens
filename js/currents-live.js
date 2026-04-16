@@ -96,6 +96,7 @@ let animFrameId        = null;
 let velocityGrid       = null;  // { width, height, latMin, latMax, lonMin, lonMax, u, v }
 let particles          = [];
 let liveCurrentsActive = false;
+let highlightLayer     = null;  // currently highlighted current polyline group
 
 /* ── Static velocity grid from named current paths ─────────────────────────── */
 // Builds a velocity field from OCEAN_CURRENTS using Gaussian diffusion.
@@ -279,32 +280,38 @@ function initParticles() {
   particles = Array.from({ length: PARTICLE_COUNT }, randomParticle);
 }
 
+/* ── Colour mode ────────────────────────────────────────────────────────────── */
+// 'temperature' — warm currents orange, cold currents blue
+// 'speed'       — single teal→cyan→white ramp; hue encodes speed only
+let colorMode = 'temperature';
+
 /* ── Speed + warmth → colour ────────────────────────────────────────────────── */
-// warmth: -1 = cold (blue), 0 = neutral (teal), +1 = warm (orange)
-// t (0-1) controls brightness within each hue band.
 function speedColor(speed, warmth) {
   const t = Math.min(1, speed / 1.2);
-  const a = 0.3 + t * 0.7; // opacity: dim when slow, bright when fast
+  const a = 0.3 + t * 0.7;
 
+  if (colorMode === 'speed') {
+    // Dark teal → cyan → white: matches the legend bar gradient
+    const r = Math.round(40  + t * 215);
+    const g = Math.round(130 + t * 125);
+    const b = Math.round(160 + t * 95);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  // Temperature mode
   if (warmth > 0.25) {
-    // Warm current: muted amber → bright orange (#fb923c family)
-    const r = Math.round(160 + t * 91);   // 160 → 251
-    const g = Math.round(80  + t * 66);   // 80  → 146
-    const b = Math.round(20  + t * 40);   // 20  → 60
+    const r = Math.round(160 + t * 91);
+    const g = Math.round(80  + t * 66);
+    const b = Math.round(20  + t * 40);
     return `rgba(${r},${g},${b},${a})`;
   }
   if (warmth < -0.25) {
-    // Cold current: muted steel → bright cyan (#38bdf8 family)
-    const r = Math.round(30  + t * 26);   // 30  → 56
-    const g = Math.round(100 + t * 89);   // 100 → 189
-    const b = Math.round(160 + t * 88);   // 160 → 248
+    const r = Math.round(30  + t * 26);
+    const g = Math.round(100 + t * 89);
+    const b = Math.round(160 + t * 88);
     return `rgba(${r},${g},${b},${a})`;
   }
-  // Neutral / no-data: existing teal-cyan ramp
-  if (t < 0.3) {
-    const v = Math.round(80 + t / 0.3 * 60);
-    return `rgba(${v},${v + 20},${v + 40},${0.3 + t * 0.4})`;
-  }
+  // Neutral teal
   const r = Math.round(40  + t * 215);
   const g = Math.round(160 + t * 95);
   const b = Math.round(200 + t * 55);
@@ -495,6 +502,16 @@ async function initLiveCurrentsMap() {
 
   animateCurrents();
 
+  // ── Build clickable current list in the legend card ──────────────────────
+  buildCurrentsList();
+
+  // Click anywhere on the map to deselect the highlighted current
+  liveCurrentsMap.on('click', () => {
+    document.querySelectorAll('.current-list-item.active')
+      .forEach(el => el.classList.remove('active'));
+    clearHighlight();
+  });
+
   // ── Background: try to upgrade to live ERDDAP data ────────────────────────
   // NOAA PFEG blocks Cloudflare IPs so the Worker proxy is unreliable.
   // CORS is not enabled on coastwatch.pfeg.noaa.gov so direct browser
@@ -533,10 +550,106 @@ async function initLiveCurrentsMap() {
     }
 
     if (data) {
-      // Silently upgrade to live data — animation keeps running uninterrupted
-      velocityGrid = data.table ? buildGrid(data) : data;
+      // Silently upgrade to live data — animation keeps running uninterrupted.
+      // Preserve warmth from the static grid: buildGrid() only has u/v from
+      // ERDDAP, so without this the warm/cold colour coding would vanish.
+      const liveGrid = data.table ? buildGrid(data) : data;
+      if (!liveGrid.warmth && velocityGrid?.warmth) {
+        liveGrid.warmth = velocityGrid.warmth;
+      }
+      velocityGrid = liveGrid;
     }
   })();
+}
+
+/* ── Clickable current list ─────────────────────────────────────────────────
+ * Generates the warm/cold list dynamically from OCEAN_CURRENTS.
+ * Dateline-split entries (name ending in " (W)" / " (E)") are merged into
+ * a single list item that highlights both path segments simultaneously.
+ */
+function buildCurrentsList() {
+  const wrap = document.getElementById('currentsListWrap');
+  if (!wrap) return;
+
+  const canonical = n => n.replace(/ \([WE]\)$/, '');
+  const groupMap  = new Map();
+  OCEAN_CURRENTS.forEach((c, i) => {
+    const key = canonical(c.name) + '|' + c.type;
+    if (!groupMap.has(key)) groupMap.set(key, { name: canonical(c.name), type: c.type, indices: [] });
+    groupMap.get(key).indices.push(i);
+  });
+
+  const warm = [], cold = [];
+  groupMap.forEach(g => (g.type === 'warm' ? warm : cold).push(g));
+
+  const makeSection = (label, color, items) => {
+    const sec = document.createElement('div');
+    sec.className = 'currents-list-section';
+    const hdr = document.createElement('div');
+    hdr.className = 'currents-list-header';
+    hdr.style.color = color;
+    hdr.textContent = label;
+    sec.appendChild(hdr);
+    items.forEach(g => {
+      const item = document.createElement('div');
+      item.className = 'current-list-item';
+      item.innerHTML =
+        `<span class="current-list-dot" style="background:${color}"></span>` +
+        `<span>${g.name}</span>`;
+      item.addEventListener('click', () => {
+        if (item.classList.contains('active')) {
+          item.classList.remove('active');
+          clearHighlight();
+        } else {
+          document.querySelectorAll('.current-list-item.active')
+            .forEach(el => el.classList.remove('active'));
+          item.classList.add('active');
+          highlightCurrent(g.indices.map(i => OCEAN_CURRENTS[i]), color);
+        }
+      });
+      sec.appendChild(item);
+    });
+    return sec;
+  };
+
+  const listEl = document.createElement('div');
+  listEl.id = 'currentsList';
+  listEl.appendChild(makeSection('▲ Warm Currents', '#fb923c', warm));
+  listEl.appendChild(makeSection('▽ Cold Currents', '#38bdf8', cold));
+  wrap.appendChild(listEl);
+}
+
+function highlightCurrent(currents, color) {
+  clearHighlight();
+  if (!liveCurrentsMap) return;
+
+  const group    = L.layerGroup();
+  const allCoords = [];
+
+  currents.forEach(c => {
+    const ll = c.coords.map(([lng, lat]) => [lat, lng]);
+    allCoords.push(...ll);
+    // Glow halo
+    L.polyline(ll, { color, weight: 10, opacity: 0.15, lineCap: 'round', lineJoin: 'round' })
+      .addTo(group);
+    // Main dashed line
+    L.polyline(ll, { color, weight: 2.5, opacity: 0.95, dashArray: '7 5', lineCap: 'round', lineJoin: 'round' })
+      .addTo(group);
+  });
+
+  group.addTo(liveCurrentsMap);
+  highlightLayer = group;
+
+  try {
+    liveCurrentsMap.fitBounds(L.latLngBounds(allCoords), { padding: [48, 48], maxZoom: 4, animate: true });
+  } catch (_) {}
+}
+
+function clearHighlight() {
+  if (highlightLayer && liveCurrentsMap) {
+    liveCurrentsMap.removeLayer(highlightLayer);
+    highlightLayer = null;
+  }
 }
 
 function stopLiveCurrents() {

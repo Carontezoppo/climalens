@@ -18,7 +18,15 @@
       <p class="header-subtitle">Weather and climate trends from 1970 to today</p>
       <div class="link" style="margin: 16px 0;"><a href="../index.html"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">←</span> Back to AM Website</a></div>
     </div>
-    <div class="header-right">
+  </header>
+
+  <nav class="page-tabs" id="pageTabsNav">
+    <div class="page-tabs-links">
+      <a class="page-tab active" href="index.html">Weather &amp; Forecast</a>
+      <a class="page-tab" href="history.html">Historical Climate</a>
+      <a class="page-tab" href="sea.html">Sea Data</a>
+    </div>
+    <div class="nav-location">
       <div class="location-select-wrapper">
         <button class="location-select" id="locationSelectBtn" type="button">
           <span id="locationSelectLabel"></span>
@@ -33,12 +41,9 @@
         </div>
       </div>
     </div>
-  </header>
-
-  <nav class="page-tabs">
-    <a class="page-tab active" href="index.html">Weather &amp; Forecast</a>
-    <a class="page-tab" href="history.html">Historical Climate</a>
-    <a class="page-tab" href="sea.html">Sea Data</a>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
+      <span id="navHamburgerIcon">☰</span><span>Menu</span>
+    </button>
   </nav>
   <nav class="section-nav">
     <a class="section-nav-btn" href="#section-forecast"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> 7-Day Forecast</a>

@@ -117,6 +117,24 @@ function init() {
     loadRange(fy, fm, ty, tm);
   });
 
+  // ── Mobile nav hamburger ──────────────────────────────────────────────────
+  const navHamburger = document.getElementById('navHamburger');
+  const pageTabsNav  = document.getElementById('pageTabsNav');
+  if (navHamburger && pageTabsNav) {
+    navHamburger.addEventListener('click', () => {
+      const isOpen = pageTabsNav.classList.toggle('open');
+      document.getElementById('navHamburgerIcon').textContent = isOpen ? '✕' : '☰';
+      navHamburger.setAttribute('aria-expanded', String(isOpen));
+    });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        pageTabsNav.classList.remove('open');
+        document.getElementById('navHamburgerIcon').textContent = '☰';
+        navHamburger.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
   // ── Section nav — smooth scroll ──────────────────────────────────────────
   document.querySelectorAll('.section-nav-btn[href^="#"]').forEach(btn => {
     btn.addEventListener('click', e => {

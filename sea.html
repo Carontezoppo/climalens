@@ -20,27 +20,17 @@
       <p class="header-subtitle">Sea surface temperature and ocean currents</p>
       <div class="link" style="margin: 16px 0;"><a href="../index.html"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">←</span> Back to AM Website</a></div>
     </div>
-    <div class="header-right">
-      <div class="location-select-wrapper">
-        <button class="location-select" id="locationSelectBtn" type="button">
-          <span id="locationSelectLabel"></span>
-        </button>
-        <div class="location-dropdown" id="locationDropdown">
-          <div class="location-search-wrap">
-            <input class="location-search" id="locationSearch" type="text" placeholder="Search city…" autocomplete="off">
-          </div>
-          <div class="location-list" id="locationList">
-            <div class="location-no-results" id="locationNoResults">No results</div>
-          </div>
-        </div>
-      </div>
-    </div>
   </header>
 
-  <nav class="page-tabs">
-    <a class="page-tab" href="index.html">Weather &amp; Forecast</a>
-    <a class="page-tab" href="history.html">Historical Climate</a>
-    <a class="page-tab active" href="sea.html">Sea Data</a>
+  <nav class="page-tabs" id="pageTabsNav">
+    <div class="page-tabs-links">
+      <a class="page-tab" href="index.html">Weather &amp; Forecast</a>
+      <a class="page-tab" href="history.html">Historical Climate</a>
+      <a class="page-tab active" href="sea.html">Sea Data</a>
+    </div>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
+      <span id="navHamburgerIcon">☰</span><span>Menu</span>
+    </button>
   </nav>
   <nav class="section-nav">
     <a class="section-nav-btn" href="#section-sst"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Sea Temperature</a>
@@ -76,6 +66,7 @@
     Ocean Currents
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Live · Geostrophic Surface Velocity</span>
   </div>
+  <div class="chart-subtitle" style="margin-bottom: 12px;">Hover over any ocean region to identify the current.</div>
   <div class="live-currents-section">
     <div class="live-currents-map-card">
       <div class="live-currents-map-wrap" id="liveCurrentsMap">
@@ -83,35 +74,30 @@
       </div>
     </div>
     <div class="live-currents-legend-card">
-      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;">
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;">
         <div>
-          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Particle Speed</div>
-          <div style="display:flex;align-items:center;gap:8px;min-width:200px;">
+          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Colour by</div>
+          <div class="currents-mode-bar" id="currentsModeBar">
+            <button class="currents-mode-btn active" data-mode="temperature">&#127777; Temperature</button>
+            <button class="currents-mode-btn" data-mode="speed">&#9654; Speed</button>
+          </div>
+        </div>
+        <div id="currentsSpeedLegend" style="display:none;padding-bottom:2px;">
+          <div style="display:flex;align-items:center;gap:8px;min-width:180px;">
             <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">Slow</span>
-            <div style="flex:1;height:6px;border-radius:3px;background:linear-gradient(to right,rgba(80,100,120,0.5),rgba(40,200,220,1),rgba(255,255,255,1));"></div>
+            <div style="flex:1;height:6px;border-radius:3px;background:linear-gradient(to right,rgba(40,130,160,0.5),rgba(40,200,220,1),rgba(255,255,255,1));"></div>
             <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-muted);">Fast</span>
           </div>
         </div>
-        <div style="display:flex;gap:28px;flex-wrap:wrap;">
-          <div>
-            <div class="currents-legend-title" style="color:#fb923c;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">▲ Warm Currents</div>
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:var(--text-secondary);line-height:1.9;">
-              Gulf Stream / N. Atlantic Drift<br>Kuroshio &amp; N. Pacific Current<br>
-              East Australian Current<br>Agulhas Current<br>Brazil Current<br>
-              N. &amp; S. Equatorial Currents
-            </div>
-          </div>
-          <div>
-            <div class="currents-legend-title" style="color:#38bdf8;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">▽ Cold Currents</div>
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:var(--text-secondary);line-height:1.9;">
-              Labrador Current<br>Canary Current<br>California Current<br>
-              Benguela Current<br>Humboldt (Peru) Current<br>
-              Oyashio Current<br>Antarctic Circumpolar Current
-            </div>
+        <div id="currentsTempLegend" style="padding-bottom:2px;">
+          <div style="display:flex;gap:14px;align-items:center;">
+            <span style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:10px;color:#fb923c;"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#fb923c;"></span> Warm</span>
+            <span style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:10px;color:#38bdf8;"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:#38bdf8;"></span> Cold</span>
           </div>
         </div>
       </div>
-      <div class="currents-source" style="margin-top:14px;">Hover over any ocean region to identify the current · Particle colour = speed · NOAA CoastWatch · SSH-derived geostrophic surface velocity · ~3-day lag · Schematic current paths: NOAA, GEBCO, Tomczak &amp; Godfrey (2003)</div>
+      <div id="currentsListWrap"></div>
+      <div class="currents-source" style="margin-top:14px;">Particle colour = speed · CMEMS Copernicus Marine · SSH-derived geostrophic surface velocity · ~1-day lag · Paths: NOAA, GEBCO, Tomczak &amp; Godfrey (2003)</div>
     </div>
   </div>
 

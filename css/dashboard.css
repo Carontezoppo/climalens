@@ -60,9 +60,8 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    margin-bottom: 40px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+    padding-bottom: 0;
   }
   .header-label {
     font-family: 'DM Mono', monospace;
@@ -203,12 +202,18 @@
   }
   .range-apply:hover { background: rgba(99,102,241,0.25); }
 
-  /* PAGE TABS */
+  /* PAGE TABS BAR */
   .page-tabs {
     display: flex;
+    align-items: center;
     gap: 0;
     border-bottom: 1px solid var(--border);
     margin-bottom: 16px;
+  }
+  .page-tabs-links {
+    display: flex;
+    align-items: center;
+    flex: 1;
   }
   .page-tab {
     font-family: 'DM Mono', monospace;
@@ -228,6 +233,14 @@
     color: var(--accent);
     border-bottom-color: var(--accent);
   }
+  .nav-location {
+    margin-left: auto;
+    padding-bottom: 6px;
+    position: relative;
+  }
+  .nav-location .location-select-wrapper { margin-bottom: 0; }
+  .nav-location .location-dropdown { right: 0; left: auto; min-width: 300px; }
+  .nav-hamburger { display: none; }
 
   /* SECTION NAV (in-page jump pills) */
   .section-nav {
@@ -255,6 +268,35 @@
     color: var(--accent);
     background: rgba(99,102,241,0.08);
   }
+  /* CURRENTS COLOUR MODE TOGGLE */
+  .currents-mode-bar {
+    display: flex;
+    gap: 6px;
+  }
+  .currents-mode-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .currents-mode-btn:hover {
+    border-color: var(--border-accent);
+    color: var(--text-secondary);
+  }
+  .currents-mode-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(99,102,241,0.12);
+  }
+
   .section-nav-btn.active {
     border-color: var(--accent);
     color: var(--accent);
@@ -781,9 +823,43 @@
 
     /* Header */
     .header { flex-direction: column; align-items: flex-start; gap: 16px; }
-    .header-right { text-align: left; width: 100%; }
     .header-title { font-size: 40px; }
     .header-period { margin-bottom: 10px; }
+
+    /* Nav bar — hamburger collapse */
+    /* Row 1 (always visible): hamburger left, location picker right */
+    .nav-hamburger {
+      display: flex; align-items: center; gap: 6px;
+      order: 1; /* anchored left in row 1 */
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 8px 2px 10px; border: none; background: none;
+      color: var(--text-secondary); cursor: pointer; transition: color 0.15s;
+      white-space: nowrap;
+    }
+    .nav-hamburger:hover { color: var(--text-primary); }
+    .nav-location {
+      order: 2; /* anchored right in row 1 */
+      display: block; /* always visible */
+      margin-left: auto;
+      width: auto;
+      padding-bottom: 6px;
+    }
+    /* Row 2 (collapsible): tab links */
+    .page-tabs { flex-wrap: wrap; }
+    .page-tabs-links {
+      display: none; flex-direction: column; width: 100%; order: 3;
+      padding: 6px 0 10px; border-top: 1px solid var(--border); margin-top: 2px;
+    }
+    .page-tabs.open .page-tabs-links { display: flex; }
+    .page-tabs .page-tab {
+      border-bottom: none; margin-bottom: 0;
+      padding: 10px 12px; border-radius: 6px; width: 100%;
+    }
+    .page-tabs .page-tab.active {
+      border-bottom-color: transparent;
+      background: rgba(99,102,241,0.08);
+    }
 
     /* Range picker */
     .range-picker { align-items: flex-start; width: 100%; }
@@ -1049,6 +1125,32 @@
   background: var(--bg-card); border: 1px solid var(--border);
   border-radius: 12px; padding: 16px 24px;
 }
+/* ── Clickable current list ────────────────────────────────────────────────── */
+#currentsList {
+  display: flex;
+  gap: 4px 28px;
+  flex-wrap: wrap;
+}
+.currents-list-section { min-width: 155px; flex: 1; }
+.currents-list-header {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.current-list-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 3px 7px; border-radius: 5px; cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px; color: var(--text-secondary); line-height: 1.5;
+  transition: background 0.12s, color 0.12s;
+  user-select: none;
+}
+.current-list-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.current-list-item.active { background: rgba(255,255,255,0.08); color: var(--text); }
+.current-list-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+}
+
 .current-label-tooltip {
   background: rgba(10,13,20,0.92) !important;
   border: 1px solid rgba(255,255,255,0.12) !important;

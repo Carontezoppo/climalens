@@ -17,8 +17,11 @@ async function fetchWeatherData(startYr, startMo, endYr, endMo) {
     throw new Error(`HTTP ${res.status}: unexpected response from weather API`);
   }
   if (!res.ok || json.error) throw new Error(json.reason || json.error || 'HTTP ' + res.status);
-  if (!json.daily?.time) throw new Error('API response missing daily data');
-  if (!json.hourly?.time) throw new Error('API response missing hourly data');
+  // _v:3 = Worker pre-aggregated; no daily/hourly fields expected
+  if (json._v !== 3) {
+    if (!json.daily?.time) throw new Error('API response missing daily data');
+    if (!json.hourly?.time) throw new Error('API response missing hourly data');
+  }
   return json;
 }
 

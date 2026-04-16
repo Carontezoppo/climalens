@@ -17,7 +17,9 @@ async function loadRange(startYr, startMo, endYr, endMo) {
     const monthDefs = buildMonthDefs(startYr, startMo, endYr, endMo);
     applyMonthDefs(monthDefs);
     const json = await fetchWeatherData(startYr, startMo, endYr, endMo);
-    DATA = aggregateToMonthly(json, monthDefs);
+    // _v:3 = Worker pre-aggregated monthly stats; use directly.
+    // Older raw responses (daily.time array) go through aggregateToMonthly as fallback.
+    DATA = json._v === 3 ? json : aggregateToMonthly(json, monthDefs);
     renderDashboard();
   } catch (err) {
     const msg = document.getElementById('loadingMsg');
