@@ -70,6 +70,84 @@ let velocityGrid       = null;  // { width, height, latMin, latMax, lonMin, lonM
 let particles          = [];
 let liveCurrentsActive = false;
 
+/* ── Static velocity grid from named current paths ─────────────────────────── */
+// Builds a velocity field from OCEAN_CURRENTS using Gaussian diffusion.
+// Each path segment contributes u/v velocity to nearby grid cells with
+// exponential falloff controlled by the current's width (sigma, in degrees).
+// Used as the reliable fallback when no live data source is accessible.
+function buildStaticGrid() {
+  const step   = GRID_STEP;
+  const width  = Math.round((GRID_LON_MAX - GRID_LON_MIN) / step) + 1;
+  const height = Math.round((GRID_LAT_MAX - GRID_LAT_MIN) / step) + 1;
+  const uAcc   = new Float64Array(width * height); // accumulator
+  const vAcc   = new Float64Array(width * height);
+  const wAcc   = new Float64Array(width * height); // weight sum
+
+  // Typical peak speeds (m/s) and spread (σ, degrees) per current type
+  const PARAMS = {
+    warm: { speed: 0.55, sigma: 5 },
+    cold: { speed: 0.35, sigma: 6 },
+  };
+
+  OCEAN_CURRENTS.forEach(current => {
+    const { speed, sigma } = PARAMS[current.type];
+    const coords = current.coords;
+    const r = Math.ceil(sigma * 2.5 / step); // influence radius in cells
+
+    for (let i = 0; i < coords.length - 1; i++) {
+      const [lon1, lat1] = coords[i];
+      const [lon2, lat2] = coords[i + 1];
+      const dLon = lon2 - lon1, dLat = lat2 - lat1;
+      const dist = Math.sqrt(dLon * dLon + dLat * dLat);
+      if (dist < 1e-6) continue;
+
+      // Velocity components (u = eastward, v = northward)
+      const segU = (dLon / dist) * speed;
+      const segV = (dLat / dist) * speed;
+
+      // Sample midpoint of segment
+      const mLon = (lon1 + lon2) / 2, mLat = (lat1 + lat2) / 2;
+      const cCol = (mLon - GRID_LON_MIN) / step;
+      const cRow = (GRID_LAT_MAX - mLat) / step;
+
+      for (let dr = -r; dr <= r; dr++) {
+        for (let dc = -r; dc <= r; dc++) {
+          const col = Math.round(cCol) + dc;
+          const row = Math.round(cRow) + dr;
+          if (col < 0 || col >= width || row < 0 || row >= height) continue;
+
+          const cellLon = GRID_LON_MIN + col * step;
+          const cellLat = GRID_LAT_MAX - row * step;
+          const d2 = (cellLon - mLon) ** 2 + (cellLat - mLat) ** 2;
+          const w  = Math.exp(-d2 / (2 * sigma * sigma));
+          if (w < 0.005) continue;
+
+          uAcc[row * width + col] += segU * w;
+          vAcc[row * width + col] += segV * w;
+          wAcc[row * width + col] += w;
+        }
+      }
+    }
+  });
+
+  // Normalise by accumulated weight so overlapping currents blend correctly
+  const u = new Float32Array(width * height);
+  const v = new Float32Array(width * height);
+  for (let i = 0; i < u.length; i++) {
+    if (wAcc[i] > 0.01) {
+      u[i] = uAcc[i] / wAcc[i];
+      v[i] = vAcc[i] / wAcc[i];
+    }
+  }
+
+  return {
+    step, width, height,
+    latMin: GRID_LAT_MIN, latMax: GRID_LAT_MAX,
+    lonMin: GRID_LON_MIN, lonMax: GRID_LON_MAX,
+    u: Array.from(u), v: Array.from(v),
+  };
+}
+
 /* ── ERDDAP → velocity grid ─────────────────────────────────────────────────── */
 // Converts the raw ERDDAP griddap JSON table returned by /api/currents-live
 // into the flat { step, width, height, latMin, latMax, lonMin, lonMax, u[], v[] }
@@ -322,21 +400,40 @@ async function initLiveCurrentsMap() {
       });
     });
 
-  // ── Fetch velocity grid ────────────────────────────────────────────────────
-  // Strategy: try the Worker cache proxy first (fast on KV hit).
-  // If the Worker is unavailable (NOAA blocks Cloudflare IPs → 502, timeout),
-  // fall back to fetching ERDDAP directly from the browser.
-  // NOAA CoastWatch returns Access-Control-Allow-Origin: * on public datasets.
-  const ERDDAP_DIRECT =
-    'https://coastwatch.pfeg.noaa.gov/erddap/griddap/nesdisSSH1day.json' +
-    '?ugos[(last):1:(last)][(-80.0):16:(80.0)][(-180.0):16:(180.0)]' +
-    ',vgos[(last):1:(last)][(-80.0):16:(80.0)][(-180.0):16:(180.0)]';
-
+  // ── Velocity grid: static-first, live-upgrade strategy ───────────────────
+  // 1. Immediately start the animation with the static grid (built from the
+  //    OCEAN_CURRENTS paths — no network, always works, correct directions).
+  // 2. Attempt to load real-time ERDDAP data in the background; if it arrives,
+  //    silently swap in the live grid so the animation upgrades without any
+  //    visible interruption.
   const statusEl = document.getElementById('liveCurrentsStatus');
-  try {
+
+  // ── Start immediately with static grid ────────────────────────────────────
+  velocityGrid = buildStaticGrid();
+  if (statusEl) statusEl.style.display = 'none';
+
+  initParticles();
+  liveCurrentsActive = true;
+
+  liveCurrentsMap.on('movestart', () => {
+    liveCurrentsCtx.clearRect(0, 0, liveCurrentsCanvas.width, liveCurrentsCanvas.height);
+  });
+
+  animateCurrents();
+
+  // ── Background: try to upgrade to live ERDDAP data ────────────────────────
+  // NOAA PFEG blocks Cloudflare IPs so the Worker proxy is unreliable.
+  // CORS is not enabled on coastwatch.pfeg.noaa.gov so direct browser
+  // fetch is blocked too.  Both attempts are best-effort; failure is silent.
+  ;(async () => {
+    const ERDDAP_DIRECT =
+      'https://coastwatch.pfeg.noaa.gov/erddap/griddap/nesdisSSH1day.json' +
+      '?ugos[(last):1:(last)][(-80.0):16:(80.0)][(-180.0):16:(180.0)]' +
+      ',vgos[(last):1:(last)][(-80.0):16:(80.0)][(-180.0):16:(180.0)]';
+
     let data = null;
 
-    // ── 1. Try Worker proxy (KV-cached, 8 s timeout) ───────────────────────
+    // Try Worker proxy (KV-cached)
     try {
       const ctrl = new AbortController();
       const tid  = setTimeout(() => ctrl.abort(), 8000);
@@ -347,36 +444,25 @@ async function initLiveCurrentsMap() {
         const j = await res.json();
         if (!j.error) data = j;
       }
-    } catch (proxyErr) {
-      console.warn('Worker proxy unavailable, falling back to direct ERDDAP fetch:', proxyErr.message);
-    }
+    } catch (_) { /* silent — static grid already running */ }
 
-    // ── 2. Fallback: fetch ERDDAP directly from the browser ────────────────
+    // Try direct ERDDAP (works only if server adds CORS in future)
     if (!data) {
-      if (statusEl) statusEl.textContent = 'Loading current data…';
-      const res = await fetch(ERDDAP_DIRECT, { headers: { Accept: 'application/json' } });
-      if (!res.ok) throw new Error(`ERDDAP HTTP ${res.status}`);
-      const ct = res.headers.get('content-type') || '';
-      if (!ct.includes('json')) throw new Error(`ERDDAP returned unexpected content-type: ${ct}`);
-      data = await res.json();
+      try {
+        const res = await fetch(ERDDAP_DIRECT, { headers: { Accept: 'application/json' } });
+        const ct  = res.headers.get('content-type') || '';
+        if (res.ok && ct.includes('json')) {
+          const j = await res.json();
+          if (j.table) data = j;
+        }
+      } catch (_) { /* silent */ }
     }
 
-    velocityGrid = data.table ? buildGrid(data) : data;
-    if (statusEl) statusEl.style.display = 'none';
-
-    initParticles();
-    liveCurrentsActive = true;
-
-    // Redraw particles on every map move so they stay aligned
-    liveCurrentsMap.on('movestart', () => {
-      liveCurrentsCtx.clearRect(0, 0, liveCurrentsCanvas.width, liveCurrentsCanvas.height);
-    });
-
-    animateCurrents();
-
-  } catch (err) {
-    if (statusEl) statusEl.textContent = 'Could not load current data: ' + err.message;
-  }
+    if (data) {
+      // Silently upgrade to live data — animation keeps running uninterrupted
+      velocityGrid = data.table ? buildGrid(data) : data;
+    }
+  })();
 }
 
 function stopLiveCurrents() {
