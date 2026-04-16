@@ -79,9 +79,10 @@ function buildStaticGrid() {
   const step   = GRID_STEP;
   const width  = Math.round((GRID_LON_MAX - GRID_LON_MIN) / step) + 1;
   const height = Math.round((GRID_LAT_MAX - GRID_LAT_MIN) / step) + 1;
-  const uAcc   = new Float64Array(width * height); // accumulator
-  const vAcc   = new Float64Array(width * height);
-  const wAcc   = new Float64Array(width * height); // weight sum
+  const uAcc    = new Float64Array(width * height); // accumulator
+  const vAcc    = new Float64Array(width * height);
+  const wAcc    = new Float64Array(width * height); // weight sum
+  const typeAcc = new Float64Array(width * height); // +w warm, -w cold
 
   // Typical peak speeds (m/s) and spread (σ, degrees) per current type
   const PARAMS = {
@@ -122,21 +123,24 @@ function buildStaticGrid() {
           const w  = Math.exp(-d2 / (2 * sigma * sigma));
           if (w < 0.005) continue;
 
-          uAcc[row * width + col] += segU * w;
-          vAcc[row * width + col] += segV * w;
-          wAcc[row * width + col] += w;
+          uAcc[row * width + col]    += segU * w;
+          vAcc[row * width + col]    += segV * w;
+          wAcc[row * width + col]    += w;
+          typeAcc[row * width + col] += (current.type === 'warm' ? 1 : -1) * w;
         }
       }
     }
   });
 
   // Normalise by accumulated weight so overlapping currents blend correctly
-  const u = new Float32Array(width * height);
-  const v = new Float32Array(width * height);
+  const u       = new Float32Array(width * height);
+  const v       = new Float32Array(width * height);
+  const warmth  = new Float32Array(width * height); // -1 cold … +1 warm
   for (let i = 0; i < u.length; i++) {
     if (wAcc[i] > 0.01) {
-      u[i] = uAcc[i] / wAcc[i];
-      v[i] = vAcc[i] / wAcc[i];
+      u[i]      = uAcc[i]    / wAcc[i];
+      v[i]      = vAcc[i]    / wAcc[i];
+      warmth[i] = typeAcc[i] / wAcc[i];
     }
   }
 
@@ -144,7 +148,7 @@ function buildStaticGrid() {
     step, width, height,
     latMin: GRID_LAT_MIN, latMax: GRID_LAT_MAX,
     lonMin: GRID_LON_MIN, lonMax: GRID_LON_MAX,
-    u: Array.from(u), v: Array.from(v),
+    u: Array.from(u), v: Array.from(v), warmth: Array.from(warmth),
   };
 }
 
@@ -218,6 +222,13 @@ function getVelocity(lat, lon) {
   };
 }
 
+// -1 = cold current, 0 = neutral, +1 = warm current
+function getWarmth(lat, lon) {
+  if (!velocityGrid?.warmth) return 0;
+  const { x, y } = toGridXY(lat, lon, velocityGrid);
+  return bilinear(velocityGrid.warmth, velocityGrid.width, velocityGrid.height, x, y);
+}
+
 /* ── Particle management ────────────────────────────────────────────────────── */
 function randomParticle() {
   return {
@@ -231,21 +242,36 @@ function initParticles() {
   particles = Array.from({ length: PARTICLE_COUNT }, randomParticle);
 }
 
-/* ── Speed → colour ─────────────────────────────────────────────────────────── */
-// Slow currents: muted blue-grey → fast currents: bright teal/cyan
-function speedColor(speed) {
-  // speed in m/s, typical range 0–1.5 m/s
+/* ── Speed + warmth → colour ────────────────────────────────────────────────── */
+// warmth: -1 = cold (blue), 0 = neutral (teal), +1 = warm (orange)
+// t (0-1) controls brightness within each hue band.
+function speedColor(speed, warmth) {
   const t = Math.min(1, speed / 1.2);
-  if (t < 0.3) {
-    // slow: dim blue-grey
-    const v = Math.round(80 + t / 0.3 * 60);
-    return `rgba(${v}, ${v + 20}, ${v + 40}, ${0.3 + t * 0.4})`;
+  const a = 0.3 + t * 0.7; // opacity: dim when slow, bright when fast
+
+  if (warmth > 0.25) {
+    // Warm current: muted amber → bright orange (#fb923c family)
+    const r = Math.round(160 + t * 91);   // 160 → 251
+    const g = Math.round(80  + t * 66);   // 80  → 146
+    const b = Math.round(20  + t * 40);   // 20  → 60
+    return `rgba(${r},${g},${b},${a})`;
   }
-  // fast: bright teal→cyan→white
+  if (warmth < -0.25) {
+    // Cold current: muted steel → bright cyan (#38bdf8 family)
+    const r = Math.round(30  + t * 26);   // 30  → 56
+    const g = Math.round(100 + t * 89);   // 100 → 189
+    const b = Math.round(160 + t * 88);   // 160 → 248
+    return `rgba(${r},${g},${b},${a})`;
+  }
+  // Neutral / no-data: existing teal-cyan ramp
+  if (t < 0.3) {
+    const v = Math.round(80 + t / 0.3 * 60);
+    return `rgba(${v},${v + 20},${v + 40},${0.3 + t * 0.4})`;
+  }
   const r = Math.round(40  + t * 215);
   const g = Math.round(160 + t * 95);
   const b = Math.round(200 + t * 55);
-  return `rgba(${r}, ${g}, ${b}, ${0.5 + t * 0.5})`;
+  return `rgba(${r},${g},${b},${0.5 + t * 0.5})`;
 }
 
 /* ── Animation loop ─────────────────────────────────────────────────────────── */
@@ -270,7 +296,8 @@ function animateCurrents() {
     }
 
     const { u, v } = getVelocity(p.lat, p.lon);
-    const speed = Math.sqrt(u * u + v * v);
+    const speed   = Math.sqrt(u * u + v * v);
+    const warmth  = getWarmth(p.lat, p.lon);
     // Only skip truly zero cells (land/missing data). Slow ocean currents down to
     // ~3 mm/s are still real signal and should animate — raising this threshold
     // is what made the Mediterranean and other slow-current regions appear static.
@@ -307,7 +334,8 @@ function animateCurrents() {
     ctx.beginPath();
     ctx.moveTo(ptA.x, ptA.y);
     ctx.lineTo(ptB.x, ptB.y);
-    ctx.strokeStyle = speedColor(speed).replace('rgba(', `rgba(`).replace(/[\d.]+\)$/, `${alpha})`);
+    // speedColor already returns rgba(...); multiply its alpha by lifeFrac alpha
+    ctx.strokeStyle = speedColor(speed, warmth).replace(/[\d.]+\)$/, `${alpha})`);
     ctx.lineWidth   = PARTICLE_WIDTH;
     ctx.stroke();
   });
