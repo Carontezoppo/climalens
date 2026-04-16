@@ -203,7 +203,33 @@
   }
   .range-apply:hover { background: rgba(99,102,241,0.25); }
 
-  /* SECTION NAV */
+  /* PAGE TABS */
+  .page-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .page-tab {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .page-tab:hover { color: var(--text-secondary); }
+  .page-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* SECTION NAV (in-page jump pills) */
   .section-nav {
     display: flex;
     gap: 8px;
@@ -234,6 +260,17 @@
     color: var(--accent);
     background: rgba(99,102,241,0.12);
   }
+
+  /* INLINE SECTION CONTROLS (range picker in context) */
+  .section-controls {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .section-controls .range-picker { align-items: flex-end; }
 
   /* KPI ROW */
   .kpi-row {

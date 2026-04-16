@@ -42,29 +42,15 @@
           </div>
         </div>
       </div>
-      <div class="header-period" id="headerPeriod"></div>
-      <div class="range-picker">
-        <div class="range-presets">
-          <button class="preset-btn" data-months="3">3 mo</button>
-          <button class="preset-btn active" data-months="6">6 mo</button>
-          <button class="preset-btn" data-months="12">12 mo</button>
-          <button class="preset-btn" data-months="24">24 mo</button>
-        </div>
-        <div class="range-custom">
-          <label>From</label>
-          <input type="month" id="rangeFrom">
-          <label>To</label>
-          <input type="month" id="rangeTo">
-          <button class="range-apply" id="rangeApply">Apply</button>
-        </div>
-      </div>
     </div>
   </header>
 
+  <nav class="page-tabs">
+    <a class="page-tab" href="index.html">Weather &amp; Forecast</a>
+    <a class="page-tab active" href="history.html">Historical Climate</a>
+    <a class="page-tab" href="sea.html">Sea Data</a>
+  </nav>
   <nav class="section-nav">
-    <a class="section-nav-btn" href="index.html">Weather &amp; Forecast</a>
-    <a class="section-nav-btn active" href="history.html">Historical Climate</a>
-    <a class="section-nav-btn" href="sea.html">Sea Data</a>
     <a class="section-nav-btn" href="#section-climate"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Climate Trends (1970-Today)</a>
     <a class="section-nav-btn" href="#section-historical"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Historical Data</a>
   </nav>
@@ -101,7 +87,27 @@
   <div id="loadingMsg" style="text-align:center;padding:60px 0;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)">Loading weather data&hellip;</div>
 
   <div class="forecast-section" id="section-historical">
-    <div class="section-title">Historical Data</div>
+    <div class="section-controls">
+      <div>
+        <div class="section-title" style="margin-bottom:4px">Historical Data</div>
+        <div class="header-period" id="headerPeriod"></div>
+      </div>
+      <div class="range-picker">
+        <div class="range-presets">
+          <button class="preset-btn" data-months="3">3 mo</button>
+          <button class="preset-btn active" data-months="6">6 mo</button>
+          <button class="preset-btn" data-months="12">12 mo</button>
+          <button class="preset-btn" data-months="24">24 mo</button>
+        </div>
+        <div class="range-custom">
+          <label>From</label>
+          <input type="month" id="rangeFrom">
+          <label>To</label>
+          <input type="month" id="rangeTo">
+          <button class="range-apply" id="rangeApply">Apply</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="kpi-row" id="kpiRow"></div>

@@ -31,7 +31,7 @@ function sstSwapLayers() {
 }
 
 function initSSTMap() {
-  if (!window.L) return;
+  if (!window.L || sstMap) return; // prevent double-init
   sstMonths = buildSSTMonths();
   if (!sstMonths.length) return;
 

@@ -24,6 +24,19 @@ const OCEAN_CURRENTS = [
     coords: [[-8,-4],[-15,-4],[-22,-4],[-30,-4],[-38,-4],[-46,-4],[-52,-2]] },
   { name: 'S. Equatorial Current (Pacific)', type: 'warm',
     coords: [[-80,-5],[-90,-5],[-100,-5],[-110,-5],[-120,-5],[-130,-6],[-140,-7],[-150,-8],[-160,-8],[-170,-8],[-180,-8],[-190,-8],[-205,-8],[-215,-8]] },
+  // Indian Ocean
+  { name: 'S. Equatorial Current (Indian Ocean)', type: 'warm',
+    coords: [[110,-12],[100,-12],[90,-12],[80,-12],[70,-12],[60,-12],[50,-10],[46,-8]] },
+  { name: 'East African Coastal Current', type: 'warm',
+    coords: [[44,-14],[44,-10],[44,-6],[44,-2],[44,2],[45,6],[46,10],[47,12]] },
+  { name: 'North Indian Ocean / Arabian Sea Gyre', type: 'warm',
+    coords: [[47,12],[55,14],[65,14],[75,13],[85,12],[92,10],[94,6],[90,2],[80,0],[70,0],[60,2],[55,6],[50,10],[47,12]] },
+  { name: 'Bay of Bengal Circulation', type: 'warm',
+    coords: [[80,20],[88,20],[94,16],[95,12],[92,8],[86,6],[80,8],[80,12],[80,16],[80,20]] },
+  { name: 'West Australian Current', type: 'cold',
+    coords: [[113,-35],[112,-28],[110,-22],[108,-16],[106,-10],[103,-5]] },
+  { name: 'South Indian Ocean Subtropical Gyre', type: 'warm',
+    coords: [[46,-8],[60,-15],[80,-20],[100,-22],[115,-25],[115,-35],[100,-38],[80,-38],[60,-38],[40,-36],[30,-32],[20,-28],[20,-20],[30,-14],[40,-10],[46,-8]] },
   // Cold currents
   { name: 'Labrador Current', type: 'cold',
     coords: [[-60,65],[-58,60],[-56,55],[-54,52],[-53,48],[-54,44],[-56,42]] },
@@ -39,6 +52,21 @@ const OCEAN_CURRENTS = [
     coords: [[148,52],[147,48],[146,44],[145,42],[144,40],[143,38]] },
   { name: 'Antarctic Circumpolar Current', type: 'cold',
     coords: [[-180,-57],[-160,-59],[-140,-59],[-120,-58],[-100,-57],[-80,-58],[-60,-59],[-40,-58],[-20,-57],[0,-56],[20,-56],[40,-57],[60,-58],[80,-58],[100,-57],[120,-57],[140,-58],[160,-58],[180,-57]] },
+  // North Pacific
+  { name: 'Alaska Current', type: 'warm',
+    coords: [[-127,46],[-130,50],[-140,54],[-148,57],[-155,58],[-160,57],[-165,55],[-170,52],[-175,50],[-178,48]] },
+  { name: 'North Pacific Countercurrent (W)', type: 'warm',
+    coords: [[145,7],[153,7],[163,7],[172,7],[180,7]] },
+  { name: 'North Pacific Countercurrent (E)', type: 'warm',
+    coords: [[-180,7],[-170,7],[-160,7],[-150,7],[-140,8],[-128,8],[-118,8],[-105,8],[-92,8]] },
+  // South Pacific gyre return
+  { name: 'South Pacific Current (W)', type: 'cold',
+    coords: [[150,-42],[160,-43],[170,-44],[178,-44]] },
+  { name: 'South Pacific Current (E)', type: 'cold',
+    coords: [[-178,-44],[-165,-43],[-150,-43],[-135,-42],[-120,-42],[-108,-40],[-95,-38],[-80,-36]] },
+  // South Atlantic gyre return
+  { name: 'South Atlantic Current', type: 'cold',
+    coords: [[-52,-42],[-40,-44],[-25,-44],[-10,-44],[5,-44],[18,-42]] },
 ];
 
 /* ── Grid bounds (must match functions/api/currents-live.js) ────────────────── */
@@ -59,7 +87,6 @@ const MAX_AGE         = 100;   // frames before a particle respawns
 const SPEED_SCALE     = 40000;
 const TRAIL_OPACITY   = 0.95;  // how much each frame fades (higher = longer trails)
 const PARTICLE_WIDTH  = 1.5;   // stroke width in px
-const FADE_COLOR      = '20, 24, 33'; // matches --bg-card (#141821) in RGB
 
 /* ── State ──────────────────────────────────────────────────────────────────── */
 let liveCurrentsMap    = null;
@@ -231,11 +258,21 @@ function getWarmth(lat, lon) {
 
 /* ── Particle management ────────────────────────────────────────────────────── */
 function randomParticle() {
-  return {
-    lat: Math.random() * 160 - 80,   // –80 to +80°
-    lon: Math.random() * 360 - 180,  // –180 to +180°
-    age: Math.floor(Math.random() * MAX_AGE),
-  };
+  let lat, lon;
+  if (liveCurrentsMap) {
+    // Spawn within the current viewport so density stays constant at all zoom levels.
+    // Pad slightly so trails don't pop in right at the edge.
+    const b = liveCurrentsMap.getBounds().pad(0.05);
+    lat = b.getSouth() + Math.random() * (b.getNorth() - b.getSouth());
+    lon = b.getWest()  + Math.random() * (b.getEast()  - b.getWest());
+    lat = Math.max(GRID_LAT_MIN, Math.min(GRID_LAT_MAX, lat));
+    // Normalise longitude to –180…180
+    lon = ((lon + 180) % 360 + 360) % 360 - 180;
+  } else {
+    lat = Math.random() * 160 - 80;
+    lon = Math.random() * 360 - 180;
+  }
+  return { lat, lon, age: Math.floor(Math.random() * MAX_AGE) };
 }
 
 function initParticles() {
@@ -284,9 +321,13 @@ function animateCurrents() {
   const map    = liveCurrentsMap;
   if (!ctx || !canvas || !map) return;
 
-  // Fade the previous frame (creates trails)
-  ctx.fillStyle = `rgba(${FADE_COLOR}, ${1 - TRAIL_OPACITY})`;
+  // Fade the previous frame — destination-out reduces existing pixel alpha
+  // toward transparent rather than painting a dark colour, so quiet ocean
+  // areas stay see-through and the map tiles show through underneath.
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.fillStyle = `rgba(0, 0, 0, ${1 - TRAIL_OPACITY})`;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.globalCompositeOperation = 'source-over';
 
   particles.forEach(p => {
     p.age++;
@@ -353,7 +394,7 @@ function resizeCanvas() {
 
 /* ── Public init ────────────────────────────────────────────────────────────── */
 async function initLiveCurrentsMap() {
-  if (!window.L) return;
+  if (!window.L || liveCurrentsMap) return; // prevent double-init
 
   // ── Map (same setup as SST / static currents) ─────────────────────────────
   liveCurrentsMap = L.map('liveCurrentsMap', {
@@ -445,6 +486,11 @@ async function initLiveCurrentsMap() {
 
   liveCurrentsMap.on('movestart', () => {
     liveCurrentsCtx.clearRect(0, 0, liveCurrentsCanvas.width, liveCurrentsCanvas.height);
+  });
+  // Respawn all particles within the new viewport after zooming
+  liveCurrentsMap.on('zoomend', () => {
+    liveCurrentsCtx.clearRect(0, 0, liveCurrentsCanvas.width, liveCurrentsCanvas.height);
+    initParticles();
   });
 
   animateCurrents();
