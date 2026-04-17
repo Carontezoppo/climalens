@@ -4,10 +4,10 @@
 // ============================================================
 const LOCATION_GROUPS = [
   { continent: 'Europe', locations: [
+    { name: 'Birmingham, UK',         lat: 52.48,  lon: -1.90  },
     { name: 'Amsterdam, Netherlands', lat: 52.37,  lon:  4.90  },
     { name: 'Athens, Greece',         lat: 37.98,  lon: 23.72  },
     { name: 'Berlin, Germany',        lat: 52.52,  lon: 13.40  },
-    { name: 'Birmingham, UK',         lat: 52.48,  lon: -1.90  },
     { name: 'Brussels, Belgium',      lat: 50.85,  lon:  4.35  },
     { name: 'Budapest, Hungary',      lat: 47.50,  lon: 19.04  },
     { name: 'Copenhagen, Denmark',    lat: 55.68,  lon: 12.57  },
