@@ -64,6 +64,7 @@ function init() {
 
   // ── Initial load ──────────────────────────────────────────────────────────
   setTimeout(initSSTMap, 0);
+  setTimeout(loadSeaIceData, 0);
   setTimeout(initLiveCurrentsMap, 0);
 }
 init();

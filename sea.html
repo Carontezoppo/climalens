@@ -8,6 +8,10 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/proj4@2.11.0/dist/proj4.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/proj4leaflet@1.0.2/src/proj4leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
@@ -34,6 +38,7 @@
   </nav>
   <nav class="section-nav">
     <a class="section-nav-btn" href="#section-sst"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Sea Temperature</a>
+    <a class="section-nav-btn" href="#section-polar-ice"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Polar Ice</a>
     <a class="section-nav-btn" href="#section-currents-live"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Ocean Currents</a>
   </nav>
 
@@ -61,6 +66,71 @@
       <div class="sst-source">Map tiles · NASA GIBS / GHRSST MUR L4 · PODAAC/JPL &nbsp;·&nbsp; Point values · Open-Meteo Marine API / ERA5</div>
     </div>
   </div>
+
+  <div class="section-title" id="section-polar-ice" style="margin-top:8px;">
+    Polar Ice Coverage
+    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">1979 – present · NSIDC Sea Ice Index</span>
+  </div>
+  <div class="chart-subtitle" style="margin-bottom:12px;">Arctic minimum (September) and Antarctic maximum (February) sea ice extent. Dashed line marks the 1981–2010 WMO baseline. Bars below the line indicate below-average ice coverage.</div>
+
+  <div class="polar-ice-grid">
+    <!-- Arctic -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Arctic — September Minimum</div>
+          <div class="chart-subtitle">Sea ice extent · million km²</div>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#38bdf8"></div>Above baseline</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#fb923c"></div>Below baseline</div>
+          <div class="legend-item"><div style="width:20px;height:2px;border-top:2px dashed rgba(251,146,60,0.85);margin-right:6px;"></div>Baseline</div>
+        </div>
+      </div>
+      <div class="climate-stats-row" id="arcticStatsRow" style="margin-bottom:12px;"></div>
+      <div id="arcticIceStatus" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);text-align:center;padding:40px">Loading Arctic data…</div>
+      <div class="chart-container" style="height:260px;"><canvas id="arcticIceChart"></canvas></div>
+      <div class="polar-map-section">
+        <div class="polar-map-top-row">
+          <div class="polar-map-year-display" id="arcticLeafletMapYear">—</div>
+          <button class="polar-live-btn" id="arcticLeafletMapLiveBtn">&#9679; Live</button>
+          <button class="sst-play-btn" id="arcticLeafletMapPlayBtn">&#9654; Play</button>
+        </div>
+        <input type="range" class="sst-slider" id="arcticLeafletMapSlider" min="1979" max="2025" value="2025">
+        <div class="polar-map-wrap" id="arcticLeafletMap"></div>
+        <div class="polar-map-source">Orange line = 1981–2010 median extent · Ice concentration: NASA GIBS SSMIS Sea Ice Concentration · Basemap: BlueMarble</div>
+      </div>
+    </div>
+    <!-- Antarctic -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Antarctic — February Maximum</div>
+          <div class="chart-subtitle">Sea ice extent · million km²</div>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#38bdf8"></div>Above baseline</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#fb923c"></div>Below baseline</div>
+          <div class="legend-item"><div style="width:20px;height:2px;border-top:2px dashed rgba(251,146,60,0.85);margin-right:6px;"></div>Baseline</div>
+        </div>
+      </div>
+      <div class="climate-stats-row" id="antarcticStatsRow" style="margin-bottom:12px;"></div>
+      <div id="antarcticIceStatus" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);text-align:center;padding:40px">Loading Antarctic data…</div>
+      <div class="chart-container" style="height:260px;"><canvas id="antarcticIceChart"></canvas></div>
+      <div class="polar-map-section">
+        <div class="polar-map-top-row">
+          <div class="polar-map-year-display" id="antarcticLeafletMapYear">—</div>
+          <button class="polar-live-btn" id="antarcticLeafletMapLiveBtn">&#9679; Live</button>
+          <button class="sst-play-btn" id="antarcticLeafletMapPlayBtn">&#9654; Play</button>
+        </div>
+        <input type="range" class="sst-slider" id="antarcticLeafletMapSlider" min="1979" max="2025" value="2025">
+        <div class="polar-map-wrap" id="antarcticLeafletMap"></div>
+        <div class="polar-map-source">Orange line = 1981–2010 median extent · Ice concentration: NASA GIBS SSMIS Sea Ice Concentration · Basemap: BlueMarble</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-subtitle" style="margin-bottom:28px;text-align:right;font-size:11px;">Source: NSIDC Sea Ice Index v4.0 (G02135) · Fetterer et al. 2017, updated yearly · NSIDC, Boulder CO</div>
 
   <div class="section-title" id="section-currents-live" style="margin-top:8px;">
     Ocean Currents
@@ -109,6 +179,7 @@
 <script src="js/config.js"></script>
 <script src="js/state.js"></script>
 <script src="js/sst.js"></script>
+<script src="js/sea-ice.js"></script>
 <script src="js/currents-live.js"></script>
 <script src="js/init-sea.js"></script>
 </body>

@@ -1011,6 +1011,14 @@
   }
   .sst-play-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(99,102,241,0.08); }
   .sst-play-btn.playing { border-color: var(--negative); color: var(--negative); background: rgba(248,113,113,0.08); }
+  .polar-live-btn {
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px;
+    text-transform: uppercase; padding: 6px 14px; border-radius: 20px;
+    border: 1px solid var(--positive); background: var(--bg-panel);
+    color: var(--positive); cursor: pointer; transition: all 0.15s;
+  }
+  .polar-live-btn:hover { background: rgba(52,211,153,0.1); }
+  .polar-live-btn.active { background: rgba(52,211,153,0.18); box-shadow: 0 0 0 2px rgba(52,211,153,0.3); }
   .sst-slider {
     width: 100%; height: 4px; -webkit-appearance: none; appearance: none;
     border-radius: 2px; background: var(--border-accent); outline: none;
@@ -1124,6 +1132,51 @@
     to { opacity: 1; transform: translateY(0); }
   }
   .panel-animate { animation: panelFadeIn 0.3s ease both; }
+
+/* ── POLAR ICE COVERAGE ──────────────────────────────────────────────────── */
+.polar-map-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.polar-map-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.polar-map-year-display {
+  font-family: 'DM Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+}
+.polar-map-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 14px;
+  background: #0a0d14;
+}
+.polar-map-source {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 8px;
+}
+.polar-ice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 8px;
+}
+@media (max-width: 900px) {
+  .polar-ice-grid { grid-template-columns: 1fr; }
+}
 
 /* ── LIVE OCEAN CURRENTS ─────────────────────────────────────────────────── */
 .live-currents-section { margin-bottom: 36px; }

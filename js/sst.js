@@ -1,5 +1,10 @@
 // Sea Surface Temperature map — NASA GIBS / GHRSST MUR L4
 
+function updateSliderFill(el) {
+  const pct = ((+el.value - +el.min) / (+el.max - +el.min)) * 100;
+  el.style.background = `linear-gradient(to right,#6366f1 ${pct}%,#2a3148 ${pct}%)`;
+}
+
 let sstMap = null, sstLayerA = null, sstLayerB = null, sstActiveSide = 'A', sstMonths = [];
 let sstPlaying = false;
 const SST_MIN_FRAME_MS = 700; // minimum ms a frame stays visible
@@ -105,6 +110,7 @@ function initSSTMap() {
   const slider = document.getElementById('sstSlider');
   slider.max = sstMonths.length - 1;
   slider.value = sstMonths.length - 1;
+  updateSliderFill(slider);
 
   // Tick labels — show ~6 year labels evenly spaced
   const tickRow = document.getElementById('sstTickRow');
@@ -142,6 +148,7 @@ function initSSTMap() {
       buffer.off('load');
       sstSwapLayers();
       slider.value = idx;
+      updateSliderFill(slider);
       dateDisplay.textContent = sstDateLabel(sstMonths[idx]);
       if (onSwapped) onSwapped(idx);
     }
@@ -159,6 +166,7 @@ function initSSTMap() {
 
   slider.addEventListener('input', () => {
     const idx = parseInt(slider.value);
+    updateSliderFill(slider);
     dateDisplay.textContent = sstDateLabel(sstMonths[idx]);
     clearTimeout(sstScrubTimer);
     sstScrubTimer = setTimeout(() => sstLoadFrame(idx), 150);
