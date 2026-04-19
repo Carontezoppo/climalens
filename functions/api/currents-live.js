@@ -43,7 +43,8 @@ export async function onRequestGet({ env }) {
 
     // ── Credentials ───────────────────────────────────────────────────────────
     if (!env.CMEMS_USERNAME || !env.CMEMS_PASSWORD) {
-      return error('CMEMS credentials not configured (set CMEMS_USERNAME and CMEMS_PASSWORD secrets)', 503);
+      const missing = [!env.CMEMS_USERNAME && 'CMEMS_USERNAME', !env.CMEMS_PASSWORD && 'CMEMS_PASSWORD'].filter(Boolean);
+      return error(`CMEMS credentials missing: ${missing.join(', ')}`, 503);
     }
     const auth = btoa(`${env.CMEMS_USERNAME}:${env.CMEMS_PASSWORD}`);
 
