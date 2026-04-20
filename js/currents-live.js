@@ -517,14 +517,7 @@ async function initLiveCurrentsMap() {
   // CORS is not enabled on coastwatch.pfeg.noaa.gov so direct browser
   // fetch is blocked too.  Both attempts are best-effort; failure is silent.
   ;(async () => {
-    const ERDDAP_DIRECT =
-      'https://coastwatch.pfeg.noaa.gov/erddap/griddap/nesdisSSH1day.json' +
-      '?ugos[(last):1:(last)][(-80.0):16:(80.0)][(-180.0):16:(180.0)]' +
-      ',vgos[(last):1:(last)][(-80.0):16:(80.0)][(-180.0):16:(180.0)]';
-
-    let data = null;
-
-    // Try Worker proxy (KV-cached)
+    // Try Worker proxy (NOAA ERDDAP via server-side, KV-cached 12h)
     try {
       const ctrl = new AbortController();
       const tid  = setTimeout(() => ctrl.abort(), 8000);
@@ -533,32 +526,17 @@ async function initLiveCurrentsMap() {
       const ct = res.headers.get('content-type') || '';
       if (res.ok && ct.includes('json')) {
         const j = await res.json();
-        if (!j.error) data = j;
+        if (!j.error) {
+          // Silently upgrade to live data — animation keeps running uninterrupted.
+          // Preserve warmth from the static grid so warm/cold colour coding survives.
+          const liveGrid = j.table ? buildGrid(j) : j;
+          if (!liveGrid.warmth && velocityGrid?.warmth) {
+            liveGrid.warmth = velocityGrid.warmth;
+          }
+          velocityGrid = liveGrid;
+        }
       }
     } catch (_) { /* silent — static grid already running */ }
-
-    // Try direct ERDDAP (works only if server adds CORS in future)
-    if (!data) {
-      try {
-        const res = await fetch(ERDDAP_DIRECT, { headers: { Accept: 'application/json' } });
-        const ct  = res.headers.get('content-type') || '';
-        if (res.ok && ct.includes('json')) {
-          const j = await res.json();
-          if (j.table) data = j;
-        }
-      } catch (_) { /* silent */ }
-    }
-
-    if (data) {
-      // Silently upgrade to live data — animation keeps running uninterrupted.
-      // Preserve warmth from the static grid: buildGrid() only has u/v from
-      // ERDDAP, so without this the warm/cold colour coding would vanish.
-      const liveGrid = data.table ? buildGrid(data) : data;
-      if (!liveGrid.warmth && velocityGrid?.warmth) {
-        liveGrid.warmth = velocityGrid.warmth;
-      }
-      velocityGrid = liveGrid;
-    }
   })();
 }
 
