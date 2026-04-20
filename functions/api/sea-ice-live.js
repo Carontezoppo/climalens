@@ -66,6 +66,7 @@ export async function onRequestGet({ request, env }) {
     REQUEST:     'GetMap',
     VERSION:     '1.3.0',
     LAYERS:      'ice_conc',
+    STYLES:      '',
     CRS:         'EPSG:4326',
     BBOX:        cfg.bbox,
     WIDTH:       String(cfg.width),
