@@ -246,8 +246,11 @@ function initPolarLeafletMap({ mapId, crsCode, crsProj4, center, pole, month, mi
   const pendingLayers = new Set();
 
   function gibsIceUrl(year) {
-    const mm = String(month).padStart(2, '0');
-    return `https://gibs.earthdata.nasa.gov/wmts/${epsgId}/best/SSMIS_Sea_Ice_Concentration/default/${year}-${mm}-01/1km/{z}/{y}/{x}.png`;
+    const mm  = String(month).padStart(2, '0');
+    // AMSR2 (2012-present): smaller polar gap (~88.5°N vs SSMIS ~85°N), covers recent years
+    // SSMIS (1978-2021): full historical record
+    const lid = year >= 2012 ? 'AMSR2_Sea_Ice_Concentration_12km' : 'SSMIS_Sea_Ice_Concentration';
+    return `https://gibs.earthdata.nasa.gov/wmts/${epsgId}/best/${lid}/default/${year}-${mm}-01/1km/{z}/{y}/{x}.png`;
   }
 
   function setYear(year, onComplete) {
