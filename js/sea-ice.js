@@ -465,8 +465,12 @@ function initPolarLeafletMap({ mapId, crsCode, crsProj4, center, pole, month, mi
     });
   }
 
-  setYear(Math.min(maxYear, 2021));
-  setTimeout(() => map.invalidateSize(), 150);
+  setYear(maxYear);
+  setTimeout(() => {
+    map.invalidateSize();
+    enableLive();
+    if (liveBtn) liveBtn.classList.add('active');
+  }, 150);
 }
 
 async function loadSeaIceData() {
