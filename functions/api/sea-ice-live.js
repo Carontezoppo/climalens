@@ -65,7 +65,7 @@ export async function onRequestGet({ request, env }) {
     SERVICE:     'WMS',
     REQUEST:     'GetMap',
     VERSION:     '1.3.0',
-    LAYERS:      'ice_conc',
+    LAYERS:      `${PRODUCT}/${cfg.dataset}/ice_conc`,
     STYLES:      '',
     CRS:         'EPSG:4326',
     BBOX:        cfg.bbox,
@@ -76,7 +76,7 @@ export async function onRequestGet({ request, env }) {
     TIME:        date,
   });
 
-  const fetchUrl = `${TERO_WMS}/${PRODUCT}/${cfg.dataset}?${params}`;
+  const fetchUrl = `${TERO_WMS}/?${params}`;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 25000);
