@@ -19,16 +19,17 @@ const VER      = '202304';
 const CACHE_TTL = 60 * 60 * 6; // 6 h
 
 // Request at 0.25°/pixel — sufficient for polar reprojection at typical zoom levels
+// WMS 1.3.0 with EPSG:4326: axis order is latMin,lonMin,latMax,lonMax
 const CONFIGS = {
   arctic: {
     dataset: `osisaf_obs-si_glo_phy-sic-north_nrt_amsr2_l4_P1D-m_${VER}`,
-    bbox:    '-180,55,180,90',  // WMS 1.1.1: minLon,minLat,maxLon,maxLat
+    bbox:    '55,-180,90,180',
     latMin: 55, latMax: 90,
     width: 1440, height: 140,
   },
   antarctic: {
     dataset: `osisaf_obs-si_glo_phy-sic-south_nrt_amsr2_l4_P1D-m_${VER}`,
-    bbox:    '-180,-90,180,-55',
+    bbox:    '-90,-180,-55,180',
     latMin: -90, latMax: -55,
     width: 1440, height: 140,
   },
@@ -63,9 +64,9 @@ export async function onRequestGet({ request, env }) {
   const params = new URLSearchParams({
     SERVICE:     'WMS',
     REQUEST:     'GetMap',
-    VERSION:     '1.1.1',
+    VERSION:     '1.3.0',
     LAYERS:      'ice_conc',
-    SRS:         'EPSG:4326',
+    CRS:         'EPSG:4326',
     BBOX:        cfg.bbox,
     WIDTH:       String(cfg.width),
     HEIGHT:      String(cfg.height),
