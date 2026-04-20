@@ -247,9 +247,9 @@ function initPolarLeafletMap({ mapId, crsCode, crsProj4, center, pole, month, mi
 
   function gibsIceUrl(year) {
     const mm  = String(month).padStart(2, '0');
-    // AMSR2 (2012-present): smaller polar gap (~88.5°N vs SSMIS ~85°N), covers recent years
-    // SSMIS (1978-2021): full historical record
-    const lid = year >= 2012 ? 'AMSR2_Sea_Ice_Concentration_12km' : 'SSMIS_Sea_Ice_Concentration';
+    // AMSRUE (2002-2011): smaller polar gap than SSMIS for that period
+    // SSMIS (1978-2021): full historical record outside AMSRUE window
+    const lid = (year >= 2002 && year <= 2011) ? 'AMSRUE_Sea_Ice_Concentration_12km' : 'SSMIS_Sea_Ice_Concentration';
     return `https://gibs.earthdata.nasa.gov/wmts/${epsgId}/best/${lid}/default/${year}-${mm}-01/1km/{z}/{y}/{x}.png`;
   }
 
@@ -348,16 +348,15 @@ function initPolarLeafletMap({ mapId, crsCode, crsProj4, center, pole, month, mi
   }
 
   function buildLiveLayer() {
-    const mm = String(month).padStart(2, '0');
     return L.tileLayer.wms('/api/cmems-wms', {
-      product:     'seaice',
+      pole:        pole,
       layers:      'ice_conc',
       styles:      '',
       format:      'image/png',
       transparent: true,
       version:     '1.3.0',
       time:        liveDate(),
-      tileSize:    512,
+      tileSize:    256,
       noWrap:      true,
       opacity:     0.9,
     });
