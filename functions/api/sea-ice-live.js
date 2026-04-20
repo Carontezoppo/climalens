@@ -61,7 +61,7 @@ export async function onRequestGet({ request, env }) {
     STYLE:         '',
     FORMAT:        'image/png',
     TILEMATRIXSET: 'EPSG:4326',
-    TILEMATRIX:    `EPSG:4326:${z}`,
+    TILEMATRIX:    z,
     TILEROW:       row,
     TILECOL:       col,
     TIME:          date,
