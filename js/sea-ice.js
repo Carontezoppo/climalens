@@ -405,7 +405,7 @@ function initPolarLeafletMap({ mapId, crsCode, crsProj4, center, pole, month, mi
     });
   }
 
-  setYear(maxYear);
+  setYear(Math.min(maxYear, 2021));
   setTimeout(() => map.invalidateSize(), 150);
 }
 
@@ -426,9 +426,8 @@ async function loadSeaIceData() {
     renderPoleChart('arctic',    json.arctic,    'arcticIceChart',    'Arctic September');
     renderPoleChart('antarctic', json.antarctic, 'antarcticIceChart', 'Antarctic February');
 
-    const GIBS_SSMIS_MAX = 2021;
-    const arcticMax    = Math.min(json.arctic.lastYear    ?? GIBS_SSMIS_MAX, GIBS_SSMIS_MAX);
-    const antarcticMax = Math.min(json.antarctic.lastYear ?? GIBS_SSMIS_MAX, GIBS_SSMIS_MAX);
+    const arcticMax    = json.arctic.lastYear    ?? 2024;
+    const antarcticMax = json.antarctic.lastYear ?? 2024;
 
     initPolarLeafletMap({
       mapId: 'arcticLeafletMap',
