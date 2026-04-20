@@ -22,37 +22,30 @@
 
 const CACHE_TTL = 60 * 60 * 12; // 12 hours
 
-const CMEMS_ERDDAP = 'https://nrt.cmems-du.eu/erddap/griddap';
-const DATASET_ID   = 'cmems_mod_glo_phy_anfc_0.083deg_P1D-m';
+// NOAA CoastWatch ERDDAP — SSH-derived geostrophic surface currents, no auth required.
+// nrt.cmems-du.eu (old CMEMS ERDDAP) was decommissioned in the 2024 Copernicus migration.
+const NOAA_ERDDAP = 'https://coastwatch.pfeg.noaa.gov/erddap/griddap';
+const DATASET_ID  = 'nesdisSSH1day';
 
-// Stride 48 on 0.083° grid ≈ 4° resolution — matches our static grid step
-const STRIDE  = 48;
+// Stride 16 on 0.25° grid ≈ 4° output resolution (~3 600 cells)
+const STRIDE  = 16;
 const LAT_MIN = -80, LAT_MAX = 80;
-const LON_MIN = -180, LON_MAX = 179; // avoid duplicate at ±180
+const LON_MIN = -180, LON_MAX = 179;
 
 export async function onRequestGet({ env }) {
   try {
     // ── KV cache (pre-built grid) ─────────────────────────────────────────────
     const today    = new Date().toISOString().slice(0, 10);
-    const cacheKey = `currents_cmems_grid_${today}_s${STRIDE}`;
+    const cacheKey = `currents_noaa_grid_${today}_s${STRIDE}`;
 
     if (env.CLIMATE_CACHE) {
       const cached = await env.CLIMATE_CACHE.get(cacheKey);
       if (cached) return respond(cached, 200, { 'X-Cache': 'HIT' });
     }
 
-    // ── Credentials ───────────────────────────────────────────────────────────
-    if (!env.CMEMS_USERNAME || !env.CMEMS_PASSWORD) {
-      const missing = [!env.CMEMS_USERNAME && 'CMEMS_USERNAME', !env.CMEMS_PASSWORD && 'CMEMS_PASSWORD'].filter(Boolean);
-      return error(`CMEMS credentials missing: ${missing.join(', ')}`, 503);
-    }
-    const auth = btoa(`${env.CMEMS_USERNAME}:${env.CMEMS_PASSWORD}`);
-
     // ── Build ERDDAP griddap URL ──────────────────────────────────────────────
-    // Dimensions: [time][depth][latitude][longitude]
-    // (last) = most recent available day; depth fixed at surface (~0.494 m)
-    const sel = `[(last):1:(last)][(0.494):1:(0.494)][(${LAT_MIN}.0):${STRIDE}:(${LAT_MAX}.0)][(${LON_MIN}.0):${STRIDE}:(${LON_MAX}.0)]`;
-    const url = `${CMEMS_ERDDAP}/${DATASET_ID}.json?uo${sel},vo${sel}`;
+    const sel = `[(last):1:(last)][(${LAT_MIN}.0):${STRIDE}:(${LAT_MAX}.0)][(${LON_MIN}.0):${STRIDE}:(${LON_MAX}.0)]`;
+    const url = `${NOAA_ERDDAP}/${DATASET_ID}.json?ugos${sel},vgos${sel}`;
 
     const controller = new AbortController();
     const fetchTimer = setTimeout(() => controller.abort(), 25000);
@@ -60,27 +53,24 @@ export async function onRequestGet({ env }) {
     let upstream;
     try {
       upstream = await fetch(url, {
-        headers: {
-          'Authorization': `Basic ${auth}`,
-          'Accept': 'application/json',
-        },
+        headers: { 'Accept': 'application/json' },
         signal: controller.signal,
       });
     } catch (fetchErr) {
       clearTimeout(fetchTimer);
-      return error(`CMEMS fetch failed: ${fetchErr.name === 'AbortError' ? 'timed out after 25s' : fetchErr.message}`);
+      return error(`NOAA fetch failed: ${fetchErr.name === 'AbortError' ? 'timed out after 25s' : fetchErr.message}`);
     }
     clearTimeout(fetchTimer);
 
     if (!upstream.ok) {
       const msg = await upstream.text();
-      return error(`CMEMS HTTP ${upstream.status}: ${msg.slice(0, 500)}`);
+      return error(`NOAA HTTP ${upstream.status}: ${msg.slice(0, 500)}`);
     }
 
     const ct = upstream.headers.get('content-type') || '';
     if (!ct.includes('json')) {
       const msg = await upstream.text();
-      return error(`CMEMS unexpected content-type "${ct}": ${msg.slice(0, 300)}`);
+      return error(`NOAA unexpected content-type "${ct}": ${msg.slice(0, 300)}`);
     }
 
     // ── Parse + build compact grid (30 s CPU budget makes this easy) ──────────
