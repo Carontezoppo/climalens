@@ -341,25 +341,81 @@ function initPolarLeafletMap({ mapId, crsCode, crsProj4, center, pole, month, mi
   let liveLayer   = null;
   let liveActive  = false;
 
-  function liveDate() {
-    const d = new Date();
-    d.setDate(d.getDate() - 1);
-    return d.toISOString().slice(0, 10);
-  }
-
+  // ── Canvas reprojection layer ─────────────────────────────────────────────
+  // Fetches a flat EPSG:4326 PNG from /api/sea-ice-live, then reprojects it
+  // pixel-by-pixel to the polar CRS using Leaflet's containerPointToLatLng.
   function buildLiveLayer() {
-    return L.tileLayer.wms('/api/cmems-wms', {
-      pole:        pole,
-      layers:      'ice_conc',
-      styles:      '',
-      format:      'image/png',
-      transparent: true,
-      version:     '1.3.0',
-      time:        liveDate(),
-      tileSize:    256,
-      noWrap:      true,
-      opacity:     0.9,
+    let cvs     = null;
+    let srcData = null, srcW = 0, srcH = 0;
+    let latMin  = pole === 'arctic' ? 55 : -90;
+    let latMax  = pole === 'arctic' ? 90 : -55;
+
+    function render() {
+      if (!cvs || !srcData) return;
+      const size    = map.getSize();
+      cvs.width     = size.x;
+      cvs.height    = size.y;
+      const ctx     = cvs.getContext('2d');
+      const out     = ctx.createImageData(size.x, size.y);
+      const d       = out.data;
+      const src     = srcData;
+      const sw      = srcW, sh = srcH;
+      const latRng  = latMax - latMin;
+
+      for (let py = 0; py < size.y; py++) {
+        for (let px = 0; px < size.x; px++) {
+          const ll  = map.containerPointToLatLng([px, py]);
+          const lat = ll.lat, lng = ll.lng;
+          if (lat < latMin || lat > latMax) continue;
+
+          let sx        = ((lng + 180) / 360 * sw) | 0;
+          const sy      = ((latMax - lat) / latRng * sh) | 0;
+          if (sx < 0) sx += sw; else if (sx >= sw) sx -= sw;
+          if (sy < 0 || sy >= sh) continue;
+
+          const si = (sy * sw + sx) * 4;
+          const oi = (py * size.x + px) * 4;
+          d[oi] = src[si]; d[oi+1] = src[si+1]; d[oi+2] = src[si+2]; d[oi+3] = src[si+3];
+        }
+      }
+      ctx.putImageData(out, 0, 0);
+      L.DomUtil.setPosition(cvs, map.containerPointToLayerPoint([0, 0]));
+    }
+
+    const LayerClass = L.Layer.extend({
+      onAdd() {
+        cvs = L.DomUtil.create('canvas');
+        Object.assign(cvs.style, { position: 'absolute', top: 0, left: 0, pointerEvents: 'none' });
+        map.getPanes().overlayPane.appendChild(cvs);
+        map.on('moveend zoomend resize', render);
+
+        fetch(`/api/sea-ice-live?pole=${pole}`)
+          .then(r => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            latMin = +(r.headers.get('X-LatMin') ?? latMin);
+            latMax = +(r.headers.get('X-LatMax') ?? latMax);
+            return r.blob();
+          })
+          .then(blob => createImageBitmap(blob))
+          .then(bm => {
+            const c = document.createElement('canvas');
+            c.width = bm.width; c.height = bm.height;
+            c.getContext('2d').drawImage(bm, 0, 0);
+            const id = c.getContext('2d').getImageData(0, 0, c.width, c.height);
+            srcData = id.data; srcW = c.width; srcH = c.height;
+            render();
+            medianGroup.bringToFront();
+          })
+          .catch(e => console.warn('LiveIceLayer error:', e));
+      },
+      onRemove() {
+        if (cvs) { cvs.remove(); cvs = null; }
+        srcData = null;
+        map.off('moveend zoomend resize', render);
+      },
     });
+
+    return new LayerClass();
   }
 
   function enableLive() {
