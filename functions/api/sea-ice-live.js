@@ -1,38 +1,25 @@
 /**
- * GET /api/sea-ice-live?pole=arctic|antarctic
+ * GET /api/sea-ice-live?pole=arctic|antarctic&z=1&row=0&col=0
  *
- * Fetches the latest OSI-SAF AMSR2 sea ice concentration from Copernicus
- * Marine teroWmts as a plain EPSG:4326 PNG image. The client canvas layer
- * reprojects this to the polar stereographic CRS for display on the map.
+ * WMTS GetTile proxy for Copernicus Marine OSI-SAF AMSR2 sea ice concentration.
+ * Injects Basic-auth credentials and caches tiles in KV.
  *
- * Returns: PNG image
- * Response headers:
- *   X-LatMin / X-LatMax  — lat bounds of the image (for client reprojection)
+ * WMTS: WorldCRS84Quad, zoom 1 → 4 cols × 2 rows, each tile 90°×90° at 256×256px
+ *   Arctic row 0 (90°N → 0°), Antarctic row 1 (0° → 90°S)
  *
+ * Returns: PNG tile (256×256)
  * Env: CMEMS_USERNAME, CMEMS_PASSWORD
  * KV:  CLIMATE_CACHE (6-hour tile cache)
  */
 
-const TERO_WMS = 'https://wmts.marine.copernicus.eu/teroWmts';
-const PRODUCT  = 'SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001';
-const VER      = '202304';
+const TERO_WMTS = 'https://wmts.marine.copernicus.eu/teroWmts/';
+const PRODUCT   = 'SEAICE_GLO_SEAICE_L4_NRT_OBSERVATIONS_011_001';
+const VER       = '202304';
 const CACHE_TTL = 60 * 60 * 6; // 6 h
 
-// Request at 0.25°/pixel — sufficient for polar reprojection at typical zoom levels
-// WMS 1.3.0 with EPSG:4326: axis order is latMin,lonMin,latMax,lonMax
-const CONFIGS = {
-  arctic: {
-    dataset: `osisaf_obs-si_glo_phy-sic-north_nrt_amsr2_l4_P1D-m_${VER}`,
-    bbox:    '55,-180,90,180',
-    latMin: 55, latMax: 90,
-    width: 1440, height: 140,
-  },
-  antarctic: {
-    dataset: `osisaf_obs-si_glo_phy-sic-south_nrt_amsr2_l4_P1D-m_${VER}`,
-    bbox:    '-90,-180,-55,180',
-    latMin: -90, latMax: -55,
-    width: 1440, height: 140,
-  },
+const DATASETS = {
+  arctic:    `osisaf_obs-si_glo_phy-sic-north_nrt_amsr2_l4_P1D-m_${VER}`,
+  antarctic: `osisaf_obs-si_glo_phy-sic-south_nrt_amsr2_l4_P1D-m_${VER}`,
 };
 
 function yesterday() {
@@ -48,41 +35,39 @@ export async function onRequestGet({ request, env }) {
 
   const { searchParams } = new URL(request.url);
   const pole = searchParams.get('pole') || 'arctic';
-  const cfg  = CONFIGS[pole];
-  if (!cfg) return err(`Unknown pole: ${pole}`, 400);
+  const z    = searchParams.get('z')    || '1';
+  const row  = searchParams.get('row')  || '0';
+  const col  = searchParams.get('col')  || '0';
+
+  const dataset = DATASETS[pole];
+  if (!dataset) return err(`Unknown pole: ${pole}`, 400);
 
   const date     = yesterday();
-  const cacheKey = `sea_ice_live_${pole}_${date}`;
+  const cacheKey = `sea_ice_wmts_${pole}_${date}_z${z}_r${row}_c${col}`;
 
   if (env.CLIMATE_CACHE) {
     const cached = await env.CLIMATE_CACHE.get(cacheKey, { type: 'arrayBuffer' });
-    if (cached) return imgResponse(cached, cfg, { 'X-Cache': 'HIT' });
+    if (cached) return tileResponse(cached, { 'X-Cache': 'HIT' });
   }
 
-  const auth = btoa(`${env.CMEMS_USERNAME}:${env.CMEMS_PASSWORD}`);
-
-  // DEBUG: fetch GetCapabilities to inspect available layers/operations
-  const capsUrl = `${TERO_WMS}/?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0`;
-  const capsRes = await fetch(capsUrl, { headers: { 'Authorization': `Basic ${auth}` } });
-  const capsXml = await capsRes.text();
-  return new Response(capsXml, { headers: { 'Content-Type': 'text/xml', 'Access-Control-Allow-Origin': '*' } });
+  const auth  = btoa(`${env.CMEMS_USERNAME}:${env.CMEMS_PASSWORD}`);
+  const layer = `${PRODUCT}/${dataset}/ice_conc`;
 
   const params = new URLSearchParams({
-    SERVICE:     'WMS',
-    REQUEST:     'GetMap',
-    VERSION:     '1.3.0',
-    LAYERS:      `${PRODUCT}/${cfg.dataset}/ice_conc`,
-    STYLES:      '',
-    CRS:         'EPSG:4326',
-    BBOX:        cfg.bbox,
-    WIDTH:       String(cfg.width),
-    HEIGHT:      String(cfg.height),
-    FORMAT:      'image/png',
-    TRANSPARENT: 'TRUE',
-    TIME:        date,
+    SERVICE:       'WMTS',
+    REQUEST:       'GetTile',
+    VERSION:       '1.0.0',
+    LAYER:         layer,
+    STYLE:         '',
+    FORMAT:        'image/png',
+    TILEMATRIXSET: 'WorldCRS84Quad',
+    TILEMATRIX:    z,
+    TILEROW:       row,
+    TILECOL:       col,
+    TIME:          date,
   });
 
-  const fetchUrl = `${TERO_WMS}/?${params}`;
+  const fetchUrl = `${TERO_WMTS}?${params}`;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 25000);
@@ -106,24 +91,22 @@ export async function onRequestGet({ request, env }) {
   const ct = upstream.headers.get('Content-Type') || '';
   if (!ct.startsWith('image/')) {
     const body = await upstream.text();
-    return err(`Unexpected content-type "${ct}": ${body.slice(0, 400)}`, 503);
+    return err(`Unexpected content-type "${ct}" [url=${fetchUrl}]: ${body.slice(0, 400)}`, 503);
   }
 
   const buf = await upstream.arrayBuffer();
   if (env.CLIMATE_CACHE) {
     await env.CLIMATE_CACHE.put(cacheKey, buf, { expirationTtl: CACHE_TTL });
   }
-  return imgResponse(buf, cfg);
+  return tileResponse(buf);
 }
 
-function imgResponse(buf, cfg, extra = {}) {
+function tileResponse(buf, extra = {}) {
   return new Response(buf, {
     headers: {
       'Content-Type':                'image/png',
       'Cache-Control':               `public, max-age=${CACHE_TTL}`,
       'Access-Control-Allow-Origin': '*',
-      'X-LatMin':                    String(cfg.latMin),
-      'X-LatMax':                    String(cfg.latMax),
       ...extra,
     },
   });
