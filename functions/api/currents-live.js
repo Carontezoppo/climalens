@@ -68,7 +68,7 @@ export async function onRequestGet({ env }) {
       });
     } catch (fetchErr) {
       clearTimeout(fetchTimer);
-      return error(`CMEMS fetch failed: ${fetchErr.name === 'AbortError' ? 'timed out after 25s' : fetchErr.message}`, 504);
+      return error(`CMEMS fetch failed: ${fetchErr.name === 'AbortError' ? 'timed out after 25s' : fetchErr.message}`);
     }
     clearTimeout(fetchTimer);
 
@@ -173,6 +173,6 @@ function respond(body, status = 200, extra = {}) {
   });
 }
 
-function error(msg, status = 502) {
+function error(msg, status = 503) {
   return respond({ error: msg }, status);
 }
