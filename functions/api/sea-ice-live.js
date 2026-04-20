@@ -93,7 +93,7 @@ export async function onRequestGet({ request, env }) {
 
   if (!upstream.ok) {
     const body = await upstream.text();
-    return err(`Upstream ${upstream.status}: ${body.slice(0, 400)}`, 503);
+    return err(`Upstream ${upstream.status} [url=${fetchUrl}]: ${body.slice(0, 400)}`, 503);
   }
 
   const ct = upstream.headers.get('Content-Type') || '';
