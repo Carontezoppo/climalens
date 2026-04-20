@@ -61,6 +61,12 @@ export async function onRequestGet({ request, env }) {
 
   const auth = btoa(`${env.CMEMS_USERNAME}:${env.CMEMS_PASSWORD}`);
 
+  // DEBUG: fetch GetCapabilities to inspect available layers/operations
+  const capsUrl = `${TERO_WMS}/?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0`;
+  const capsRes = await fetch(capsUrl, { headers: { 'Authorization': `Basic ${auth}` } });
+  const capsXml = await capsRes.text();
+  return new Response(capsXml, { headers: { 'Content-Type': 'text/xml', 'Access-Control-Allow-Origin': '*' } });
+
   const params = new URLSearchParams({
     SERVICE:     'WMS',
     REQUEST:     'GetMap',
