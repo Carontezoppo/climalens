@@ -54,22 +54,33 @@ export async function onRequestGet({ env }) {
     const sel = `[(last):1:(last)][(0.494):1:(0.494)][(${LAT_MIN}.0):${STRIDE}:(${LAT_MAX}.0)][(${LON_MIN}.0):${STRIDE}:(${LON_MAX}.0)]`;
     const url = `${CMEMS_ERDDAP}/${DATASET_ID}.json?uo${sel},vo${sel}`;
 
-    const upstream = await fetch(url, {
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'Accept': 'application/json',
-      },
-    });
+    const controller = new AbortController();
+    const fetchTimer = setTimeout(() => controller.abort(), 25000);
+
+    let upstream;
+    try {
+      upstream = await fetch(url, {
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Accept': 'application/json',
+        },
+        signal: controller.signal,
+      });
+    } catch (fetchErr) {
+      clearTimeout(fetchTimer);
+      return error(`CMEMS fetch failed: ${fetchErr.name === 'AbortError' ? 'timed out after 25s' : fetchErr.message}`, 504);
+    }
+    clearTimeout(fetchTimer);
 
     if (!upstream.ok) {
       const msg = await upstream.text();
-      return error(`CMEMS HTTP ${upstream.status}: ${msg.slice(0, 300)}`);
+      return error(`CMEMS HTTP ${upstream.status}: ${msg.slice(0, 500)}`);
     }
 
     const ct = upstream.headers.get('content-type') || '';
     if (!ct.includes('json')) {
       const msg = await upstream.text();
-      return error(`CMEMS unexpected content-type "${ct}": ${msg.slice(0, 200)}`);
+      return error(`CMEMS unexpected content-type "${ct}": ${msg.slice(0, 300)}`);
     }
 
     // ── Parse + build compact grid (30 s CPU budget makes this easy) ──────────
