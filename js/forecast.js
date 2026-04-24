@@ -168,8 +168,18 @@ function renderHourlyStrip(dayIdx) {
 }
 
 async function loadForecast() {
+  const cacheKey = `forecast_${currentLocation.lat}_${currentLocation.lon}`;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    const { ts, data } = JSON.parse(cached);
+    if (Date.now() - ts < 60 * 60 * 1000) {
+      renderForecast(data);
+      return;
+    }
+  }
   try {
     const json = await fetchForecast();
+    localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: json }));
     renderForecast(json);
   } catch (err) {
     document.getElementById('forecastContent').textContent = 'Forecast unavailable: ' + err.message;

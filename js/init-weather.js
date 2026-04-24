@@ -12,6 +12,7 @@ function init() {
   function selectLocation(idx) {
     currentLocation = LOCATIONS[idx];
     locationLabel.textContent = LOCATIONS[idx].name;
+    document.getElementById('forecastSectionTitle').textContent = LOCATIONS[idx].name + ' — 7-Day Forecast';
     locationList.querySelectorAll('.location-option').forEach(el => {
       el.classList.toggle('active', +el.dataset.idx === idx);
     });
@@ -132,6 +133,7 @@ function init() {
   });
 
   // ── Initial load ──────────────────────────────────────────────────────────
+  document.getElementById('forecastSectionTitle').textContent = currentLocation.name + ' — 7-Day Forecast';
   initMap();
   initAirQuality();
   loadForecast();
