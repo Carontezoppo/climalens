@@ -34,9 +34,9 @@ export async function onRequestGet({ request, env }) {
       latitude:      latN,
       longitude:     lonN,
       daily:         'temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,weather_code',
-      hourly:        'temperature_2m,precipitation,wind_speed_10m,relative_humidity_2m,weather_code',
+      hourly:        'temperature_2m,precipitation,wind_speed_10m,relative_humidity_2m,weather_code,is_day',
       forecast_days: '7',
-      timezone:      'Europe/London',
+      timezone:      'auto',
     });
 
     const upstream = await fetch(`${UPSTREAM}?${params}`);

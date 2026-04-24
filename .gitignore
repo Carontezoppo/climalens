@@ -2,6 +2,8 @@
 .DS_Store
 .AppleDouble
 .LSOverride
+CLAUDE.md
+.claude/
 
 # Editor
 .vscode/

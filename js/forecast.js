@@ -3,13 +3,6 @@
 // FORECAST
 // ============================================================
 async function fetchForecast() {
-  const qs = [
-    `latitude=${currentLocation.lat}`, `longitude=${currentLocation.lon}`,
-    'daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,weather_code',
-    'hourly=temperature_2m,precipitation,wind_speed_10m,relative_humidity_2m,weather_code',
-    'forecast_days=7',
-    'timezone=Europe%2FLondon',
-  ].join('&');
   const res = await fetch(`/api/forecast?lat=${currentLocation.lat}&lon=${currentLocation.lon}`);
   const text = await res.text();
   let json;
@@ -20,8 +13,8 @@ async function fetchForecast() {
   return json;
 }
 
-function weatherIcon(code, hour) {
-  if (code === 0)  return hour >= 18
+function weatherIcon(code, isDay) {
+  if (code === 0)  return isDay === 0
     ? { icon: 'weather_icon/Clear_night.svg', label: 'Clear night' }
     : { icon: 'weather_icon/Clear.svg',       label: 'Clear' };
   if (code <= 2)   return { icon: 'weather_icon/Partly_cloudy.svg', label: 'Partly cloudy' };
@@ -147,7 +140,7 @@ function renderHourlyStrip(dayIdx) {
     const hour    = +hourly.time[i].slice(11, 13);
     const timeStr =  hourly.time[i].slice(11, 16);
     const isNow   = isToday && hour === currentHour;
-    const { icon, label } = weatherIcon(hourly.weather_code[i], hour);
+    const { icon, label } = weatherIcon(hourly.weather_code[i], hourly.is_day[i]);
     const temp    = Math.round(hourly.temperature_2m[i]);
     const precip  = hourly.precipitation[i];
     const wind    = Math.round(hourly.wind_speed_10m[i]);

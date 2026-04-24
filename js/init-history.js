@@ -12,6 +12,7 @@ function init() {
   function selectLocation(idx) {
     currentLocation = LOCATIONS[idx];
     locationLabel.textContent = LOCATIONS[idx].name;
+    document.getElementById('climateSectionTitle').textContent = LOCATIONS[idx].name + ' — Climate Trends';
     locationList.querySelectorAll('.location-option').forEach(el => {
       el.classList.toggle('active', +el.dataset.idx === idx);
     });
@@ -167,6 +168,7 @@ function init() {
   });
 
   // ── Initial load ──────────────────────────────────────────────────────────
+  document.getElementById('climateSectionTitle').textContent = currentLocation.name + ' — Climate Trends';
   initClimate();
   loadClimateData();
   loadRange(startYr, startMo, endYr, endMo);
