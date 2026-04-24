@@ -20,8 +20,10 @@ async function fetchForecast() {
   return json;
 }
 
-function weatherIcon(code) {
-  if (code === 0)  return { icon: 'weather_icon/Clear.svg',        label: 'Clear' };
+function weatherIcon(code, hour) {
+  if (code === 0)  return hour >= 18
+    ? { icon: 'weather_icon/Clear_night.svg', label: 'Clear night' }
+    : { icon: 'weather_icon/Clear.svg',       label: 'Clear' };
   if (code <= 2)   return { icon: 'weather_icon/Partly_cloudy.svg', label: 'Partly cloudy' };
   if (code === 3)  return { icon: 'weather_icon/Overcast.svg',      label: 'Overcast' };
   if (code <= 49)  return { icon: 'weather_icon/Fog.svg',           label: 'Fog' };
@@ -145,7 +147,7 @@ function renderHourlyStrip(dayIdx) {
     const hour    = +hourly.time[i].slice(11, 13);
     const timeStr =  hourly.time[i].slice(11, 16);
     const isNow   = isToday && hour === currentHour;
-    const { icon, label } = weatherIcon(hourly.weather_code[i]);
+    const { icon, label } = weatherIcon(hourly.weather_code[i], hour);
     const temp    = Math.round(hourly.temperature_2m[i]);
     const precip  = hourly.precipitation[i];
     const wind    = Math.round(hourly.wind_speed_10m[i]);
