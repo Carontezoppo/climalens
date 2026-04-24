@@ -247,10 +247,7 @@ function initPolarLeafletMap({ mapId, crsCode, crsProj4, center, pole, month, mi
 
   function gibsIceUrl(year) {
     const mm  = String(month).padStart(2, '0');
-    // AMSRUE (2002-2011): smaller polar gap than SSMIS for that period
-    // SSMIS (1978-2021): full historical record outside AMSRUE window
-    const lid = (year >= 2002 && year <= 2011) ? 'AMSRUE_Sea_Ice_Concentration_12km' : 'SSMIS_Sea_Ice_Concentration';
-    return `https://gibs.earthdata.nasa.gov/wmts/${epsgId}/best/${lid}/default/${year}-${mm}-01/1km/{z}/{y}/{x}.png`;
+    return `https://gibs.earthdata.nasa.gov/wmts/${epsgId}/best/SSMIS_Sea_Ice_Concentration/default/${year}-${mm}-01/1km/{z}/{y}/{x}.png`;
   }
 
   function setYear(year, onComplete) {
@@ -350,6 +347,7 @@ function initPolarLeafletMap({ mapId, crsCode, crsProj4, center, pole, month, mi
     let cvs        = null;
     const tiles    = {};   // col (0-3) → { data: Uint8ClampedArray }
     let loadCount  = 0;
+    let errCount   = 0;
     const latMin   = pole === 'arctic' ?  55 : -90;
     const latMax   = pole === 'arctic' ?  90 : -55;
     const tileRow  = pole === 'arctic' ?   0 :   1;
@@ -400,7 +398,19 @@ function initPolarLeafletMap({ mapId, crsCode, crsProj4, center, pole, month, mi
           loadCount++;
           if (loadCount === 4) { render(); medianGroup.bringToFront(); }
         })
-        .catch(e => { loadCount++; console.warn(`LiveIceLayer col=${col}:`, e); });
+        .catch(e => {
+          console.warn(`LiveIceLayer col=${col}:`, e);
+          errCount++;
+          loadCount++;
+          if (errCount === 4) {
+            // All tiles failed — revert to historical view and show the error
+            disableLive();
+            if (liveBtn) liveBtn.classList.remove('active');
+            const yrEl = document.getElementById(mapId + 'Year');
+            if (yrEl) yrEl.textContent = 'Live unavailable';
+            setTimeout(() => { if (yrEl) yrEl.textContent = currentYear; }, 3000);
+          }
+        });
     }
 
     const LayerClass = L.Layer.extend({
@@ -466,11 +476,7 @@ function initPolarLeafletMap({ mapId, crsCode, crsProj4, center, pole, month, mi
   }
 
   setYear(maxYear);
-  setTimeout(() => {
-    map.invalidateSize();
-    enableLive();
-    if (liveBtn) liveBtn.classList.add('active');
-  }, 150);
+  setTimeout(() => { map.invalidateSize(); }, 150);
 }
 
 async function loadSeaIceData() {
@@ -490,8 +496,11 @@ async function loadSeaIceData() {
     renderPoleChart('arctic',    json.arctic,    'arcticIceChart',    'Arctic September');
     renderPoleChart('antarctic', json.antarctic, 'antarcticIceChart', 'Antarctic February');
 
-    const arcticMax    = json.arctic.lastYear    ?? 2024;
-    const antarcticMax = json.antarctic.lastYear ?? 2024;
+    // GIBS SSMIS tiles end at 2021; cap the map slider there so the
+    // default historical view always loads. LIVE mode covers anything newer.
+    const GIBS_LAST_YEAR = 2020;
+    const arcticMax    = Math.min(json.arctic.lastYear    ?? GIBS_LAST_YEAR, GIBS_LAST_YEAR);
+    const antarcticMax = Math.min(json.antarctic.lastYear ?? GIBS_LAST_YEAR, GIBS_LAST_YEAR);
 
     initPolarLeafletMap({
       mapId: 'arcticLeafletMap',
