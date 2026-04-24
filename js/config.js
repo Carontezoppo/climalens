@@ -13,6 +13,7 @@ const LOCATION_GROUPS = [
     { name: 'Copenhagen, Denmark',    lat: 55.68,  lon: 12.57  },
     { name: 'Dublin, Ireland',        lat: 53.33,  lon: -6.25  },
     { name: 'Edinburgh, UK',          lat: 55.95,  lon: -3.19  },
+    { name: 'Elba, Italy',            lat: 42.78,  lon: 10.23  },
     { name: 'Florence, Italy',        lat: 43.77,  lon: 11.25  },
     { name: 'Grosseto, Italy',        lat: 42.76,  lon: 11.11  },
     { name: 'Helsinki, Finland',      lat: 60.17,  lon: 24.94  },
@@ -54,6 +55,8 @@ const LOCATION_GROUPS = [
     { name: 'Shanghai, China',  lat: 31.23,  lon: 121.47 },
     { name: 'Singapore',        lat:  1.35,  lon: 103.82 },
     { name: 'Tokyo, Japan',     lat: 35.68,  lon: 139.69 },
+    { name: 'Seoul, South Korea', lat: 37.56,  lon: 126.97 },
+    { name: 'Ulaanbaatar, Mongolia', lat: 47.92,  lon: 106.92 },
     
   ]},
   { continent: 'Oceania', locations: [
