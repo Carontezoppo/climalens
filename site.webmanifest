@@ -1,0 +1,21 @@
+{
+  "name": "ClimaLens",
+  "short_name": "ClimaLens",
+  "description": "Real-time weather, historical climate data, and ocean data in one dashboard.",
+  "icons": [
+    {
+      "src": "/img/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0c0f14",
+  "background_color": "#0c0f14",
+  "display": "browser",
+  "start_url": "/"
+}
