@@ -432,10 +432,8 @@ function initPolarLeafletMap({ mapId, crsCode, crsProj4, center, pole, month, mi
 
   function enableLive() {
     liveActive = true;
-    // Hide the historical GIBS layer
     pendingLayers.forEach(l => map.removeLayer(l));
     pendingLayers.clear();
-    if (iceLayer) { iceLayer.setOpacity(0); }
 
     liveLayer = buildLiveLayer();
     liveLayer.addTo(map);
