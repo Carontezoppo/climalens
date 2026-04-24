@@ -416,7 +416,7 @@ function initPolarLeafletMap({ mapId, crsCode, crsProj4, center, pole, month, mi
     const LayerClass = L.Layer.extend({
       onAdd() {
         cvs = L.DomUtil.create('canvas');
-        Object.assign(cvs.style, { position: 'absolute', top: 0, left: 0, pointerEvents: 'none', opacity: '0.75' });
+        Object.assign(cvs.style, { position: 'absolute', top: 0, left: 0, pointerEvents: 'none', opacity: '0.85' });
         map.getPanes().overlayPane.appendChild(cvs);
         map.on('moveend zoomend resize', render);
         for (let c = 0; c < 4; c++) loadTile(c);
