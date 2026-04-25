@@ -66,10 +66,13 @@ function init() {
   locationLabel.textContent = LOCATIONS[0].name;
   locationList.querySelector('.location-option').classList.add('active');
 
+  locationBtn.setAttribute('aria-expanded', 'false');
+  locationBtn.setAttribute('aria-haspopup', 'listbox');
   locationBtn.addEventListener('click', e => {
     e.stopPropagation();
     const opening = !locationDropdown.classList.contains('open');
     locationDropdown.classList.toggle('open');
+    locationBtn.setAttribute('aria-expanded', String(opening));
     if (opening) {
       locationSearch.value = '';
       filterLocations('');
@@ -79,6 +82,7 @@ function init() {
   locationDropdown.addEventListener('click', e => e.stopPropagation());
   document.addEventListener('click', () => {
     locationDropdown.classList.remove('open');
+    locationBtn.setAttribute('aria-expanded', 'false');
     locationSearch.value = '';
     filterLocations('');
   });

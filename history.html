@@ -50,7 +50,7 @@
 <div class="drill-panel" id="drillPanel">
   <div class="panel-top-bar">
     <div class="panel-breadcrumb" id="panelBreadcrumb"></div>
-    <button class="panel-close" id="panelClose">&#x2715;</button>
+    <button class="panel-close" id="panelClose" aria-label="Close panel">&#x2715;</button>
   </div>
   <div class="panel-body" id="panelBody"></div>
 </div>
@@ -78,6 +78,7 @@
         </button>
         <div class="location-dropdown" id="locationDropdown">
           <div class="location-search-wrap">
+            <label for="locationSearch" class="sr-only">Search city</label>
             <input class="location-search" id="locationSearch" type="text" placeholder="Search city…" autocomplete="off">
           </div>
           <div class="location-list" id="locationList">
@@ -140,9 +141,9 @@
           <button class="preset-btn" data-months="24">24 mo</button>
         </div>
         <div class="range-custom">
-          <label>From</label>
+          <label for="rangeFrom">From</label>
           <input type="month" id="rangeFrom">
-          <label>To</label>
+          <label for="rangeTo">To</label>
           <input type="month" id="rangeTo">
           <button class="range-apply" id="rangeApply">Apply</button>
         </div>

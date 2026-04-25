@@ -61,7 +61,7 @@
 <div class="drill-panel" id="drillPanel">
   <div class="panel-top-bar">
     <div class="panel-breadcrumb" id="panelBreadcrumb"></div>
-    <button class="panel-close" id="panelClose">&#x2715;</button>
+    <button class="panel-close" id="panelClose" aria-label="Close panel">&#x2715;</button>
   </div>
   <div class="panel-body" id="panelBody"></div>
 </div>
@@ -89,6 +89,7 @@
         </button>
         <div class="location-dropdown" id="locationDropdown">
           <div class="location-search-wrap">
+            <label for="locationSearch" class="sr-only">Search city</label>
             <input class="location-search" id="locationSearch" type="text" placeholder="Search city…" autocomplete="off">
           </div>
           <div class="location-list" id="locationList">
@@ -117,17 +118,17 @@
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
         <div class="section-title" style="margin-bottom:0">Weather Map</div>
         <div class="map-layer-bar" id="mapLayerBar">
-          <button class="map-layer-btn active" data-layer="wind">💨 Wind</button>
-          <button class="map-layer-btn" data-layer="clouds">☁️ Clouds</button>
-          <button class="map-layer-btn" data-layer="rain">🌧️ Rain</button>
-          <button class="map-layer-btn" data-layer="pressure">🔵 Pressure</button>
-          <button class="map-layer-btn" data-layer="temp">🌡️ Temp</button>
+          <button class="map-layer-btn active" data-layer="wind"><span aria-hidden="true">💨</span> Wind</button>
+          <button class="map-layer-btn" data-layer="clouds"><span aria-hidden="true">☁️</span> Clouds</button>
+          <button class="map-layer-btn" data-layer="rain"><span aria-hidden="true">🌧️</span> Rain</button>
+          <button class="map-layer-btn" data-layer="pressure"><span aria-hidden="true">🔵</span> Pressure</button>
+          <button class="map-layer-btn" data-layer="temp"><span aria-hidden="true">🌡️</span> Temp</button>
         </div>
       </div>
       <button class="map-toggle-btn" id="mapToggleBtn">Hide Map</button>
     </div>
     <div class="map-wrap" id="mapWrap">
-      <iframe id="windyFrame" allowfullscreen></iframe>
+      <iframe id="windyFrame" title="Weather map" allowfullscreen></iframe>
     </div>
   </div>
 

@@ -27,12 +27,14 @@ function initMap() {
   });
 
   // Toggle visibility
-  document.getElementById('mapToggleBtn').addEventListener('click', () => {
+  const mapToggleBtn = document.getElementById('mapToggleBtn');
+  mapToggleBtn.setAttribute('aria-expanded', 'true');
+  mapToggleBtn.addEventListener('click', () => {
     mapVisible = !mapVisible;
     const wrap = document.getElementById('mapWrap');
-    const btn  = document.getElementById('mapToggleBtn');
     wrap.classList.toggle('collapsed', !mapVisible);
-    btn.textContent = mapVisible ? 'Hide Map' : 'Show Map';
+    mapToggleBtn.textContent = mapVisible ? 'Hide Map' : 'Show Map';
+    mapToggleBtn.setAttribute('aria-expanded', String(mapVisible));
   });
 
   updateMap();

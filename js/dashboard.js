@@ -111,9 +111,14 @@ function renderDashboard() {
   tbody += '</tbody>';
   table.innerHTML = thead + tbody;
 
-  // WIRE UP CLICKS
+  // WIRE UP CLICKS + KEYBOARD
   document.querySelectorAll('.kpi-card[data-metric]').forEach(card => {
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
     card.addEventListener('click', () => showMonthlyDrill(card.dataset.metric));
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showMonthlyDrill(card.dataset.metric); }
+    });
   });
 
   // Resize charts when their container changes size (handles both shrink and restore)

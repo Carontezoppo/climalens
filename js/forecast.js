@@ -47,7 +47,7 @@ function renderForecast(json) {
     const precip = daily.precipitation_sum[i];
     const wind = daily.wind_speed_10m_max[i];
     strip += `
-      <div class="forecast-day${isToday ? ' today' : ''}" onclick="selectForecastDay(${i})" style="cursor:pointer">
+      <div class="forecast-day${isToday ? ' today' : ''}" role="button" tabindex="0" onclick="selectForecastDay(${i})" style="cursor:pointer">
         <div class="forecast-day-name">${name}</div>
         <div class="forecast-icon"><img src="${icon}" alt="${label}" title="${label}"></div>
         <div class="forecast-high">${Math.round(daily.temperature_2m_max[i])}°</div>
@@ -83,6 +83,15 @@ function renderForecast(json) {
     </div>`;
 
   container.innerHTML = strip;
+
+  container.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const day = e.target.closest('.forecast-day');
+    if (day) { e.preventDefault(); day.click(); return; }
+    const hour = e.target.closest('.hourly-card');
+    if (hour) { e.preventDefault(); hour.click(); }
+  });
+
   selectForecastDay(0); // populate hourly strip with today on first render
 
   if (forecastChartInstance) forecastChartInstance.destroy();
@@ -146,7 +155,7 @@ function renderHourlyStrip(dayIdx) {
     const wind    = Math.round(hourly.wind_speed_10m[i]);
     const tempColor = temp >= 20 ? 'var(--temp-high)' : temp <= 5 ? 'var(--temp-low)' : 'var(--text-primary)';
 
-    html += `<div class="hourly-card${isNow ? ' now' : ''}" onclick="showForecastDrill(${dayIdx})">
+    html += `<div class="hourly-card${isNow ? ' now' : ''}" role="button" tabindex="0" onclick="showForecastDrill(${dayIdx})">
       <div class="hourly-time">${isNow ? 'Now' : timeStr}</div>
       <div class="hourly-icon"><img src="${icon}" alt="${label}" title="${label}"></div>
       <div class="hourly-temp" style="color:${tempColor}">${temp}°</div>

@@ -152,11 +152,13 @@ async function loadAirQuality() {
 }
 
 function initAirQuality() {
-  document.getElementById('aqToggleBtn').addEventListener('click', () => {
+  const aqToggleBtn = document.getElementById('aqToggleBtn');
+  aqToggleBtn.setAttribute('aria-expanded', 'true');
+  aqToggleBtn.addEventListener('click', () => {
     aqVisible = !aqVisible;
     const wrap = document.getElementById('aqWrap');
-    const btn  = document.getElementById('aqToggleBtn');
     wrap.classList.toggle('collapsed', !aqVisible);
-    btn.textContent = aqVisible ? 'Hide' : 'Show';
+    aqToggleBtn.textContent = aqVisible ? 'Hide' : 'Show';
+    aqToggleBtn.setAttribute('aria-expanded', String(aqVisible));
   });
 }

@@ -24,12 +24,27 @@
     --temp-high: #fb923c;
     --temp-low: #38bdf8;
     --accent: #6366f1;
+    --accent-text: #a5b4fc;
     --positive: #34d399;
     --negative: #f87171;
     --background-color: #2e3138;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 
   body {
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -173,7 +188,7 @@
     white-space: nowrap;
   }
   .location-option:hover { background: var(--bg-card-hover); color: var(--text-primary); }
-  .location-option.active { color: var(--accent); }
+  .location-option.active { color: var(--accent-text); }
 
   .range-picker { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
   .range-presets { display: flex; gap: 6px; }
@@ -184,7 +199,7 @@
     color: var(--text-muted); cursor: pointer; transition: all 0.15s;
   }
   .preset-btn:hover { border-color: var(--border-accent); color: var(--text-secondary); }
-  .preset-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(99,102,241,0.1); }
+  .preset-btn.active { border-color: var(--accent); color: var(--accent-text); background: rgba(99,102,241,0.1); }
   .range-custom { display: flex; align-items: center; gap: 8px; }
   .range-custom label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
   .range-custom input[type=month] {
@@ -200,7 +215,7 @@
     font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px;
     text-transform: uppercase; padding: 5px 12px; border-radius: 6px;
     border: 1px solid var(--accent); background: rgba(99,102,241,0.15);
-    color: var(--accent); cursor: pointer; transition: all 0.15s;
+    color: var(--accent-text); cursor: pointer; transition: all 0.15s;
   }
   .range-apply:hover { background: rgba(99,102,241,0.25); }
 
@@ -245,7 +260,7 @@
   }
   .page-tab:hover { color: var(--text-secondary); }
   .page-tab.active {
-    color: var(--accent);
+    color: var(--accent-text);
     border-bottom-color: var(--accent);
   }
   .nav-location {
@@ -280,7 +295,7 @@
   }
   .section-nav-btn:hover {
     border-color: var(--accent);
-    color: var(--accent);
+    color: var(--accent-text);
     background: rgba(99,102,241,0.08);
   }
   /* CURRENTS COLOUR MODE TOGGLE */
@@ -308,13 +323,13 @@
   }
   .currents-mode-btn.active {
     border-color: var(--accent);
-    color: var(--accent);
+    color: var(--accent-text);
     background: rgba(99,102,241,0.12);
   }
 
   .section-nav-btn.active {
     border-color: var(--accent);
-    color: var(--accent);
+    color: var(--accent-text);
     background: rgba(99,102,241,0.12);
   }
 
@@ -504,7 +519,7 @@
     color: var(--text-muted); cursor: pointer; transition: all 0.15s;
   }
   .map-layer-btn:hover { border-color: var(--border-accent); color: var(--text-secondary); }
-  .map-layer-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(99,102,241,0.1); }
+  .map-layer-btn.active { border-color: var(--accent); color: var(--accent-text); background: rgba(99,102,241,0.1); }
   .map-toggle-btn {
     font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px;
     text-transform: uppercase; padding: 5px 12px; border-radius: 6px;
@@ -643,7 +658,7 @@
   .forecast-day.today { border-color: var(--accent); background: rgba(99,102,241,0.07); }
   .forecast-day.selected { border-color: var(--accent); background: rgba(99,102,241,0.13); box-shadow: inset 0 0 0 1px var(--accent); }
   .forecast-day-name { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
-  .forecast-day.today .forecast-day-name { color: var(--accent); }
+  .forecast-day.today .forecast-day-name { color: var(--accent-text); }
   .forecast-icon { margin-bottom: 10px; line-height: 1; }
   .forecast-icon img { width: 40px; height: 40px; display: block; margin: 0 auto; }
   .forecast-high { font-size: 18px; font-weight: 700; color: var(--temp-high); letter-spacing: -0.5px; }
@@ -665,7 +680,7 @@
     text-transform: uppercase; color: var(--text-muted); background: none;
     border: none; cursor: pointer; padding: 0; transition: color 0.15s;
   }
-  .hourly-detail-btn:hover { color: var(--accent); }
+  .hourly-detail-btn:hover { color: var(--accent-text); }
   .hourly-scroll {
     display: flex; gap: 8px; overflow-x: auto;
     padding-bottom: 6px; scroll-behavior: smooth;
@@ -685,7 +700,7 @@
     font-family: 'DM Mono', monospace; font-size: 10px;
     letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px;
   }
-  .hourly-card.now .hourly-time { color: var(--accent); font-weight: 500; }
+  .hourly-card.now .hourly-time { color: var(--accent-text); font-weight: 500; }
   .hourly-icon { margin-bottom: 6px; line-height: 1; }
   .hourly-icon img { width: 24px; height: 24px; display: block; margin: 0 auto; }
   .hourly-temp { font-size: 14px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
@@ -878,7 +893,7 @@
     }
     .page-tabs .page-tab:hover { background: var(--bg-card-hover); }
     .page-tabs .page-tab.active {
-      color: var(--accent);
+      color: var(--accent-text);
       background: rgba(99,102,241,0.08);
       border-bottom-color: transparent;
     }
@@ -962,7 +977,7 @@
     font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px;
     text-transform: uppercase; padding: 12px 28px; border-radius: 10px;
     border: 1px solid var(--accent); background: rgba(99,102,241,0.1);
-    color: var(--accent); cursor: pointer; transition: all 0.2s;
+    color: var(--accent-text); cursor: pointer; transition: all 0.2s;
   }
   .climate-load-btn:hover { background: rgba(99,102,241,0.25); transform: translateY(-1px); }
   .climate-stripes { width: 100%; height: 32px; border-radius: 6px; display: block; margin-top: 16px; }
@@ -1010,7 +1025,7 @@
     border: 1px solid var(--border); background: var(--bg-panel);
     color: var(--text-muted); cursor: pointer; transition: all 0.15s;
   }
-  .sst-play-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(99,102,241,0.08); }
+  .sst-play-btn:hover { border-color: var(--accent); color: var(--accent-text); background: rgba(99,102,241,0.08); }
   .sst-play-btn.playing { border-color: var(--negative); color: var(--negative); background: rgba(248,113,113,0.08); }
   .polar-live-btn {
     font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px;
@@ -1237,3 +1252,42 @@
   white-space: nowrap !important;
 }
 .current-label-tooltip::before { display: none !important; }
+
+/* ── Touch target sizes (WCAG 2.5.5 — minimum 44×44px on touch devices) ── */
+@media (pointer: coarse) {
+  /* Explicit size — overrides the hardcoded 36×36 */
+  .panel-close {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Links rendered as flex so min-height actually centres content vertically */
+  .page-tab,
+  .section-nav-btn,
+  .hourly-detail-btn {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* List items — left-aligned, already flex in base styles */
+  .location-option,
+  .current-list-item {
+    min-height: 44px;
+  }
+
+  /* Buttons — browser centres content by default */
+  .nav-hamburger,
+  .map-layer-btn,
+  .preset-btn,
+  .map-toggle-btn,
+  .aq-toggle-btn,
+  .range-apply,
+  .climate-load-btn,
+  .sst-play-btn,
+  .polar-live-btn,
+  .currents-mode-btn {
+    min-height: 44px;
+  }
+}
