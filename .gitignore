@@ -4,6 +4,7 @@
 .LSOverride
 CLAUDE.md
 .claude/
+/skills
 
 # Editor
 .vscode/
