@@ -94,6 +94,7 @@
     letter-spacing: -0.5px;
     line-height: 1.1;
   }
+  .header-subtitle { font-size: 16px; color: var(--text-secondary); }
   .header-title span { color: var(--accent); }
   .header-right { text-align: right; }
   .header-location { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
@@ -856,10 +857,12 @@
 
     /* Header — row on mobile, hamburger on right; positioned for dropdown anchor */
     /* z-index: 201 keeps the header (and its hamburger/close button) above the nav overlay (z: 100) */
-    .header { position: relative; align-items: center; z-index: 201; }
+    .header { position: relative; align-items: center; z-index: 201; margin-bottom: 48px; }
     .header-left { max-width: 75%; }
     .header-title { font-size: 40px; }
+    .header-subtitle { font-size: 16px; }
     .header-period { margin-bottom: 10px; }
+    .section-title { font-size: 18px; }
 
     /* Hamburger button */
     .nav-hamburger {
