@@ -58,19 +58,23 @@
 <div class="dashboard">
   <header class="header">
     <div class="header-left">
-      <div class="header-label">MeteoScope Dashboard</div>
       <h1 class="header-title">Clima<span>Lens</span></h1>
       <p class="header-subtitle">Weather and climate trends from 1970 to today</p>
-      <div class="link" style="margin: 16px 0; font-size: 14px;"><a href="https://alessandromolinaro.com/vibes.html"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">←</span> Back to prototypes</a></div>
     </div>
+    <nav class="header-nav" id="pageTabsNav">
+      <div class="header-nav-links">
+        <a class="page-tab" href="index.html">Weather</a>
+        <a class="page-tab active" href="history.html">History</a>
+        <a class="page-tab" href="sea.html">Sea</a>
+        <a class="page-tab" href="https://alessandromolinaro.com/vibes.html">Portfolio ↗</a>
+      </div>
+      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
+        <span id="navHamburgerIcon">☰</span><span>Menu</span>
+      </button>
+    </nav>
   </header>
 
-  <nav class="page-tabs" id="pageTabsNav">
-    <div class="page-tabs-links">
-      <a class="page-tab" href="index.html">Weather &amp; Forecast</a>
-      <a class="page-tab active" href="history.html">Historical Climate</a>
-      <a class="page-tab" href="sea.html">Sea Data</a>
-    </div>
+  <div class="controls-bar">
     <div class="nav-location">
       <div class="location-select-wrapper">
         <button class="location-select" id="locationSelectBtn" type="button">
@@ -87,14 +91,11 @@
         </div>
       </div>
     </div>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
-      <span id="navHamburgerIcon">☰</span><span>Menu</span>
-    </button>
-  </nav>
-  <nav class="section-nav">
-    <a class="section-nav-btn" href="#section-climate"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Climate Trends (1970-Today)</a>
-    <a class="section-nav-btn" href="#section-historical"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Historical Data</a>
-  </nav>
+    <nav class="section-nav">
+      <a class="section-nav-btn" href="#section-climate"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Trends</a>
+      <a class="section-nav-btn" href="#section-historical"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Historical</a>
+    </nav>
+  </div>
 
   <div class="section-title" id="section-climate" style="margin-top:8px;">
     <span id="climateSectionTitle">Climate Trends</span>

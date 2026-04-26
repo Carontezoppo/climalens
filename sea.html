@@ -54,28 +54,29 @@
 <div class="dashboard">
   <header class="header">
     <div class="header-left">
-      <div class="header-label">MeteoScope Dashboard</div>
       <h1 class="header-title">Clima<span>Lens</span></h1>
       <p class="header-subtitle">Sea surface temperature and ocean currents</p>
-      <div class="link" style="margin: 16px 0; font-size: 14px;"><a href="https://alessandromolinaro.com/vibes.html"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">←</span> Back to prototypes</a></div>
     </div>
+    <nav class="header-nav" id="pageTabsNav">
+      <div class="header-nav-links">
+        <a class="page-tab" href="index.html">Weather</a>
+        <a class="page-tab" href="history.html">History</a>
+        <a class="page-tab active" href="sea.html">Sea</a>
+        <a class="page-tab" href="https://alessandromolinaro.com/vibes.html">Portfolio ↗</a>
+      </div>
+      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
+        <span id="navHamburgerIcon">☰</span><span>Menu</span>
+      </button>
+    </nav>
   </header>
 
-  <nav class="page-tabs" id="pageTabsNav">
-    <div class="page-tabs-links">
-      <a class="page-tab" href="index.html">Weather &amp; Forecast</a>
-      <a class="page-tab" href="history.html">Historical Climate</a>
-      <a class="page-tab active" href="sea.html">Sea Data</a>
-    </div>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
-      <span id="navHamburgerIcon">☰</span><span>Menu</span>
-    </button>
-  </nav>
-  <nav class="section-nav">
-    <a class="section-nav-btn" href="#section-sst"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Sea Temperature</a>
-    <a class="section-nav-btn" href="#section-polar-ice"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Polar Ice</a>
-    <a class="section-nav-btn" href="#section-currents-live"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Ocean Currents</a>
-  </nav>
+  <div class="controls-bar">
+    <nav class="section-nav">
+      <a class="section-nav-btn" href="#section-sst"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Temperature</a>
+      <a class="section-nav-btn" href="#section-polar-ice"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Ice</a>
+      <a class="section-nav-btn" href="#section-currents-live"><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;">↓</span> Currents</a>
+    </nav>
+  </div>
 
   <div class="section-title" id="section-sst" style="margin-top:8px;">
     Sea Surface Temperature

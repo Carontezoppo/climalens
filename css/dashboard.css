@@ -76,7 +76,7 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 72px;
     padding-bottom: 0;
   }
   .header-label {
@@ -118,7 +118,7 @@
     outline: none;
     text-align: left;
     width: 100%;
-    min-width: 240px;
+    min-width: 300px;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238891a5' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
@@ -231,19 +231,14 @@
   }
   .nav-overlay.open { display: block; }
 
-  /* PAGE TABS BAR */
-  .page-tabs {
+  /* HEADER NAV */
+  .header-nav {
     display: flex;
     align-items: center;
-    gap: 0;
-    position: relative;   /* anchor for absolute dropdown */
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 16px;
   }
-  .page-tabs-links {
+  .header-nav-links {
     display: flex;
     align-items: center;
-    flex: 1;
   }
   .page-tab {
     font-family: 'DM Mono', monospace;
@@ -254,7 +249,6 @@
     text-decoration: none;
     color: var(--text-muted);
     border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
     white-space: nowrap;
     transition: color 0.15s, border-color 0.15s;
   }
@@ -263,20 +257,29 @@
     color: var(--accent-text);
     border-bottom-color: var(--accent);
   }
+
+  /* CONTROLS BAR (location + section pills) */
+  .controls-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    padding-bottom: 10px;
+    flex-wrap: wrap;
+  }
   .nav-location {
-    margin-left: auto;
-    padding-bottom: 6px;
+    padding-bottom: 0;
     position: relative;
   }
   .nav-location .location-select-wrapper { margin-bottom: 0; }
   .nav-location .location-dropdown { right: 0; left: auto; min-width: 240px; }
   .nav-hamburger { display: none; }
 
-  /* SECTION NAV (in-page jump pills) */
+  /* SECTION NAV (in-page jump pills, lives inside .controls-bar) */
   .section-nav {
     display: flex;
     gap: 8px;
-    margin-bottom: 40px;
     flex-wrap: wrap;
   }
   .section-nav-btn {
@@ -851,15 +854,16 @@
     /* Layout */
     .dashboard { padding: 24px 14px 48px; }
 
-    /* Header */
-    .header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    /* Header — row on mobile, hamburger on right; positioned for dropdown anchor */
+    /* z-index: 201 keeps the header (and its hamburger/close button) above the nav overlay (z: 100) */
+    .header { position: relative; align-items: center; z-index: 201; }
+    .header-left { max-width: 75%; }
     .header-title { font-size: 40px; }
     .header-period { margin-bottom: 10px; }
 
-    /* Nav bar — hamburger + always-visible location row */
+    /* Hamburger button */
     .nav-hamburger {
       display: flex; align-items: center; gap: 6px;
-      order: 1;
       font-family: 'DM Mono', monospace; font-size: 11px;
       letter-spacing: 1.5px; text-transform: uppercase;
       padding: 8px 2px 10px; border: none; background: none;
@@ -867,36 +871,36 @@
       white-space: nowrap;
     }
     .nav-hamburger:hover { color: var(--text-primary); }
-    .nav-location {
-      order: 2; display: block; margin-left: auto; width: auto; padding-bottom: 6px;
-    }
 
-    /* Collapsible tab links — absolute panel below nav bar */
-    .page-tabs { z-index: 200; }
-    .page-tabs-links { display: none; }
-    .page-tabs.open .page-tabs-links {
+    /* Collapsible tab links — absolute panel below header */
+    .header-nav-links { display: none; }
+    .header-nav.open .header-nav-links {
       display: flex; flex-direction: column;
-      position: absolute; top: 100%; left: 0; right: 0;
+      position: absolute; top: calc(100% + 8px); left: 0; right: 0;
       background: var(--bg-card);
-      border: 1px solid var(--border); border-top: none;
-      border-radius: 0 0 12px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
       box-shadow: 0 16px 40px rgba(0,0,0,0.6);
       padding: 8px 0 20px;
       z-index: 200;
     }
-    .page-tabs .page-tab {
+    .header-nav .page-tab {
       font-size: 15px; font-family: 'Plus Jakarta Sans', sans-serif;
       letter-spacing: 0; font-weight: 500;
       padding: 16px 24px; line-height: 1.4;
-      border-bottom: none; margin-bottom: 0;
-      border-radius: 0; width: 100%; text-transform: none;
+      border-bottom: none; width: 100%; text-transform: none;
     }
-    .page-tabs .page-tab:hover { background: var(--bg-card-hover); }
-    .page-tabs .page-tab.active {
+    .header-nav .page-tab:hover { background: var(--bg-card-hover); }
+    .header-nav .page-tab.active {
       color: var(--accent-text);
       background: rgba(99,102,241,0.08);
       border-bottom-color: transparent;
     }
+
+    /* Controls bar — stack location above pills on mobile */
+    .controls-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .controls-bar .nav-location { width: 100%; }
+    .controls-bar .nav-location .location-select { min-width: 0; width: 100%; }
 
     /* Range picker */
     .range-picker { align-items: flex-start; width: 100%; }
