@@ -302,6 +302,12 @@
     color: var(--accent-text);
     background: rgba(99,102,241,0.08);
   }
+  .section-nav-arrows {
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    font-size: 13px; 
+    margin-right: 4px; 
+    margin-top: -2px;
+  }
   /* CURRENTS COLOUR MODE TOGGLE */
   .currents-mode-bar {
     display: flex;
@@ -890,7 +896,7 @@
     .header-nav .page-tab {
       font-size: 15px; font-family: 'Plus Jakarta Sans', sans-serif;
       letter-spacing: 0; font-weight: 500;
-      padding: 16px 24px; line-height: 1.4;
+      padding: 32px 24px; line-height: 1.4;
       border-bottom: none; width: 100%; text-transform: none;
     }
     .header-nav .page-tab:hover { background: var(--bg-card-hover); }
