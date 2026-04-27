@@ -258,6 +258,8 @@
     color: var(--accent-text);
     border-bottom-color: var(--accent);
   }
+  .page-tab:has(img) { display: flex; align-items: center; gap: 6px; }
+  .page-tab img { height: 20px; width: auto; }
 
   /* CONTROLS BAR (location + section pills) */
   .controls-bar {
@@ -474,6 +476,7 @@
   .chart-legend { display: flex; gap: 16px; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
   .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .legend-dash { width: 18px; height: 0; border-top: 2px dashed; flex-shrink: 0; }
   .chart-container { position: relative; height: 240px; }
   .chart-card.full-width .chart-container { height: 280px; }
 

@@ -31,7 +31,7 @@ function weatherIcon(code, isDay) {
 let forecastChartInstance = null;
 let forecastData = null; // stored for drill-down access
 
-function renderForecast(json) {
+function renderForecast(json, normals) {
   forecastData = json;
   const daily = json.daily;
   const container = document.getElementById('forecastContent');
@@ -72,11 +72,12 @@ function renderForecast(json) {
       <div class="chart-header" style="margin-bottom:12px">
         <div>
           <div class="chart-title">Temperature Forecast</div>
-          <div class="chart-subtitle">High &amp; low over the next 7 days (°C)</div>
+          <div class="chart-subtitle">High &amp; low over the next 7 days (°C)${normals ? ' · dashed: 2000–2024 monthly avg' : ''}</div>
         </div>
         <div class="chart-legend">
           <div class="legend-item"><div class="legend-dot" style="background:var(--temp-high)"></div>High</div>
           <div class="legend-item"><div class="legend-dot" style="background:var(--temp-low)"></div>Low</div>
+          ${normals ? `<div class="legend-item"><div class="legend-dash" style="border-top-color:rgba(251,146,60,0.5)"></div>Avg High</div><div class="legend-item"><div class="legend-dash" style="border-top-color:rgba(56,189,248,0.5)"></div>Avg Low</div>` : ''}
         </div>
       </div>
       <div class="forecast-chart-container"><canvas id="forecastChart"></canvas></div>
@@ -99,12 +100,19 @@ function renderForecast(json) {
     const d = new Date(date + 'T12:00:00');
     return date === today ? 'Today' : dayNames[d.getDay()];
   });
+  const datasets = [
+    { label:'High', data: daily.temperature_2m_max.map(v => Math.round(v)), borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#fb923c', pointBorderColor:'#0c0f14', pointBorderWidth:2 },
+    { label:'Low',  data: daily.temperature_2m_min.map(v => Math.round(v)), borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,0.08)',  fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#38bdf8', pointBorderColor:'#0c0f14', pointBorderWidth:2 },
+  ];
+  if (normals) {
+    const normHigh = daily.time.map(d => normals.high[new Date(d + 'T12:00:00').getMonth()]);
+    const normLow  = daily.time.map(d => normals.low[new Date(d + 'T12:00:00').getMonth()]);
+    datasets.push({ label:'Avg High', data: normHigh, borderColor:'rgba(251,146,60,0.45)', borderDash:[5,4], pointRadius:0, fill:false, tension:0 });
+    datasets.push({ label:'Avg Low',  data: normLow,  borderColor:'rgba(56,189,248,0.45)',  borderDash:[5,4], pointRadius:0, fill:false, tension:0 });
+  }
   forecastChartInstance = new Chart(document.getElementById('forecastChart'), {
     type: 'line',
-    data: { labels, datasets: [
-      { label:'High', data: daily.temperature_2m_max.map(v => Math.round(v)), borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#fb923c', pointBorderColor:'#0c0f14', pointBorderWidth:2 },
-      { label:'Low',  data: daily.temperature_2m_min.map(v => Math.round(v)), borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,0.08)',  fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#38bdf8', pointBorderColor:'#0c0f14', pointBorderWidth:2 },
-    ]},
+    data: { labels, datasets },
     options: { responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, scales:{ y:{ ticks:{ callback: v => v+'°' }, grace:'20%' } }, plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y}°C` } } } }
   });
 }
@@ -176,20 +184,36 @@ function renderHourlyStrip(dayIdx) {
   }
 }
 
-async function loadForecast() {
-  const cacheKey = `forecast_${currentLocation.lat}_${currentLocation.lon}`;
+async function loadNormals() {
+  const cacheKey = `normals_${currentLocation.lat}_${currentLocation.lon}`;
   const cached = localStorage.getItem(cacheKey);
   if (cached) {
     const { ts, data } = JSON.parse(cached);
-    if (Date.now() - ts < 60 * 60 * 1000) {
-      renderForecast(data);
-      return;
-    }
+    if (Date.now() - ts < 7 * 24 * 60 * 60 * 1000) return data;
   }
+  const res = await fetch(`/api/normals?lat=${currentLocation.lat}&lon=${currentLocation.lon}`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (!data.high || !data.low) return null;
+  localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
+  return data;
+}
+
+async function loadForecast() {
+  const cacheKey = `forecast_${currentLocation.lat}_${currentLocation.lon}`;
   try {
-    const json = await fetchForecast();
-    localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: json }));
-    renderForecast(json);
+    const forecastPromise = (async () => {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const { ts, data } = JSON.parse(cached);
+        if (Date.now() - ts < 60 * 60 * 1000) return data;
+      }
+      const json = await fetchForecast();
+      localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: json }));
+      return json;
+    })();
+    const [json, normals] = await Promise.all([forecastPromise, loadNormals().catch(() => null)]);
+    renderForecast(json, normals);
   } catch (err) {
     document.getElementById('forecastContent').textContent = 'Forecast unavailable: ' + err.message;
   }
