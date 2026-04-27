@@ -1012,7 +1012,7 @@
     border: 1px solid var(--border); border-radius: 12px;
     overflow: hidden; margin-bottom: 12px;
   }
-  .sst-map-wrap { height: 600px; background: #141821; }
+  .sst-map-wrap { height: 600px; background: #141821; isolation: isolate; }
   .sst-map-wrap .leaflet-container { background: #141821 !important; }
   .sst-map-wrap .leaflet-control-zoom a {
     background: var(--bg-card) !important; border-color: var(--border) !important;
@@ -1187,6 +1187,7 @@
   border-radius: 8px;
   overflow: hidden;
   margin-top: 14px;
+  isolation: isolate;
   background: #0a0d14;
 }
 .polar-map-source {
@@ -1213,7 +1214,7 @@
   border: 1px solid var(--border); border-radius: 12px;
   overflow: hidden; margin-bottom: 12px; position: relative;
 }
-.live-currents-map-wrap { height: 550px; background: #141821; position: relative; }
+.live-currents-map-wrap { height: 550px; background: #141821; position: relative; isolation: isolate; }
 .live-currents-map-wrap .leaflet-container { background: #141821 !important; }
 .live-currents-map-wrap .leaflet-control-zoom a {
   background: var(--bg-card) !important; border-color: var(--border) !important;
