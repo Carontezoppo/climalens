@@ -471,8 +471,8 @@
   .chart-card:hover { border-color: var(--border-accent); }
   .chart-card.full-width { grid-column: 1 / -1; }
   .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .chart-title { font-size: 15px; font-weight: 600; }
-  .chart-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .chart-title { font-size: 18px; font-weight: 600; }
+  .chart-subtitle { font-size: 14px; color: var(--text-muted); margin-top: 2px; line-height: 1.618; }
   .chart-legend { display: flex; gap: 16px; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
   .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
@@ -1307,4 +1307,103 @@
   .currents-mode-btn {
     min-height: 44px;
   }
+}
+
+/* ========= FOREST COVER MAP ========= */
+.forest-map-wrap {
+  height: 600px; background: #0a0e17; isolation: isolate;
+}
+.forest-map-wrap .leaflet-image-layer {
+  transition: opacity 0.35s ease;
+}
+.forest-map-wrap .leaflet-container { background: #0a0e17 !important; }
+.forest-map-wrap .leaflet-control-zoom a {
+  background: var(--bg-card) !important; border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+}
+.forest-map-wrap .leaflet-control-zoom a:hover { color: var(--text-primary) !important; }
+.forest-map-wrap .leaflet-control-attribution {
+  background: rgba(7,10,15,0.75) !important;
+  color: rgba(136,145,165,0.6) !important; font-size: 9px !important;
+}
+.forest-progress-wrap {
+  margin-bottom: 16px;
+}
+.forest-progress-bg {
+  height: 4px; border-radius: 2px; background: var(--border-accent);
+  overflow: hidden; margin-bottom: 6px;
+}
+.forest-progress-bar {
+  height: 100%; width: 0%; border-radius: 2px; background: var(--accent);
+  transition: width 0.25s ease;
+}
+.forest-progress-label {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted);
+}
+.forest-year-display {
+  font-family: 'DM Mono', monospace; font-size: 24px;
+  font-weight: 500; letter-spacing: 3px; color: var(--text-primary);
+}
+.forest-legend {
+  display: flex; flex-wrap: wrap; gap: 6px 20px; margin-bottom: 14px;
+}
+.forest-legend-item {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted);
+}
+.forest-legend-swatch {
+  width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+@media (max-width: 768px) {
+  .forest-map-wrap { height: 320px; }
+  .worldcover-map-wrap { height: 320px; }
+}
+
+/* ========= WORLDCOVER MAP ========= */
+.worldcover-map-wrap {
+  height: 600px; background: #004ca3; isolation: isolate;
+}
+.worldcover-map-wrap .leaflet-container { background: #004ca3 !important; }
+.worldcover-map-wrap .leaflet-control-zoom a {
+  background: var(--bg-card) !important; border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+}
+.worldcover-map-wrap .leaflet-control-zoom a:hover { color: var(--text-primary) !important; }
+.worldcover-map-wrap .leaflet-control-attribution {
+  background: rgba(7,10,15,0.75) !important;
+  color: rgba(136,145,165,0.6) !important; font-size: 9px !important;
+}
+.worldcover-map-wrap .leaflet-shadow-pane {
+  mix-blend-mode: screen;
+  filter: brightness(1.6);
+}
+
+/* ========= FOREST ANIMATION GATE ========= */
+.forest-gate {
+  border: 1px solid var(--border); border-radius: 12px;
+  background: var(--bg-card); min-height: 240px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px 24px; margin-bottom: 12px;
+}
+.forest-gate-inner { text-align: center; max-width: 480px; }
+.forest-gate-title {
+  font-family: 'DM Mono', monospace; font-size: 12px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 12px;
+}
+.forest-gate-desc {
+  font-size: 14px; color: var(--text-secondary);
+  line-height: 1.7; margin-bottom: 24px;
+}
+.forest-gate-btn {
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 10px 28px; border-radius: 20px;
+  border: 1px solid var(--accent); background: rgba(99,102,241,0.08);
+  color: var(--accent-text); cursor: pointer; transition: all 0.15s;
+}
+.forest-gate-btn:hover {
+  background: rgba(99,102,241,0.18); border-color: var(--accent-text);
 }
