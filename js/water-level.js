@@ -100,6 +100,62 @@ const WL_CITIES = [
     cause: 'mixed',
     detail: 'Two-thirds of the Netherlands lies below sea level or at flood risk. Rotterdam\'s Maeslant Barrier and the broader Delta Works system are among the world\'s most sophisticated flood defences — but they require continuous adaptation as the sea level baseline rises.',
   },
+  {
+    id: 'london',
+    name: 'London', country: 'United Kingdom',
+    lat: 51.51, lon: -0.12,
+    eustaticRate: 3.2, relativeRate: 4.2,
+    cause: 'isostatic',
+    detail: 'While global seas rise, South East England is also sinking due to post-glacial isostatic adjustment (the "seesaw" effect as Scotland rises). The Thames Barrier, designed in the 1970s, is being used more frequently than anticipated to manage these compounding risks.',
+  },
+  {
+    id: 'norfolk-va',
+    name: 'Norfolk', country: 'USA',
+    lat: 36.85, lon: -76.28,
+    eustaticRate: 3.1, relativeRate: 5.1,
+    cause: 'mixed',
+    detail: 'Norfolk experiences some of the highest relative sea level rise on the US East Coast. This is caused by a combination of global rise, land subsidence from groundwater extraction, and the slowing of the Gulf Stream, which allows water to pile up along the coast.',
+  },
+  {
+    id: 'hamburg',
+    name: 'Hamburg', country: 'Germany',
+    lat: 53.55, lon: 9.99,
+    eustaticRate: 3.2, relativeRate: 3.5,
+    cause: 'mixed',
+    detail: 'As a major port 100km inland on the Elbe River, Hamburg is vulnerable to "storm surge stacking." Rising sea levels push more water into the river funnel, increasing the height and frequency of tidal surges that threaten its historic Speicherstadt district.',
+  },
+  {
+    id: 'shanghai',
+    name: 'Shanghai', country: 'China',
+    lat: 31.23, lon: 121.47,
+    eustaticRate: 3.2, relativeRate: 12.0,
+    cause: 'mixed',
+    detail: 'Shanghai sits on a low-lying swampy delta. While aggressive groundwater regulations have slowed subsidence recently, the city remains highly vulnerable to "compound flooding"—the simultaneous occurrence of high tides, storm surges, and heavy river runoff.',
+  },
+  {
+    id: 'lagos',
+    name: 'Lagos', country: 'Nigeria',
+    lat: 6.45, lon: 3.40,
+    eustaticRate: 3.5, relativeRate: 5.0,
+    cause: 'eustatic',
+    detail: 'As Africa\'s largest city, Lagos is built on a series of islands and sandbars. It is exceptionally vulnerable to eustatic rise and coastal erosion. Recent "Great Wall of Lagos" projects aim to protect new developments, but may increase erosion in older, poorer neighborhoods.',
+  },
+  {
+    id: 'alexandria',
+    name: 'Alexandria', country: 'Egypt',
+    lat: 31.20, lon: 29.91,
+    eustaticRate: 3.2, relativeRate: 5.0,
+    cause: 'mixed',
+    detail: 'The Nile Delta is sinking naturally due to the lack of new silt (trapped by the Aswan High Dam). This, combined with eustatic rise, threatens to displace millions and salinize the fertile agricultural land that feeds much of Egypt.',
+  },
+  {
+    id: 'galveston',
+    name: 'Galveston/Houston', country: 'USA',
+    lat: 29.30, lon: -94.79,
+    eustaticRate: 3.1, relativeRate: 6.5,
+    cause: 'mixed',
+    detail: 'The Texas Gulf Coast faces high relative rise due to oil and gas extraction causing land subsidence. This amplifies the impact of increasingly intense hurricanes, leading to the proposed "Ike Dike" coastal spine project.',
+  }
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -237,7 +293,7 @@ function renderCityPanel(city) {
 
   const subsidence  = +(city.relativeRate - city.eustaticRate).toFixed(1);
   const isHighLocal = city.relativeRate > city.eustaticRate + 1;
-  const causeLabel  = { subsidence: 'Subsidence-driven', eustatic: 'Eustatic', mixed: 'Mixed' }[city.cause];
+  const causeLabel  = { subsidence: 'Subsidence-driven', eustatic: 'Eustatic', mixed: 'Mixed', isostatic: 'Isostatic' }[city.cause];
 
   panel.innerHTML = `
     <div class="wl-city-name">${city.name}</div>
