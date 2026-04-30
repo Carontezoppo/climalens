@@ -1046,11 +1046,18 @@
   .polar-live-btn {
     font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px;
     text-transform: uppercase; padding: 6px 14px; border-radius: 20px;
-    border: 1px solid var(--positive); background: var(--bg-panel);
-    color: var(--positive); cursor: pointer; transition: all 0.15s;
+    border: 1px solid var(--temp-low); background: var(--bg-panel);
+    color: var(--temp-low); cursor: pointer; transition: all 0.15s;
   }
-  .polar-live-btn:hover { background: rgba(52,211,153,0.1); }
-  .polar-live-btn.active { background: rgba(52,211,153,0.18); box-shadow: 0 0 0 2px rgba(52,211,153,0.3); }
+  .polar-live-btn .plb-pause { display: none; }
+  .polar-live-btn:hover { background: rgba(56,189,248,0.08); }
+  .polar-live-btn.active {
+    border-color: var(--positive); color: var(--positive);
+    background: rgba(52,211,153,0.12); box-shadow: 0 0 0 2px rgba(52,211,153,0.25);
+  }
+  .polar-live-btn.active .plb-play  { display: none; }
+  .polar-live-btn.active .plb-pause { display: inline; }
+  .polar-live-btn.active:hover { background: rgba(52,211,153,0.2); }
   .sst-slider {
     width: 100%; height: 4px; -webkit-appearance: none; appearance: none;
     border-radius: 2px; background: var(--border-accent); outline: none;
@@ -1461,9 +1468,9 @@
   flex: 1; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
 }
 .wl-map-wrap {
-  height: 440px; background: #141821; isolation: isolate;
+  height: 440px; background: #0d1b2a; isolation: isolate;
 }
-.wl-map-wrap .leaflet-container { background: #141821 !important; }
+.wl-map-wrap .leaflet-container { background: #0d1b2a !important; }
 .wl-map-wrap .leaflet-control-zoom a {
   background: var(--bg-card) !important; border-color: var(--border) !important;
   color: var(--text-secondary) !important;
