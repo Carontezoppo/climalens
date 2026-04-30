@@ -73,11 +73,54 @@
 
   <div class="controls-bar">
     <nav class="section-nav">
+      <a class="section-nav-btn" href="#section-water-level"><span class="section-nav-arrows">↓</span> Level</a>
       <a class="section-nav-btn" href="#section-sst"><span class="section-nav-arrows">↓</span> Temperature</a>
       <a class="section-nav-btn" href="#section-polar-ice"><span class="section-nav-arrows">↓</span> Ice</a>
       <a class="section-nav-btn" href="#section-currents-live"><span class="section-nav-arrows">↓</span> Currents</a>
     </nav>
   </div>
+
+  <!-- ── Sea Level ──────────────────────────────────────────────────────────── -->
+  <div class="section-title" id="section-water-level" style="margin-top:8px;">
+    Sea Level
+    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Global · 1993 – present · Satellite Altimetry</span>
+  </div>
+  <div class="chart-subtitle" style="margin-bottom:12px;">Global Mean Sea Level (GMSL) from merged satellite altimetry. Click a coastal city to see local rates, causes, and context.<br><strong>Note:</strong> Eustatic sea level refers to the <strong>global, absolute change in ocean volume</strong> (ice melt, thermal expansion), affecting the whole planet uniformly.<br>Relative sea level is the <strong> height of the sea compared to the land</strong>, which changes due to both eustatic changes and vertical land movement (subsidence or uplift).</div>
+
+  <!-- Section A: Global Vital Sign -->
+  <div class="wl-vital-card">
+    <div class="wl-vital-top">
+      <div class="wl-vital-metrics">
+        <div class="wl-metric-label">Current rate</div>
+        <div class="wl-metric-value" id="wlGmslRate">—</div>
+        <div class="wl-metric-sub" id="wlGmslTotal">Loading…</div>
+      </div>
+      <div class="wl-sparkline-wrap">
+        <svg id="wlSparkline" class="wl-sparkline" preserveAspectRatio="none" aria-label="Global mean sea level trend since 1993" role="img"></svg>
+        <div class="wl-sparkline-labels">
+          <span>1993</span><span id="wlSparklineEnd">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="wl-context-line">
+      The ocean is currently rising at nearly double the rate of the 20th century. Since 1993, the global average has climbed by more than 10 cm — the fastest sustained rise in the satellite record.
+    </div>
+    <div class="wl-vital-source" id="wlGmslStatus">Loading…</div>
+  </div>
+
+  <!-- Section B: Regional Alert -->
+  <div class="wl-regional-wrap">
+    <div class="wl-regional-map-card">
+      <div class="wl-map-wrap" id="wlMap"></div>
+    </div>
+    <div class="wl-regional-panel" id="wlCityPanel">
+      <div class="wl-panel-placeholder">
+        <div class="wl-panel-placeholder-icon">◎</div>
+        <div>Click a marker to explore local sea level data</div>
+      </div>
+    </div>
+  </div>
+  <div class="wl-regional-source">Local rates: IPCC AR6 WG1 Ch.9 · PSMSL tide gauge records · Subsidence literature</div>
 
   <div class="section-title" id="section-sst" style="margin-top:8px;">
     Sea Surface Temperature
@@ -108,7 +151,7 @@
     Polar Ice Coverage
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">1979 – present · NSIDC Sea Ice Index</span>
   </div>
-  <div class="chart-subtitle" style="margin-bottom:12px;">Arctic minimum (September) and Antarctic maximum (February) sea ice extent. Dashed line marks the 1981–2010 WMO baseline. Bars below the line indicate below-average ice coverage.</div>
+  <div class="chart-subtitle" style="margin-bottom:12px;">Arctic minimum (September) and Antarctic maximum (February) sea ice extent. Dashed line marks the 1981–2010 WMO baseline. Bars below the line indicate below-average ice coverage.<br><strong>Note:</strong> The black hole in the polar regions represents areas where ice data is unavailable due to Satellite Data Gap. Basically, most polar-orbiting satellites do not fly directly over the 90° North or South poles. Those parts are often called <strong>Zone of Silence</strong>.</div>
 
   <div class="polar-ice-grid">
     <!-- Arctic -->
@@ -218,6 +261,7 @@
 <script src="js/sst.js"></script>
 <script src="js/sea-ice.js"></script>
 <script src="js/currents-live.js"></script>
+<script src="js/water-level.js"></script>
 <script src="js/init-sea.js"></script>
 <!----------------------------Cookies enabler-------------------------------------------->
 <script src="https://alessandromolinaro.com/js/cookies.js"></script>

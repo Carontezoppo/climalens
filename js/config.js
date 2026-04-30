@@ -5,6 +5,7 @@
 const LOCATION_GROUPS = [
   { continent: 'Europe', locations: [
     { name: 'Birmingham, UK',         lat: 52.48,  lon: -1.90  },
+    { name: 'Almeria, Spain',         lat: 36.84,  lon: -2.46  },
     { name: 'Amsterdam, Netherlands', lat: 52.37,  lon:  4.90  },
     { name: 'Athens, Greece',         lat: 37.98,  lon: 23.72  },
     { name: 'Berlin, Germany',        lat: 52.52,  lon: 13.40  },
@@ -31,6 +32,7 @@ const LOCATION_GROUPS = [
     { name: 'Rome, Italy',            lat: 41.90,  lon: 12.50  },
     { name: 'St. Petersburg, Russia', lat: 59.93,  lon: 30.33  },
     { name: 'Stockholm, Sweden',      lat: 59.33,  lon: 18.07  },
+    { name: 'Svalbard, Norway',       lat: 78.22, lon: 15.63 },     // The 'Fastest Warming Place on Earth'
     { name: 'Vienna, Austria',        lat: 48.21,  lon: 16.37  },
     { name: 'Warsaw, Poland',         lat: 52.23,  lon: 21.01  },
     { name: 'Zurich, Switzerland',    lat: 47.37,  lon:  8.54  },
@@ -43,10 +45,12 @@ const LOCATION_GROUPS = [
     { name: 'São Paulo, Brazil', lat: -23.55,  lon: -46.63 },
     { name: 'Toronto, Canada',   lat:  43.65,  lon: -79.38 },
     { name: 'Vancouver, Canada', lat:  49.28,  lon: -123.12 },
+    { name: 'Manaus, Brazil',    lat: -3.11, lon: -60.02 },      // The 'Heart of the Amazon' (Deforestation)
     { name: 'Mexico City, Mexico', lat: 19.43,  lon: -99.13 },
     { name: 'Buenos Aires, Argentina', lat: -34.60, lon: -58.38 },
   ]},
   { continent: 'Asia & Middle East', locations: [
+    { name: 'Aral Sea, Uzbekistan', lat: 45.00, lon: 60.00 }, // The 'Disappearing Water' story
     { name: 'Bangalore, India', lat: 12.97,  lon:  77.59 },
     { name: 'Beijing, China',   lat: 39.90,  lon: 116.40 },
     { name: 'Delhi, India',     lat: 28.61,  lon:  77.21 },
@@ -60,10 +64,26 @@ const LOCATION_GROUPS = [
     
   ]},
   { continent: 'Oceania', locations: [
+    { name: 'Great Barrier Reef, AUS', lat: -18.28, lon: 147.69 }, // The 'Ocean Health' indicator
     { name: 'Melbourne, Australia', lat: -37.81, lon: 144.96 },
     { name: 'Sydney, Australia',    lat: -33.87, lon: 151.21 },
     { name: 'Auckland, New Zealand', lat: -36.85, lon: 174.76 },
     { name: 'Wellington, New Zealand', lat: -41.29, lon: 174.78 },
+  ]},
+  { continent: 'Africa', locations: [
+    { name: 'Cairo, Egypt',       lat: 30.04,  lon: 31.24 },
+    { name: 'Cape Town, South Africa', lat: -33.92, lon: 18.42 },
+    { name: 'Lagos, Nigeria',     lat:  6.52,  lon:  3.37 },
+    { name: 'Nairobi, Kenya',     lat: -1.29,  lon: 36.82 },
+    { name: 'Rabat, Morocco',     lat: 34.02,  lon: -6.84 },
+    { name: 'Tunis, Tunisia',     lat: 36.80,  lon: 10.18 },
+    { name: 'Accra, Ghana',      lat: 5.56,   lon: -0.20 },
+    { name: 'Addis Ababa, Ethiopia', lat: 9.03, lon: 38.74 },
+  ]},
+  { continent: 'Polar Regions', locations: [
+    { name: 'Longyearbyen, Svalbard', lat: 78.22, lon: 15.64 },
+    { name: 'Barrow, Alaska, USA', lat: 71.29, lon: -156.78 },
+    { name: 'McMurdo Station, Antarctica', lat: -77.85, lon: 166.67 },
   ]},
 ];
 

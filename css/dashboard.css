@@ -728,7 +728,7 @@
     min-width: 0;
     overflow: hidden;
   }
-  .forecast-chart-container { position: relative; height: 120px; }
+  .forecast-chart-container { position: relative; height: 300px; }
   @media (max-width: 768px) {
     /* touch screens: disable lift so overflow-y clipping never triggers */
     .forecast-day:hover { transform: none; }
@@ -1406,4 +1406,176 @@
 }
 .forest-gate-btn:hover {
   background: rgba(99,102,241,0.18); border-color: var(--accent-text);
+}
+
+/* ── Water Level ─────────────────────────────────────────────────────────────── */
+.wl-vital-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 12px;
+}
+.wl-vital-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  margin-bottom: 20px;
+}
+.wl-vital-metrics { flex-shrink: 0; min-width: 180px; }
+.wl-metric-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 8px;
+}
+.wl-metric-value {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 36px; color: #38bdf8; line-height: 1; margin-bottom: 6px; font-weight: 700;
+}
+.wl-metric-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; color: var(--text-muted);
+}
+.wl-sparkline-wrap { flex: 1; min-width: 0; }
+.wl-sparkline { width: 100%; height: 60px; display: block; }
+.wl-sparkline-labels {
+  display: flex; justify-content: space-between;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 0.5px;
+  color: var(--text-muted); margin-top: 4px;
+}
+.wl-context-line {
+  font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+  padding-top: 16px; border-top: 1px solid var(--border); margin-bottom: 12px;
+}
+.wl-vital-source {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 0.5px; color: var(--text-muted);
+}
+
+/* ── Water Level Regional section ────────────────────────────────────────────── */
+.wl-regional-wrap {
+  display: flex; gap: 12px; margin-bottom: 8px;
+}
+.wl-regional-map-card {
+  flex: 1; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+}
+.wl-map-wrap {
+  height: 440px; background: #141821; isolation: isolate;
+}
+.wl-map-wrap .leaflet-container { background: #141821 !important; }
+.wl-map-wrap .leaflet-control-zoom a {
+  background: var(--bg-card) !important; border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+}
+.wl-map-wrap .leaflet-control-zoom a:hover { color: var(--text-primary) !important; }
+.wl-map-wrap .leaflet-control-attribution {
+  background: rgba(7,10,15,0.75) !important;
+  color: rgba(136,145,165,0.6) !important; font-size: 9px !important;
+}
+.wl-regional-panel {
+  width: 280px; flex-shrink: 0;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px;
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.wl-regional-source {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 0.5px;
+  color: var(--text-muted); text-align: right; margin-bottom: 36px;
+}
+
+/* ── Pulse marker ────────────────────────────────────────────────────────────── */
+.wl-marker-wrap {
+  background: transparent !important;
+  border: none !important;
+  width: 24px; height: 24px;
+}
+.wl-marker-dot {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #38bdf8;
+  border: 2px solid rgba(255,255,255,0.9);
+  box-shadow: 0 0 8px rgba(56,189,248,0.7);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.wl-marker-ring {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1.5px solid rgba(56,189,248,0.55);
+  animation: wlPulse 2.6s ease-out infinite;
+}
+@keyframes wlPulse {
+  0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
+}
+.wl-marker-active .wl-marker-dot {
+  background: #7dd3fc;
+  border-color: #fff;
+  box-shadow: 0 0 14px rgba(56,189,248,0.9);
+}
+
+/* ── City panel content ──────────────────────────────────────────────────────── */
+.wl-panel-placeholder {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px; text-align: center;
+  color: var(--text-muted); font-size: 13px; line-height: 1.5;
+}
+.wl-panel-placeholder-icon { font-size: 22px; opacity: 0.35; }
+.wl-city-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px; margin-bottom: 2px; font-weight: 700;
+}
+.wl-city-country {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 16px;
+}
+.wl-city-rates {
+  background: var(--bg-panel); border-radius: 8px;
+  padding: 12px; margin-bottom: 12px;
+}
+.wl-rate-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 5px 0;
+}
+.wl-rate-row + .wl-rate-row { border-top: 1px solid var(--border); }
+.wl-rate-label { font-size: 11px; color: var(--text-muted); }
+.wl-rate-value {
+  font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500;
+}
+.wl-rate-high   { color: #fb923c; }
+.wl-rate-global { color: #38bdf8; }
+.wl-cause-badge {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 20px; margin-bottom: 12px;
+}
+.wl-cause-subsidence {
+  background: rgba(251,146,60,0.12); color: #fb923c;
+  border: 1px solid rgba(251,146,60,0.3);
+}
+.wl-cause-eustatic {
+  background: rgba(56,189,248,0.12); color: #38bdf8;
+  border: 1px solid rgba(56,189,248,0.3);
+}
+.wl-cause-mixed {
+  background: rgba(192,132,252,0.12); color: #c084fc;
+  border: 1px solid rgba(192,132,252,0.3);
+}
+.wl-city-detail {
+  font-size: 12px; color: var(--text-secondary); line-height: 1.65;
+}
+
+/* ── Water Level mobile ──────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .wl-vital-top { flex-direction: column; gap: 16px; }
+  .wl-regional-wrap { flex-direction: column; }
+  .wl-regional-panel { width: 100%; height: auto; }
+  .wl-map-wrap { height: 320px; }
 }
