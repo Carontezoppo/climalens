@@ -1468,7 +1468,7 @@
   flex: 1; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
 }
 .wl-map-wrap {
-  height: 440px; background: #0d1b2a; isolation: isolate;
+  height: 600px; background: #0d1b2a; isolation: isolate;
 }
 .wl-map-wrap .leaflet-container { background: #0d1b2a !important; }
 .wl-map-wrap .leaflet-control-zoom a {
@@ -1487,6 +1487,34 @@
   display: flex; flex-direction: column;
   overflow-y: auto;
 }
+.wl-map-legend {
+  background: var(--bg-card); border-top: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 20px;
+}
+.wl-legend-section {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.wl-legend-section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text-muted); white-space: nowrap;
+}
+.wl-legend-item {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted);
+  white-space: nowrap;
+}
+.wl-legend-dot {
+  display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+}
+.wl-legend-swatch {
+  display: inline-block; width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
+}
+.wl-legend-divider {
+  width: 1px; height: 20px; background: var(--border); flex-shrink: 0;
+}
+
 .wl-regional-source {
   font-family: 'DM Mono', monospace;
   font-size: 9px; letter-spacing: 0.5px;
@@ -1523,6 +1551,17 @@
   background: #7dd3fc;
   border-color: #fff;
   box-shadow: 0 0 14px rgba(56,189,248,0.9);
+}
+.wl-marker-spatial .wl-marker-dot {
+  background: var(--wind);
+  box-shadow: 0 0 8px rgba(126,232,168,0.6);
+}
+.wl-marker-spatial .wl-marker-ring {
+  border-color: rgba(126,232,168,0.55);
+}
+.wl-marker-spatial.wl-marker-active .wl-marker-dot {
+  background: #a7f3d0;
+  box-shadow: 0 0 14px rgba(126,232,168,0.9);
 }
 
 /* ── City panel content ──────────────────────────────────────────────────────── */
@@ -1579,8 +1618,43 @@
   background: rgba(245,166,35,0.12); color: var(--sun);
   border: 1px solid rgba(245,166,35,0.3);
 }
+.wl-cause-oceanographic {
+  background: rgba(245,166,35,0.12); color: #009dff;
+  border: 1px solid rgba(245,166,35,0.3);
+}
+.wl-cause-coastal-erosion {
+  background: rgba(245,166,35,0.12); color: #e1894e;
+  border: 1px solid rgba(245,166,35,0.3);
+}
+.wl-cause-artificial-land {
+  background: rgba(245,166,35,0.12); color: #f157ff;
+  border: 1px solid rgba(245,166,35,0.3);
+}
+.wl-cause-urban-loading {
+  background: rgba(245,166,35,0.12); color: #a7a7a7;
+  border: 1px solid rgba(245,166,35,0.3);
+}
+.wl-cause-topographic {
+  background: rgba(245,166,35,0.12); color: #80ba6b;
+  border: 1px solid rgba(245,166,35,0.3);
+}
 .wl-city-detail {
   font-size: 12px; color: var(--text-secondary); line-height: 1.65;
+}
+.wl-spatial-proof {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(126,232,168,0.06);
+  border: 1px solid rgba(126,232,168,0.18);
+  border-radius: 8px;
+}
+.wl-spatial-proof-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--wind); margin-bottom: 6px;
+}
+.wl-spatial-proof-text {
+  font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin: 0;
 }
 
 /* ── Water Level mobile ──────────────────────────────────────────────────────── */

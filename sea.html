@@ -6,7 +6,7 @@
 <title>ClimaLens — Sea Surface Temperature, Polar Ice & Ocean Currents</title>
 <meta name="description" content="Live sea surface temperature, Arctic and Antarctic sea ice extent, and global ocean currents — updated daily from satellite observations.">
 <meta name="theme-color" content="#0c0f14">
-<link rel="canonical" href="https://climalens.alessandromolinaro.com/sea.html">
+<link rel="canonical" href="https://climalens.org/sea.html">
 <link rel="icon" href="/img/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
@@ -24,14 +24,14 @@
 <link rel="apple-touch-icon" sizes="192x192" href="/img/apple-touch-icon-192x192.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://climalens.alessandromolinaro.com/sea.html">
+<meta property="og:url" content="https://climalens.org/sea.html">
 <meta property="og:title" content="ClimaLens — Sea Surface Temperature, Polar Ice & Ocean Currents">
 <meta property="og:description" content="Live sea surface temperature, Arctic and Antarctic sea ice extent, and global ocean currents — updated daily from satellite observations.">
-<meta property="og:image" content="https://climalens.alessandromolinaro.com/img/og-image.png">
+<meta property="og:image" content="https://climalens.org/img/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="ClimaLens — Sea Surface Temperature, Polar Ice & Ocean Currents">
 <meta name="twitter:description" content="Live sea surface temperature, Arctic and Antarctic sea ice extent, and global ocean currents — updated daily from satellite observations.">
-<meta name="twitter:image" content="https://climalens.alessandromolinaro.com/img/og-image.png">
+<meta name="twitter:image" content="https://climalens.org/img/og-image.png">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -63,7 +63,7 @@
         <a class="page-tab" href="history.html">History</a>
         <a class="page-tab active" href="sea.html">Sea</a>
         <a class="page-tab" href="forest.html">Land Cover</a>
-        <a class="page-tab" href="https://alessandromolinaro.com/vibes.html"><img src="/img/AM_alt_2.svg" alt="Portfolio" /> Portfolio</a>
+        <a class="page-tab" href="about.html">About</a>
       </div>
       <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
         <span id="navHamburgerIcon">☰</span><span>Menu</span>
@@ -112,6 +112,23 @@
   <div class="wl-regional-wrap">
     <div class="wl-regional-map-card">
       <div class="wl-map-wrap" id="wlMap"></div>
+      <div class="wl-map-legend">
+        <div class="wl-legend-section">
+          <span class="wl-legend-section-label">Markers</span>
+          <span class="wl-legend-item"><span class="wl-legend-dot" style="background:#38bdf8;border:2px solid rgba(255,255,255,0.85);box-shadow:0 0 6px rgba(56,189,248,0.5)"></span>Sea level risk</span>
+          <span class="wl-legend-item"><span class="wl-legend-dot" style="background:#7ee8a8;border:2px solid rgba(255,255,255,0.85);box-shadow:0 0 6px rgba(126,232,168,0.5)"></span>+ Land cover signal</span>
+        </div>
+        <div class="wl-legend-divider"></div>
+        <div class="wl-legend-section">
+          <span class="wl-legend-section-label">Land cover · zoom ≥ 10</span>
+          <span class="wl-legend-item"><span class="wl-legend-swatch" style="background:#0064C8"></span>Water</span>
+          <span class="wl-legend-item"><span class="wl-legend-swatch" style="background:#0096A0"></span>Wetland</span>
+          <span class="wl-legend-item"><span class="wl-legend-swatch" style="background:#00CF75"></span>Mangrove</span>
+          <span class="wl-legend-item"><span class="wl-legend-swatch" style="background:#F096FF"></span>Cropland</span>
+          <span class="wl-legend-item"><span class="wl-legend-swatch" style="background:#FA0000"></span>Built-up</span>
+          <span class="wl-legend-item"><span class="wl-legend-swatch" style="background:#006400"></span>Forest</span>
+        </div>
+      </div>
     </div>
     <div class="wl-regional-panel" id="wlCityPanel">
       <div class="wl-panel-placeholder">

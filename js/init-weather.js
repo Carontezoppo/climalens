@@ -11,6 +11,7 @@ function init() {
 
   function selectLocation(idx) {
     currentLocation = LOCATIONS[idx];
+    localStorage.setItem('selectedLocationIdx', String(idx));
     locationLabel.textContent = LOCATIONS[idx].name;
     document.getElementById('forecastSectionTitle').textContent = LOCATIONS[idx].name + ' — 7-Day Forecast';
     locationList.querySelectorAll('.location-option').forEach(el => {
@@ -63,8 +64,11 @@ function init() {
   locationSearch.addEventListener('input', () => filterLocations(locationSearch.value));
   locationSearch.addEventListener('click', e => e.stopPropagation());
 
-  locationLabel.textContent = LOCATIONS[0].name;
-  locationList.querySelector('.location-option').classList.add('active');
+  locationLabel.textContent = currentLocation.name;
+  const _activeIdx = parseInt(localStorage.getItem('selectedLocationIdx'), 10);
+  locationList.querySelectorAll('.location-option').forEach(el => {
+    el.classList.toggle('active', +el.dataset.idx === (_activeIdx || 0));
+  });
 
   locationBtn.setAttribute('aria-expanded', 'false');
   locationBtn.setAttribute('aria-haspopup', 'listbox');

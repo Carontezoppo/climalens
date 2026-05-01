@@ -36,10 +36,15 @@ function init() {
   const forestGate     = document.getElementById('forestGate');
   const forestMapSection = document.getElementById('forestMapSection');
 
-  forestLoadBtn.addEventListener('click', () => {
+  function triggerForestLoad() {
     forestGate.hidden = true;
     forestMapSection.hidden = false;
+    sessionStorage.setItem('modisLoaded', '1');
     setTimeout(initForestMap, 0);
-  });
+  }
+
+  forestLoadBtn.addEventListener('click', triggerForestLoad);
+
+  if (sessionStorage.getItem('modisLoaded')) triggerForestLoad();
 }
 init();

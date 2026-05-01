@@ -91,3 +91,8 @@ const LOCATION_GROUPS = [
 const LOCATIONS = LOCATION_GROUPS.flatMap(g => g.locations);
 
 let currentLocation = LOCATIONS[0];
+// Restore last-selected location across page navigations
+const _savedLocIdx = parseInt(localStorage.getItem('selectedLocationIdx'), 10);
+if (!isNaN(_savedLocIdx) && _savedLocIdx >= 0 && _savedLocIdx < LOCATIONS.length) {
+  currentLocation = LOCATIONS[_savedLocIdx];
+}

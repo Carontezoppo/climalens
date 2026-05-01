@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClimaLens — About</title>
+<meta name="description" content="ClimaLens makes climate data legible — turning satellite observations, ocean measurements, and historical records into a visual narrative anyone can read.">
+<meta name="theme-color" content="#0c0f14">
+<link rel="canonical" href="https://climalens.org/about.html">
+<link rel="icon" href="/img/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/img/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="128x128" href="/img/favicon-128x128.png">
+<link rel="icon" type="image/png" sizes="196x196" href="/img/favicon-196x196.png">
+<link rel="apple-touch-icon" sizes="57x57" href="/img/apple-touch-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/img/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/img/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/img/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/img/apple-touch-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon-180x180.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/img/apple-touch-icon-192x192.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://climalens.org/about.html">
+<meta property="og:title" content="ClimaLens — About">
+<meta property="og:description" content="ClimaLens makes climate data legible — turning satellite observations, ocean measurements, and historical records into a visual narrative anyone can read.">
+<meta property="og:image" content="https://climalens.org/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ClimaLens — About">
+<meta name="twitter:description" content="ClimaLens makes climate data legible — turning satellite observations, ocean measurements, and historical records into a visual narrative anyone can read.">
+<meta name="twitter:image" content="https://climalens.org/img/og-image.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/dashboard.css">
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "on99vgv2ep");
+</script>
+</head>
+<body>
+
+<div class="dashboard">
+  <header class="header">
+    <div class="header-left">
+      <h1 class="header-title">Clima<span>Lens</span></h1>
+      <p class="header-subtitle">About this project</p>
+    </div>
+    <nav class="header-nav" id="pageTabsNav">
+      <div class="header-nav-links">
+        <a class="page-tab" href="index.html">Weather</a>
+        <a class="page-tab" href="history.html">History</a>
+        <a class="page-tab" href="sea.html">Sea</a>
+        <a class="page-tab" href="forest.html">Land Cover</a>
+        <a class="page-tab active" href="about.html">About</a>
+      </div>
+      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
+        <span id="navHamburgerIcon">☰</span><span>Menu</span>
+      </button>
+    </nav>
+  </header>
+
+  <div class="about-wrap">
+
+    <div class="about-lead">
+      <!-- Main mission statement — 2–3 sentences max -->
+    </div>
+
+    <div class="about-body">
+      <!-- The why: what problem this solves, what it shows, what it doesn't do -->
+    </div>
+
+    <div class="about-sources">
+      <div class="section-title" style="margin-bottom:16px;">Data sources</div>
+      <!-- List of sources and what they power -->
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <p>ClimaLens · Open data, open source</p>
+  </footer>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/dashboard.js"></script>
+<script>
+  const navHamburger = document.getElementById('navHamburger');
+  const pageTabsNav  = document.getElementById('pageTabsNav');
+  if (navHamburger && pageTabsNav) {
+    const navOverlay = document.createElement('div');
+    navOverlay.className = 'nav-overlay';
+    document.body.appendChild(navOverlay);
+    const openMenu  = () => { pageTabsNav.classList.add('open'); navOverlay.classList.add('open'); document.getElementById('navHamburgerIcon').textContent = '✕'; navHamburger.setAttribute('aria-expanded', 'true'); };
+    const closeMenu = () => { pageTabsNav.classList.remove('open'); navOverlay.classList.remove('open'); document.getElementById('navHamburgerIcon').textContent = '☰'; navHamburger.setAttribute('aria-expanded', 'false'); };
+    navHamburger.addEventListener('click', () => pageTabsNav.classList.contains('open') ? closeMenu() : openMenu());
+    navOverlay.addEventListener('click', closeMenu);
+    window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
+  }
+</script>
+<!----------------------------Cookies enabler-------------------------------------------->
+<script src="https://alessandromolinaro.com/js/cookies.js"></script>
+</body>
+</html>
