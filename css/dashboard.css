@@ -528,7 +528,7 @@
   .table-card tbody tr:hover td { background: rgba(255,255,255,0.02); }
   .table-card .cell-bar { display: inline-block; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 8px; }
 
-  .footer { text-align: center; padding-top: 32px; border-top: 1px solid var(--border); }
+  .footer { text-align: center; padding-top: 32px; border-top: 1px solid var(--border); margin-top: 48px; }
   .footer p { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: 0.5px; }
 
   /* ========= MAP SECTION ========= */
