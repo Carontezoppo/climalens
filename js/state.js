@@ -162,8 +162,8 @@ const METRIC_DEFS = {
       { key: 'low', label: 'Low °C', color: 'var(--temp-low)' },
     ],
     statsFn: m => [
-      { label: 'Total', value: m.reduce((a,b)=>a+b,0).toFixed(0), unit: 'cm' },
-      { label: 'Peak Month', value: Math.max(...m).toFixed(0), unit: 'cm' },
+      { label: 'Total', value: m.reduce((a,b)=>a+b,0).toFixed(1), unit: 'cm' },
+      { label: 'Peak Month', value: Math.max(...m).toFixed(1), unit: 'cm' },
       { label: 'Snow Months', value: m.filter(v=>v>0).length, unit: '' },
     ],
   },
@@ -173,9 +173,9 @@ const METRIC_DEFS = {
     dailyCols: [{ key: 'pressure', label: 'Pressure (hPa)', color: 'var(--pressure)' }],
     statsFn: m => [
       { label: 'Average', value: Math.round(m.reduce((a,b)=>a+b,0)/6), unit: 'hPa' },
-      { label: 'Highest', value: Math.max(...m), unit: 'hPa' },
-      { label: 'Lowest', value: Math.min(...m), unit: 'hPa' },
-      { label: 'Range', value: Math.max(...m) - Math.min(...m), unit: 'hPa' },
+      { label: 'Highest', value: Math.round(Math.max(...m)), unit: 'hPa' },
+      { label: 'Lowest', value: Math.round(Math.min(...m)), unit: 'hPa' },
+      { label: 'Range', value: Math.round(Math.max(...m) - Math.min(...m)), unit: 'hPa' },
     ],
   },
   humidity: {
@@ -184,8 +184,8 @@ const METRIC_DEFS = {
     dailyCols: [{ key: 'humidity', label: 'Humidity (%)', color: 'var(--humidity)' }],
     statsFn: m => [
       { label: 'Average', value: Math.round(m.reduce((a,b)=>a+b,0)/6), unit: '%' },
-      { label: 'Most Humid', value: Math.max(...m), unit: '%' },
-      { label: 'Least Humid', value: Math.min(...m), unit: '%' },
+      { label: 'Most Humid', value: Math.round(Math.max(...m)), unit: '%' },
+      { label: 'Least Humid', value: Math.round(Math.min(...m)), unit: '%' },
     ],
   },
 };

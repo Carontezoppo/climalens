@@ -21,10 +21,10 @@ function renderDashboard() {
   // KPI CARDS
   const n6 = n; // actual month count
   const kpiDefs = [
-    { cls:'rain',     value: DATA.rain.reduce((a,b)=>a+b,0),                    unit:'mm',  note:`${n6}-month total` },
-    { cls:'sun',      value: DATA.sunHours.reduce((a,b)=>a+b,0),                unit:'hrs', note:`${n6}-month total` },
+    { cls:'rain',     value: DATA.rain.reduce((a,b)=>a+b,0).toFixed(0),          unit:'mm',  note:`${n6}-month total` },
+    { cls:'sun',      value: DATA.sunHours.reduce((a,b)=>a+b,0).toFixed(0),     unit:'hrs', note:`${n6}-month total` },
     { cls:'wind',     value: (DATA.windAvg.reduce((a,b)=>a+b,0)/n6).toFixed(1), unit:'km/h',note:`${n6}-month avg`   },
-    { cls:'snow',     value: DATA.snow.reduce((a,b)=>a+b,0),                    unit:'cm',  note:`${n6}-month total` },
+    { cls:'snow',     value: DATA.snow.reduce((a,b)=>a+b,0).toFixed(1),          unit:'cm',  note:`${n6}-month total` },
     { cls:'pressure', value: Math.round(DATA.pressure.reduce((a,b)=>a+b,0)/n6), unit:'hPa', note:'avg'               },
     { cls:'humidity', value: Math.round(DATA.humidity.reduce((a,b)=>a+b,0)/n6), unit:'%',   note:'avg'               },
   ];
