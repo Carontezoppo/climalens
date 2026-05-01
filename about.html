@@ -64,22 +64,107 @@
     </nav>
   </header>
 
-  <div class="about-wrap">
+  <div class="about-wrap" style="max-width:700px;margin:48px auto 0;">
 
     <div class="about-lead">
-      <!-- Main mission statement — 2–3 sentences max -->
+      <div class="section-title" style="margin-bottom:16px;">What is this project about?</div>
+
+      <p class="text">Climate change is a complex system, and complexity is easy to misread. A snowstorm in New York becomes evidence that the Earth isn't warming. What it actually reflects is a polar vortex destabilised by warming Arctic ice. The heat is real, but it's redistributing itself in ways that don't match intuition.</p>
+
+      <p class="text">On top of this, some changes are extremely fast in climatic terms, yet slow in human-perceptual terms. A phenomenon can take months or years to manifest itself, and we may recognise it only when we already suffer the consequences. A good example is the increase in salinity in fresh water, which can collapse drinking water supplies and ecosystems before anyone notices the trend.</p>
+
+      <p class="text link">The instinct to deny what you can't directly observe is understandable. The tool to counter it is context: specifically, the ability to place today's conditions against a baseline and triangulate across data sources. The Met Office's 2025 annual assessment makes the point directly: a colder month than usual within a warmer-than-average year only makes sense in context (see the <a href="https://www.metoffice.gov.uk/api/assets/file/annual_assessment_2025pdf?prefix=assets" target="_blank" rel="noopener noreferrer">Met Office's 2025 annual assessment</a> for more information).</p>
+
+      <p class="text">ClimaLens started as a 15-minute mockup built to demonstrate a point about AI-assisted prototyping: how quickly a working idea can take shape. Then the data got interesting, and the project kept going. The hard part turned out to be finding and connecting the right sources.</p>
+
+      <hr>
+    
     </div>
 
-    <div class="about-body">
-      <!-- The why: what problem this solves, what it shows, what it doesn't do -->
+    <div class="about-body" style="max-width: 700px; margin: 48px auto 0;">
+      <div class="section-title" style="margin-bottom:24px;">Current status</div>
+      <p class="text">The part still in progress is the narrative: making the story legible to readers without a background in the field. This requires testing and feedback.</p>
+
+      <hr>
+
+      <p class="text">Feedback is very welcome. I'm not a specialist in the field, and the project doesn't claim any particular expertise. I’m curious about complex systems, and worried about changes happening at an unprecedented speed.</p>
+      <p class="text link">For feedback, ideas, attributions, or anything else: <a href="mailto:hello@climalens.org">hello@climalens.org</a></p>
     </div>
+
+    <hr>
 
     <div class="about-sources">
-      <div class="section-title" style="margin-bottom:16px;">Data sources</div>
-      <!-- List of sources and what they power -->
-    </div>
+    
+    <div style="max-width:700px;margin:48px auto 0;">
+      <div class="section-title" style="margin-bottom:24px;">Credits</div>
+      <p class="text">Sources update at different cadences, some automatically, some manually, some yearly, some monthly.</p>
 
-  </div>
+      <div style="display:flex;flex-direction:column;gap:32px;line-height:1.618;">
+
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">Climate &amp; Weather</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+            <li><span style="color:var(--text-primary);font-weight:500;">Open-Meteo</span> <span style="color:var(--text-muted);font-size:13px;">— forecast, current conditions, ERA5 historical climate, air quality (CAMS), marine data</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">Copernicus Climate Change Service / ERA5</span> <span style="color:var(--text-muted);font-size:13px;">— reanalysis underpinning the historical climate trend, 1970–present. Baseline: 1981–2010 WMO reference period</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">CAMS – Copernicus Atmosphere Monitoring Service</span> <span style="color:var(--text-muted);font-size:13px;">— air quality index, via Open-Meteo</span></li>
+          </ul>
+        </div>
+
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">Sea Level</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+            <li><span style="color:var(--text-primary);font-weight:500;">University of Colorado Sea Level Research Group</span> <span style="color:var(--text-muted);font-size:13px;">— Global Mean Sea Level time series from merged satellite altimetry, seasonal signals and GIA removed</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">IPCC AR6 Working Group I, Chapter 9</span> <span style="color:var(--text-muted);font-size:13px;">— local relative sea level rates and cause attribution for coastal cities</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">PSMSL – Permanent Service for Mean Sea Level</span> <span style="color:var(--text-muted);font-size:13px;">— tide gauge records used to cross-reference city-level data</span></li>
+          </ul>
+        </div>
+
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">Ocean &amp; Sea Ice</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+            <li><span style="color:var(--text-primary);font-weight:500;">NASA GIBS / PODAAC / JPL</span> <span style="color:var(--text-muted);font-size:13px;">— sea surface temperature tiles (GHRSST MUR L4); polar sea ice historical tiles (SSMIS and AMSR-E)</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">Copernicus Marine Service / OSI-SAF</span> <span style="color:var(--text-muted);font-size:13px;">— live Arctic and Antarctic sea ice concentration (AMSR2 radiometer)</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">NSIDC Sea Ice Index v4.0</span> <span style="color:var(--text-muted);font-size:13px;">— polar ice extent charts. Fetterer et al. 2017, updated yearly. NSIDC, Boulder CO</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">NOAA CoastWatch ERDDAP</span> <span style="color:var(--text-muted);font-size:13px;">— ocean surface currents (geostrophic velocity from SSH). Current paths: NOAA, GEBCO, Tomczak &amp; Godfrey (2003)</span></li>
+          </ul>
+        </div>
+
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">Land Cover</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+            <li><span style="color:var(--text-primary);font-weight:500;">ESA WorldCover 2021</span> <span style="color:var(--text-muted);font-size:13px;">— global land classification at 10 m from Sentinel-1 and Sentinel-2. Served via Terrascope WMTS</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">MODIS IGBP Land Cover Type 1</span> <span style="color:var(--text-muted);font-size:13px;">— annual land cover 2001–2024 at 500 m. NASA GIBS / LP DAAC</span></li>
+          </ul>
+        </div>
+
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">Maps &amp; Basemaps</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+            <li><span style="color:var(--text-primary);font-weight:500;">Esri World Imagery</span> <span style="color:var(--text-muted);font-size:13px;">— satellite tiles on the sea level map</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">CARTO Dark Matter</span> <span style="color:var(--text-muted);font-size:13px;">— basemap tiles on ocean currents</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">NASA Blue Marble</span> <span style="color:var(--text-muted);font-size:13px;">— basemap on polar ice maps, via NASA GIBS</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">Windy</span> <span style="color:var(--text-muted);font-size:13px;">— embedded weather map on the forecast page</span></li>
+          </ul>
+        </div>
+
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">Libraries &amp; Infrastructure</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+            <li><span style="color:var(--text-primary);font-weight:500;">Leaflet.js</span> <span style="color:var(--text-muted);font-size:13px;">— interactive maps</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">Chart.js</span> <span style="color:var(--text-muted);font-size:13px;">— climate and forecast charts</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">Proj4js + proj4leaflet</span> <span style="color:var(--text-muted);font-size:13px;">— polar stereographic projections (EPSG:3413 Arctic, EPSG:3031 Antarctic)</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">TopoJSON</span> <span style="color:var(--text-muted);font-size:13px;">— geographic boundaries</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">JSZip</span> <span style="color:var(--text-muted);font-size:13px;">— shapefile parsing for sea ice median extent</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">Cloudflare Pages + Workers</span> <span style="color:var(--text-muted);font-size:13px;">— hosting, API proxying, and KV caching</span></li>
+            <li><span style="color:var(--text-primary);font-weight:500;">Microsoft Clarity</span> <span style="color:var(--text-muted);font-size:13px;">— anonymous usage analytics. It allows me to understand how the website is experienced. No personal data is collected; if you rejected the cookies, this will be inactive.</span></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+    </div><!-- /.about-sources -->
+
+  </div><!-- /.about-wrap -->
 
   <footer class="footer">
     <p>ClimaLens · Open data, open source</p>
