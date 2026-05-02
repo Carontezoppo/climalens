@@ -1675,7 +1675,7 @@
   .wl-vital-top { flex-direction: column; gap: 16px; }
   .wl-regional-wrap { flex-direction: column; }
   .wl-regional-panel { width: 100%; height: auto; }
-  .wl-map-wrap { height: 320px; }
+  .wl-map-wrap { height: 450px; }
 }
 
 /* ── Cookie consent banner ───────────────────────────────────────────────────── */
