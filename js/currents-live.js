@@ -5,14 +5,18 @@
 const OCEAN_CURRENTS = [
   // Warm currents
   { name: 'Gulf Stream / N. Atlantic Drift', type: 'warm',
+    note: '~30 Sv · Has weakened ~15% since the 1950s (AMOC slowdown)',
     coords: [[-80,24],[-79,26],[-78,28],[-77,30],[-76,32],[-75,35],[-72,38],[-68,40],[-62,43],[-55,46],[-47,49],[-40,51],[-32,53],[-22,55],[-14,57],[-5,58],[5,60],[15,63]] },
   { name: 'Kuroshio Current', type: 'warm',
+    note: '~42 Sv · Meander path increasingly erratic with Pacific warming',
     coords: [[130,18],[130,22],[131,26],[134,30],[138,34],[141,37],[143,40],[147,43],[155,45],[165,46],[175,46]] },
   { name: 'North Pacific Current', type: 'warm',
     coords: [[175,46],[185,47],[195,48],[205,49],[215,49],[225,48],[233,46]] },
   { name: 'East Australian Current', type: 'warm',
+    note: '~20 Sv · Has shifted ~350 km southward since the 1940s',
     coords: [[154,-14],[154,-18],[154,-22],[153,-26],[152,-30],[151,-34],[150,-38],[149,-42]] },
   { name: 'Agulhas Current', type: 'warm',
+    note: '~70 Sv · Leakage into the Atlantic increasing; a potential climate tipping point',
     coords: [[42,-10],[43,-14],[42,-18],[41,-22],[38,-26],[35,-30],[33,-34],[28,-37],[20,-40],[15,-42],[8,-42],[0,-40]] },
   { name: 'Brazil Current', type: 'warm',
     coords: [[-35,-10],[-36,-14],[-38,-18],[-39,-22],[-42,-26],[-45,-30],[-48,-34],[-52,-38],[-55,-42]] },
@@ -47,10 +51,12 @@ const OCEAN_CURRENTS = [
   { name: 'Benguela Current', type: 'cold',
     coords: [[18,-35],[15,-30],[13,-24],[12,-18],[11,-12],[10,-6]] },
   { name: 'Humboldt (Peru) Current', type: 'cold',
+    note: '~15 Sv · Collapses during El Niño; disruptions can last months',
     coords: [[-68,-54],[-72,-48],[-76,-42],[-76,-36],[-74,-30],[-73,-24],[-72,-18],[-75,-12],[-78,-6],[-82,-2]] },
   { name: 'Oyashio Current', type: 'cold',
     coords: [[148,52],[147,48],[146,44],[145,42],[144,40],[143,38]] },
   { name: 'Antarctic Circumpolar Current', type: 'cold',
+    note: '~130 Sv · Earth\'s largest current; intensifying as polar westerlies strengthen',
     coords: [[-180,-57],[-160,-59],[-140,-59],[-120,-58],[-100,-57],[-80,-58],[-60,-59],[-40,-58],[-20,-57],[0,-56],[20,-56],[40,-57],[60,-58],[80,-58],[100,-57],[120,-57],[140,-58],[160,-58],[180,-57]] },
   // North Pacific
   { name: 'Alaska Current', type: 'warm',
@@ -553,7 +559,7 @@ function buildCurrentsList() {
   const groupMap  = new Map();
   OCEAN_CURRENTS.forEach((c, i) => {
     const key = canonical(c.name) + '|' + c.type;
-    if (!groupMap.has(key)) groupMap.set(key, { name: canonical(c.name), type: c.type, indices: [] });
+    if (!groupMap.has(key)) groupMap.set(key, { name: canonical(c.name), type: c.type, indices: [], note: c.note || null });
     groupMap.get(key).indices.push(i);
   });
 
@@ -571,9 +577,13 @@ function buildCurrentsList() {
     items.forEach(g => {
       const item = document.createElement('div');
       item.className = 'current-list-item';
+      if (g.note) item.classList.add('has-note');
       item.innerHTML =
         `<span class="current-list-dot" style="background:${color}"></span>` +
-        `<span>${g.name}</span>`;
+        `<span class="current-list-text">` +
+        `<span>${g.name}</span>` +
+        (g.note ? `<span class="current-list-note">${g.note}</span>` : '') +
+        `</span>`;
       item.addEventListener('click', () => {
         if (item.classList.contains('active')) {
           item.classList.remove('active');

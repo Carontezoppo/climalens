@@ -1277,6 +1277,16 @@
 .current-list-dot {
   width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
 }
+.current-list-item.has-note { align-items: flex-start; }
+.current-list-item.has-note .current-list-dot { margin-top: 6px; }
+.current-list-text { display: flex; flex-direction: column; }
+.current-list-note {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 2px;
+}
 
 .current-label-tooltip {
   background: rgba(10,13,20,0.92) !important;
