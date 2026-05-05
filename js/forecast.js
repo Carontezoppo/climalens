@@ -200,6 +200,8 @@ async function loadNormals() {
 }
 
 async function loadForecast() {
+  const container = document.getElementById('forecastContent');
+  container.innerHTML = '<div class="forecast-loading"><div class="forecast-spinner"></div></div>';
   const cacheKey = `forecast_${currentLocation.lat}_${currentLocation.lon}`;
   try {
     const forecastPromise = (async () => {
@@ -215,6 +217,6 @@ async function loadForecast() {
     const [json, normals] = await Promise.all([forecastPromise, loadNormals().catch(() => null)]);
     renderForecast(json, normals);
   } catch (err) {
-    document.getElementById('forecastContent').textContent = 'Forecast unavailable: ' + err.message;
+    container.textContent = 'Forecast unavailable: ' + err.message;
   }
 }
