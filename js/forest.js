@@ -130,7 +130,9 @@ function initForestMap() {
       progressBar.style.width = pct + '%';
       if (slider.disabled) progressLabel.textContent = `Loading ${pct}%`;
       if (settled === total) {
-        progressWrap.style.display = 'none';
+        progressWrap.querySelector('.forest-progress-bg').style.display = 'none';
+        progressLabel.textContent = '✓ Animation loaded';
+        progressLabel.classList.add('map-loaded-badge');
         playBtn.disabled = false;
       }
     };

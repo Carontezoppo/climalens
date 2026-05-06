@@ -67,5 +67,6 @@ function init() {
   setTimeout(initSSTMap, 0);
   setTimeout(loadSeaIceData, 0);
   setTimeout(initLiveCurrentsMap, 0);
+  setTimeout(initPaleo, 0);
 }
 init();

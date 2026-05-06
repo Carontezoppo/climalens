@@ -70,6 +70,7 @@
       <a class="section-nav-btn" href="#section-sst"><span class="section-nav-arrows">↓</span> Temperature</a>
       <a class="section-nav-btn" href="#section-polar-ice"><span class="section-nav-arrows">↓</span> Ice</a>
       <a class="section-nav-btn" href="#section-currents-live"><span class="section-nav-arrows">↓</span> Currents</a>
+      <a class="section-nav-btn" href="#section-paleo"><span class="section-nav-arrows">↓</span> Paleo</a>
     </nav>
   </div>
 
@@ -276,6 +277,58 @@
     </div>
   </div>
 
+  <div class="section-sep"></div>
+
+  <div class="section-title" id="section-paleo">
+    Paleocoastlines
+    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Last 100,000 Years · ETOPO 2022 · 0.25°</span>
+  </div>
+  <div class="chart-subtitle" style="margin-bottom:12px;">Global coastlines as they appeared during the last glacial cycle. At the Last Glacial Maximum (~20,000 years ago) sea level was 120–130 m lower — exposing the Bering land bridge between Asia and North America, Sundaland in Southeast Asia, and the floor of the North Sea as dry land. Sandy areas show continental shelf that was above water at the selected time.</div>
+
+  <div class="forest-gate" id="paleoGate">
+    <div class="forest-gate-inner">
+      <div class="forest-gate-title">Choose resolution</div>
+      <p class="forest-gate-desc" id="paleoGateDesc">Coastlines are rendered in your browser from a global elevation grid (ETOPO 2022). Higher resolution shows more coastal detail but requires a larger download.</p>
+      <div class="paleo-res-row">
+        <button class="paleo-res-btn" id="paleoLoadLow">
+          <span class="paleo-res-name">Standard</span>
+          <span class="paleo-res-detail">0.25° · ~28 km · 2 MB</span>
+        </button>
+        <button class="paleo-res-btn" id="paleoLoadHigh">
+          <span class="paleo-res-name">High Resolution</span>
+          <span class="paleo-res-detail">0.10° · ~11 km · 13 MB</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="paleoMapSection" hidden>
+    <div class="sst-section">
+      <div class="sst-map-card">
+        <div class="paleo-map-wrap" id="paleoMap"></div>
+      </div>
+      <div class="sst-controls-card">
+        <div class="forest-progress-wrap" id="paleoProgressWrap">
+          <div class="forest-progress-bg"><div class="forest-progress-bar" id="paleoProgressBar"></div></div>
+          <div class="forest-progress-label" id="paleoProgressLabel">Downloading elevation data…</div>
+        </div>
+        <div class="paleo-time-display" id="paleoTimeLabel">—</div>
+        <div class="paleo-sl-label" id="paleoSlLabel">—</div>
+        <input type="range" class="sst-slider" id="paleoSlider" min="0" max="20" value="4" aria-label="Time step selector">
+        <div class="sst-tick-row">
+          <span>Today</span><span>25k ya</span><span>50k ya</span><span>75k ya</span><span>100k ya</span>
+        </div>
+        <div class="paleo-legend">
+          <div class="paleo-legend-item"><span class="paleo-legend-swatch" style="background:#3e4e34"></span>Land</div>
+          <div class="paleo-legend-item"><span class="paleo-legend-swatch" style="background:#c8a076"></span>Exposed continental shelf</div>
+          <div class="paleo-legend-item"><span class="paleo-legend-swatch" style="background:#285595"></span>Ocean (depth-shaded)</div>
+        </div>
+        <div class="map-loaded-badge" id="paleoLoadedBadge" hidden>✓ Map loaded</div>
+        <div class="sst-source">ETOPO 2022 · NOAA National Centers for Environmental Information · Sea level curve: Spratt &amp; Lisiecki (2016) · Lambeck et al. (2014)</div>
+      </div>
+    </div>
+  </div>
+
   <footer class="footer">
     <p>ClimaLens · Open data, open source</p>
   </footer>
@@ -287,6 +340,7 @@
 <script src="js/sea-ice.js"></script>
 <script src="js/currents-live.js"></script>
 <script src="js/water-level.js"></script>
+<script src="js/paleo-sea.js"></script>
 <script src="js/init-sea.js"></script>
 <script src="/js/cookies.js"></script>
 </body>

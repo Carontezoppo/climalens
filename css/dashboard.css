@@ -1791,6 +1791,67 @@
   font-family: inherit;
   transition: opacity 0.15s, border-color 0.15s, color 0.15s;
 }
+/* ── Shared map/animation load badge ─────────────────────────────────────────── */
+.map-loaded-badge {
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--positive); text-align: center;
+  padding: 6px 0; margin-bottom: 4px;
+}
+
+/* ── Paleo resolution picker ─────────────────────────────────────────────────── */
+.paleo-res-row {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+}
+.paleo-res-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 14px 24px; border-radius: 10px; min-width: 140px;
+  border: 1px solid var(--border); background: var(--bg-panel);
+  cursor: pointer; transition: all 0.15s;
+}
+.paleo-res-btn:hover:not(:disabled) {
+  border-color: var(--accent); background: rgba(99,102,241,0.08);
+}
+.paleo-res-btn:disabled { opacity: 0.4; cursor: default; }
+.paleo-res-name {
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent-text);
+}
+.paleo-res-detail {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: 0.5px; color: var(--text-muted);
+}
+
+/* ── Paleocoastlines ─────────────────────────────────────────────────────────── */
+.paleo-map-wrap {
+  height: 600px; background: #06111f; isolation: isolate;
+}
+.paleo-map-wrap .leaflet-container { background: #06111f !important; }
+.paleo-map-wrap .leaflet-control-zoom a {
+  background: var(--bg-card) !important; border-color: var(--border) !important;
+  color: var(--text-secondary) !important;
+}
+.paleo-map-wrap .leaflet-control-zoom a:hover { color: var(--text-primary) !important; }
+.paleo-time-display {
+  font-family: 'DM Mono', monospace; font-size: 20px;
+  font-weight: 400; letter-spacing: 0.5px; color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.paleo-sl-label {
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 16px;
+}
+.paleo-legend { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; margin-bottom: 12px; }
+.paleo-legend-item {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-secondary);
+}
+.paleo-legend-swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+@media (max-width: 768px) {
+  .paleo-map-wrap { height: 300px; }
+}
+
 .cookie-btn-accept { background: var(--accent); color: #fff; border: none; }
 .cookie-btn-accept:hover { opacity: 0.85; }
 .cookie-btn-accept:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
