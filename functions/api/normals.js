@@ -41,12 +41,17 @@ export async function onRequestGet({ request, env }) {
       timezone:   'UTC',
     });
 
-    const upstream = await fetch(`${UPSTREAM}?${params}`);
+    let upstream = await fetch(`${UPSTREAM}?${params}`);
+    // Single retry on rate-limit — wall-clock sleep, no CPU cost
+    if (upstream.status === 429) {
+      await new Promise(r => setTimeout(r, 1500));
+      upstream = await fetch(`${UPSTREAM}?${params}`);
+    }
     const body = await upstream.text();
     if (!upstream.ok) {
       let reason = `HTTP ${upstream.status}`;
       try { reason = JSON.parse(body).reason || reason; } catch { /* non-JSON */ }
-      return json({ error: reason }, upstream.status);
+      return json({ error: reason }, 503);
     }
 
     const raw    = JSON.parse(body);

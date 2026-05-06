@@ -35,9 +35,9 @@ export async function onRequestGet({ request, env }) {
     const latN = parseFloat(lat).toFixed(4);
     const lonN = parseFloat(lon).toFixed(4);
 
-    // Use a versioned cache key so old raw-data entries are ignored
-    const today    = new Date().toISOString().slice(0, 10);
-    const cacheKey = `climate2_${latN}_${lonN}_${today}`;
+    // Versioned cache key — no date, so expiry is staggered by TTL rather than
+    // all entries expiring simultaneously at midnight UTC.
+    const cacheKey = `climate3_${latN}_${lonN}`;
 
     // ── KV cache read ─────────────────────────────────────────────────────────
     if (env.CLIMATE_CACHE) {
@@ -56,13 +56,18 @@ export async function onRequestGet({ request, env }) {
       timezone:   'UTC',
     });
 
-    const upstream = await fetch(`${UPSTREAM}?${params}`);
-    const body     = await upstream.text();
+    let upstream = await fetch(`${UPSTREAM}?${params}`);
+    // Single retry on rate-limit — wall-clock sleep, no CPU cost
+    if (upstream.status === 429) {
+      await new Promise(r => setTimeout(r, 1500));
+      upstream = await fetch(`${UPSTREAM}?${params}`);
+    }
+    const body = await upstream.text();
 
     if (!upstream.ok) {
       let reason = `HTTP ${upstream.status}`;
       try { reason = JSON.parse(body).reason || reason; } catch { /* non-JSON */ }
-      return json({ error: reason }, upstream.status, { 'X-Cache': 'MISS' });
+      return json({ error: reason }, 503, { 'X-Cache': 'MISS' });
     }
 
     // ── Process: 150 KB raw → ~5 KB pre-computed ──────────────────────────────
