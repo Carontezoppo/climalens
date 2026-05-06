@@ -42,7 +42,7 @@ function renderForecast(json, normals) {
   daily.time.forEach((date, i) => {
     const d = new Date(date + 'T12:00:00');
     const isToday = date === today;
-    const name = isToday ? 'Today' : dayNames[d.getDay()];
+    const name = isToday ? 'Today' : `${dayNames[d.getDay()]} ${d.getDate()}`;
     const { icon, label } = weatherIcon(daily.weather_code[i]);
     const precip = daily.precipitation_sum[i];
     const wind = daily.wind_speed_10m_max[i];
