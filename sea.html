@@ -318,13 +318,20 @@
         <div class="sst-tick-row">
           <span>Today</span><span>25k ya</span><span>50k ya</span><span>75k ya</span><span>100k ya</span>
         </div>
+        <button class="paleo-ice-btn" id="paleoIceToggle" hidden aria-label="Toggle ice sheet overlay">
+          <span class="pib-on">Ice sheets · On</span>
+          <span class="pib-off">Ice sheets · Off</span>
+        </button>
+        <p class="paleo-ice-note" id="paleoIceNote" hidden>Beyond 26 ka BP, ice sheet data is unavailable — the Last Glacial Maximum extent is shown as an approximation.</p>
         <div class="paleo-legend">
+          <div class="paleo-legend-item" id="paleoIceLegendItem" hidden><span class="paleo-legend-swatch" style="background:#d2e4f8"></span>Ice sheets</div>
+          <div class="paleo-legend-item" id="paleoSeaIceLegendItem" hidden><span class="paleo-legend-swatch" style="background:#f1f6fa"></span>Sea ice / ice shelves</div>
           <div class="paleo-legend-item"><span class="paleo-legend-swatch" style="background:#3e4e34"></span>Land</div>
           <div class="paleo-legend-item"><span class="paleo-legend-swatch" style="background:#c8a076"></span>Exposed continental shelf</div>
           <div class="paleo-legend-item"><span class="paleo-legend-swatch" style="background:#285595"></span>Ocean (depth-shaded)</div>
         </div>
         <div class="map-loaded-badge" id="paleoLoadedBadge" hidden>✓ Map loaded</div>
-        <div class="sst-source">ETOPO 2022 · NOAA National Centers for Environmental Information · Sea level curve: Spratt &amp; Lisiecki (2016) · Lambeck et al. (2014)</div>
+        <div class="sst-source">ETOPO 2022 · NOAA NCEI · Sea level: Spratt &amp; Lisiecki (2016) · Lambeck et al. (2014) · Ice sheets: ICE-7G_NA · Peltier et al.</div>
       </div>
     </div>
   </div>
