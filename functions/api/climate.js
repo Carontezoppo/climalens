@@ -44,17 +44,10 @@ export async function onRequestGet({ request, env }) {
 
     // ── Fetch from NASA POWER ─────────────────────────────────────────────────
     const endYear = new Date().getFullYear() - 1;
-    const params  = new URLSearchParams({
-      parameters: 'T2MMAX,T2MMIN',
-      community:  'RE',
-      longitude:  lonN,
-      latitude:   latN,
-      start:      '19810101',
-      end:        `${endYear}1231`,
-      format:     'JSON',
-    });
+    // Build URL manually — URLSearchParams encodes commas as %2C which NASA POWER rejects
+    const query = `parameters=T2MMAX,T2MMIN&community=RE&longitude=${lonN}&latitude=${latN}&start=19810101&end=${endYear}1231&format=JSON`;
 
-    const upstream = await fetch(`${UPSTREAM}?${params}`, {
+    const upstream = await fetch(`${UPSTREAM}?${query}`, {
       headers: { 'User-Agent': 'ClimaLens/1.0' },
     });
     const body = await upstream.text();
