@@ -12,7 +12,7 @@
  */
 
 const UPSTREAM  = 'https://archive-api.open-meteo.com/v1/archive';
-const CACHE_TTL = 60 * 60 * 24 * 30; // 30 days
+const CACHE_TTL = 60 * 60 * 24 * 90; // 90 days — ERA5 normals are static
 const START     = '2000-01-01';
 const END       = '2024-12-31';
 

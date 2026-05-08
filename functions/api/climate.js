@@ -20,7 +20,7 @@
  */
 
 const UPSTREAM  = 'https://archive-api.open-meteo.com/v1/archive';
-const CACHE_TTL = 60 * 60 * 24 * 30; // 30 days — ERA5 data is static until Jan 1
+const CACHE_TTL = 60 * 60 * 24 * 90; // 90 days — ERA5 data is static until Jan 1
 
 export async function onRequestGet({ request, env }) {
   try {
