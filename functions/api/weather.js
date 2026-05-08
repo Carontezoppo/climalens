@@ -143,7 +143,7 @@ function aggregateToMonthly(p, monthDefs) {
     out.humidity.push( Math.round(avg(b.rh       || [])));
     out.rainDays.push( b.rainDays  || 0);
     out.frostDays.push(b.frostDays || 0);
-    out.uvIndex.push(  +(avg(b.uv || [])).toFixed(1));
+    out.uvIndex.push(  b.uv && b.uv.length ? +(avg(b.uv)).toFixed(1) : null);
   }
 
   return out;

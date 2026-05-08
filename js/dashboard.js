@@ -93,10 +93,9 @@ function renderDashboard(normals = null) {
     ${normals ? '<div class="chart-legend"><div class="legend-item"><div class="legend-dash" style="border-top-color:rgba(245,166,35,0.6)"></div>2000–2024 avg</div></div>' : ''}`;
 
   document.getElementById('windChart').closest('.chart-card').querySelector('.chart-header').innerHTML = `
-    <div><div class="chart-title">Wind Speed</div><div class="chart-subtitle">Average &amp; peak gusts (km/h)${normNote}</div></div>
+    <div><div class="chart-title">Wind Speed</div><div class="chart-subtitle">Average daily maximum (km/h)${normNote}</div></div>
     <div class="chart-legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--wind)"></div>Avg</div>
-      <div class="legend-item"><div class="legend-dot" style="background:rgba(126,232,168,0.35)"></div>Gusts</div>
       ${normLegendItems([{color:'rgba(126,232,168,0.55)',label:'Norm Avg'}])}
     </div>`;
 
@@ -134,8 +133,7 @@ function renderDashboard(normals = null) {
   });
 
   const windDs = [
-    { label:'Peak Gusts', data:DATA.windGust, borderColor:'rgba(126,232,168,0.35)', backgroundColor:'rgba(126,232,168,0.06)', fill:true, tension:0.4, pointRadius:0, borderWidth:1.5, borderDash:[4,4] },
-    { label:'Avg Speed',  data:DATA.windAvg,  borderColor:'#7ee8a8',                backgroundColor:'rgba(126,232,168,0.1)',  fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#7ee8a8', pointBorderColor:'#0c0f14', pointBorderWidth:2 },
+    { label:'Avg Speed', data:DATA.windAvg, borderColor:'#7ee8a8', backgroundColor:'rgba(126,232,168,0.1)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#7ee8a8', pointBorderColor:'#0c0f14', pointBorderWidth:2 },
   ];
   if (normWind) windDs.push({ label:'Norm Avg', data:normWind, borderColor:'rgba(126,232,168,0.45)', borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
   chartInstances.wind = new Chart(document.getElementById('windChart'), {
