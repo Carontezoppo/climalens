@@ -134,7 +134,7 @@ function aggregateToMonthly(p, monthDefs) {
     out.avgLow.push(   +(avg(b.lows     || [])).toFixed(1));
     out.rain.push(     +(b.rain         || 0).toFixed(0));
     out.sunHours.push( Math.round((b.rad || 0) / 2.5));
-    out.windAvg.push(  Math.round(avg(b.wind     || [])));
+    out.windAvg.push(  Math.round(avg(b.wind     || []) * 3.6));
     out.windGust.push( 0);
     out.snow.push(     +(b.snow         || 0).toFixed(1));
     out.pressure.push( Math.round(avg(b.pressure || []) * 10));

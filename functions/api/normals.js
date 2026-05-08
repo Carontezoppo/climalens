@@ -104,7 +104,7 @@ export async function onRequestGet({ request, env }) {
       low:      sumLow.map((v, m)  => count[m]   > 0 ? Math.round(v / count[m])          : null),
       rain:     rainTot.map((v, m) => ymCount[m] > 0 ? Math.round(v / ymCount[m])        : null),
       sun:      radTot.map((v, m)  => ymCount[m] > 0 ? Math.round(v / ymCount[m] / 2.5) : null),
-      wind:     sumWind.map((v, m) => count[m]   > 0 ? Math.round(v / count[m])          : null),
+      wind:     sumWind.map((v, m) => count[m]   > 0 ? Math.round(v / count[m] * 3.6)    : null),
       windGust: Array(12).fill(null),
       snow:     snowTot.map((v, m) => ymCount[m] > 0 ? +(v / ymCount[m]).toFixed(1)      : null),
     };
