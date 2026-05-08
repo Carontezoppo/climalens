@@ -7,7 +7,7 @@
 # Default base_url: https://climalens.org
 
 BASE="${1:-https://climalens.org}"
-DELAY=5
+DELAY=10
 
 declare -a LOCATIONS=(
   "Birmingham UK|52.48|-1.90"
