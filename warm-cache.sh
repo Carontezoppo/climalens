@@ -1,13 +1,14 @@
 #!/bin/bash
 # Warms the KV cache for all ClimaLens locations after a deploy.
-# Hits /api/climate and /api/normals for each location with a 5-second gap
-# between calls to stay within Open-Meteo's per-minute rate limit.
+# Hits /api/climate and /api/normals for each location. Both endpoints
+# now use NASA POWER which has no meaningful rate limits — 1s delay is
+# just courtesy to their servers.
 #
 # Usage: ./warm-cache.sh [base_url]
 # Default base_url: https://climalens.org
 
 BASE="${1:-https://climalens.org}"
-DELAY=10
+DELAY=1
 
 declare -a LOCATIONS=(
   "Birmingham UK|52.48|-1.90"

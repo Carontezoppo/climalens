@@ -1,24 +1,25 @@
 /**
  * GET /api/weather?lat=XX&lon=YY&start=YYYY-MM-DD&end=YYYY-MM-DD
  *
- * Fetches ERA5 daily+hourly data from Open-Meteo, aggregates it to monthly
- * stats server-side (mirrors js/weather-data.js aggregateToMonthly), and
- * caches the compact result in KV for 7 days.
+ * Fetches daily data from NASA POWER (MERRA-2, AG community), aggregates
+ * it to monthly stats server-side, and caches the compact result in KV
+ * for 7 days.
  *
- * With the paid plan (30 s CPU / request) we can do the number-crunching
- * here instead of shipping ~150 KB of raw records to every browser.
- * The cached payload is ~2 KB — a 75× reduction.
- *
- * Response shape (version 3, pre-aggregated):
+ * Response shape (version 3, pre-aggregated — same as before):
  *   { _v:3,
  *     avgHigh[], avgLow[], rain[], sunHours[], windAvg[], windGust[],
  *     snow[], pressure[], humidity[], rainDays[], frostDays[], uvIndex[] }
  * Each array has one entry per month in the requested range.
  *
- * KV binding: CLIMATE_CACHE (reused for all weather/climate caches)
+ * Notes:
+ * - sunHours is approximated from ALLSKY_SFC_SW_DWN (radiation MJ/m²/day) ÷ 2.5
+ * - windGust is not available in NASA POWER, always returns 0
+ * - pressure is PS (surface, kPa) × 10 → hPa (close to MSL for low-elevation sites)
+ *
+ * KV binding: CLIMATE_CACHE
  */
 
-const UPSTREAM  = 'https://archive-api.open-meteo.com/v1/archive';
+const UPSTREAM  = 'https://power.larc.nasa.gov/api/temporal/daily/point';
 const CACHE_TTL = 60 * 60 * 24 * 7; // 7 days
 
 export async function onRequestGet({ request, env }) {
@@ -36,41 +37,37 @@ export async function onRequestGet({ request, env }) {
     const latN = parseFloat(lat).toFixed(4);
     const lonN = parseFloat(lon).toFixed(4);
 
-    // Versioned cache key (v3 = pre-aggregated monthly stats)
-    const cacheKey = `weather3_${latN}_${lonN}_${start}_${end}`;
+    const cacheKey = `weather4_${latN}_${lonN}_${start}_${end}`;
 
-    // ── KV cache read ─────────────────────────────────────────────────────────
     if (env.CLIMATE_CACHE) {
       const cached = await env.CLIMATE_CACHE.get(cacheKey);
       if (cached) return json(cached, 200, { 'X-Cache': 'HIT' });
     }
 
-    // ── Fetch raw ERA5 data from Open-Meteo ───────────────────────────────────
-    const params = new URLSearchParams({
-      latitude:   latN,
-      longitude:  lonN,
-      start_date: start,
-      end_date:   end,
-      daily:      'temperature_2m_max,temperature_2m_min,precipitation_sum,snowfall_sum,sunshine_duration,wind_speed_10m_max,wind_gusts_10m_max,precipitation_hours',
-      hourly:     'pressure_msl,relative_humidity_2m',
-      timezone:   'Europe/London',
-    });
+    // NASA POWER expects YYYYMMDD; incoming dates are YYYY-MM-DD
+    const startNASA = start.replace(/-/g, '');
+    const endNASA   = end.replace(/-/g, '');
+    const query = `parameters=T2M_MAX,T2M_MIN,PRECTOTCORR,ALLSKY_SFC_SW_DWN,WS10M_MAX,PRECSNO,RH2M,PS&community=AG&longitude=${lonN}&latitude=${latN}&start=${startNASA}&end=${endNASA}&format=JSON`;
 
-    const upstream = await fetch(`${UPSTREAM}?${params}`);
-    const body     = await upstream.text();
+    const upstream = await fetch(`${UPSTREAM}?${query}`, {
+      headers: { 'User-Agent': 'ClimaLens/1.0' },
+    });
+    const body = await upstream.text();
 
     if (!upstream.ok) {
       let reason = `HTTP ${upstream.status}`;
-      try { reason = JSON.parse(body).reason || reason; } catch { /* non-JSON */ }
-      return json({ error: reason }, upstream.status, { 'X-Cache': 'MISS' });
+      try { reason = JSON.parse(body).errors?.[0] || reason; } catch { /* non-JSON */ }
+      return json({ error: reason }, 503, { 'X-Cache': 'MISS' });
     }
 
-    // ── Aggregate: 150 KB raw → ~2 KB monthly stats ───────────────────────────
-    const raw        = JSON.parse(body);
-    const monthDefs  = buildMonthDefs(start, end);
-    const aggregated = aggregateToMonthly(raw, monthDefs);
+    const raw = JSON.parse(body);
+    if (raw.errors && raw.errors.length > 0) {
+      return json({ error: raw.errors[0] }, 503, { 'X-Cache': 'MISS' });
+    }
 
-    // ── KV cache write (fire-and-forget) ──────────────────────────────────────
+    const monthDefs  = buildMonthDefs(start, end);
+    const aggregated = aggregateToMonthly(raw.properties.parameter, monthDefs);
+
     if (env.CLIMATE_CACHE) {
       env.CLIMATE_CACHE.put(cacheKey, JSON.stringify(aggregated), { expirationTtl: CACHE_TTL });
     }
@@ -78,14 +75,11 @@ export async function onRequestGet({ request, env }) {
     return json(aggregated, 200, { 'X-Cache': 'MISS' });
 
   } catch (err) {
-    return json({ error: err.message }, 500);
+    return json({ error: err.message }, 503);
   }
 }
 
-/* ── Month list builder ──────────────────────────────────────────────────────
- * Returns [[year, month], ...] for every calendar month between start and end.
- * start / end are ISO date strings: "YYYY-MM-DD".
- */
+// Returns [[year, month], ...] for every calendar month between start and end.
 function buildMonthDefs(start, end) {
   const [sy, sm] = start.split('-').map(Number);
   const [ey, em] = end.split('-').map(Number);
@@ -98,21 +92,32 @@ function buildMonthDefs(start, end) {
   return defs;
 }
 
-/* ── Monthly aggregation (mirrors js/weather-data.js aggregateToMonthly) ────
- * Input:  raw Open-Meteo JSON  { daily: {...}, hourly: {...} }
- * Output: { _v:3, avgHigh[], avgLow[], rain[], sunHours[], windAvg[],
- *           windGust[], snow[], pressure[], humidity[], rainDays[],
- *           frostDays[], uvIndex[] }
- */
-function aggregateToMonthly(raw, monthDefs) {
-  const { daily, hourly } = raw;
+function aggregateToMonthly(p, monthDefs) {
+  // Bucket daily NASA POWER values by "YYYYMM"
+  const buckets = {};
+  for (const dateKey of Object.keys(p.T2M_MAX)) {
+    const ym = dateKey.slice(0, 6);
+    if (!buckets[ym]) buckets[ym] = {
+      highs: [], lows: [], wind: [], rh: [], pressure: [],
+      rain: 0, rad: 0, snow: 0, rainDays: 0, frostDays: 0,
+    };
+    const b  = buckets[ym];
+    const mx = p.T2M_MAX[dateKey],  mn = p.T2M_MIN[dateKey];
+    const pr = p.PRECTOTCORR[dateKey], rd = p.ALLSKY_SFC_SW_DWN[dateKey];
+    const ws = p.WS10M_MAX[dateKey],  sn = p.PRECSNO[dateKey];
+    const rh = p.RH2M[dateKey],      ps = p.PS[dateKey];
+
+    if (mx > -998) b.highs.push(mx);
+    if (mn > -998) { b.lows.push(mn); if (mn < 0) b.frostDays++; }
+    if (ws > -998) b.wind.push(ws);
+    if (rh > -998) b.rh.push(rh);
+    if (ps > -998) b.pressure.push(ps);
+    if (pr > -998) { b.rain += pr; if (pr >= 1) b.rainDays++; }
+    if (rd > -998) b.rad += rd;
+    if (sn > -998) b.snow += sn;
+  }
 
   const avg = a => a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0;
-  const sum = a => a.reduce((s, v) => s + v, 0);
-  const ymFromStr = t => {
-    const p = t.split('T')[0].split('-');
-    return [+p[0], +p[1]];
-  };
 
   const out = {
     _v: 3,
@@ -122,35 +127,21 @@ function aggregateToMonthly(raw, monthDefs) {
   };
 
   for (const [yr, mo] of monthDefs) {
-    const dIdx = daily.time.reduce((acc, t, i) => {
-      const [y, m] = ymFromStr(t);
-      if (y === yr && m === mo) acc.push(i);
-      return acc;
-    }, []);
+    const ym = `${yr}${String(mo).padStart(2, '0')}`;
+    const b  = buckets[ym] || {};
 
-    const hIdx = hourly.time.reduce((acc, t, i) => {
-      const [y, m] = ymFromStr(t);
-      if (y === yr && m === mo) acc.push(i);
-      return acc;
-    }, []);
-
-    const dv = k => dIdx.map(i => daily[k]?.[i]).filter(v => v != null && !isNaN(v));
-    const hv = k => hIdx.map(i => hourly[k]?.[i]).filter(v => v != null && !isNaN(v));
-
-    const gustVals = dv('wind_gusts_10m_max');
-
-    out.avgHigh.push(+avg(dv('temperature_2m_max')).toFixed(1));
-    out.avgLow.push(+avg(dv('temperature_2m_min')).toFixed(1));
-    out.rain.push(+sum(dv('precipitation_sum')).toFixed(0));
-    out.sunHours.push(Math.round(sum(dv('sunshine_duration')) / 3600));
-    out.windAvg.push(Math.round(avg(dv('wind_speed_10m_max'))));
-    out.windGust.push(gustVals.length ? Math.round(Math.max(...gustVals)) : 0);
-    out.snow.push(+sum(dv('snowfall_sum')).toFixed(1));
-    out.pressure.push(Math.round(avg(hv('pressure_msl'))));
-    out.humidity.push(Math.round(avg(hv('relative_humidity_2m'))));
-    out.rainDays.push(dv('precipitation_sum').filter(v => v >= 1).length);
-    out.frostDays.push(dv('temperature_2m_min').filter(v => v < 0).length);
-    out.uvIndex.push(Math.max(1, Math.round([1, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 1][mo - 1] * 0.6)));
+    out.avgHigh.push(  +(avg(b.highs    || [])).toFixed(1));
+    out.avgLow.push(   +(avg(b.lows     || [])).toFixed(1));
+    out.rain.push(     +(b.rain         || 0).toFixed(0));
+    out.sunHours.push( Math.round((b.rad || 0) / 2.5));
+    out.windAvg.push(  Math.round(avg(b.wind     || [])));
+    out.windGust.push( 0);
+    out.snow.push(     +(b.snow         || 0).toFixed(1));
+    out.pressure.push( Math.round(avg(b.pressure || []) * 10));
+    out.humidity.push( Math.round(avg(b.rh       || [])));
+    out.rainDays.push( b.rainDays  || 0);
+    out.frostDays.push(b.frostDays || 0);
+    out.uvIndex.push(  Math.max(1, Math.round([1, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 1][mo - 1] * 0.6)));
   }
 
   return out;
