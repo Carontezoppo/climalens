@@ -172,7 +172,7 @@ function renderDashboard(normals = null) {
   const table = document.getElementById('detailTable');
   const maxRain = Math.max(...DATA.rain);
   let thead = '<thead><tr>';
-  ['Month','Avg High °C','Avg Low °C','Rain (mm)','Rain Days','Sun (hrs)','Wind (km/h)','Gusts (km/h)','Snow (cm)','Pressure (hPa)','Humidity (%)','Frost Days','UV Index'].forEach(c => thead += '<th>'+c+'</th>');
+  ['Month','Avg High °C','Avg Low °C','Rain (mm)','Rain Days','Sun (hrs)','Wind (km/h)','Snow (cm)','Pressure (hPa)','Humidity (%)','Frost Days','UV Index'].forEach(c => thead += '<th>'+c+'</th>');
   thead += '</tr></thead>';
   let tbody = '<tbody>';
   for (let i = 0; i < MONTHS.length; i++) {
@@ -183,7 +183,7 @@ function renderDashboard(normals = null) {
     tbody += '<td><span class="cell-bar" style="width:'+bw+'px;background:var(--rain)"></span>'+DATA.rain[i]+'</td>';
     tbody += '<td>'+DATA.rainDays[i]+'</td>';
     tbody += '<td style="color:var(--sun)">'+DATA.sunHours[i]+'</td>';
-    tbody += '<td>'+DATA.windAvg[i]+'</td><td>'+DATA.windGust[i]+'</td>';
+    tbody += '<td>'+DATA.windAvg[i]+'</td>';
     tbody += '<td>'+(DATA.snow[i]||'—')+'</td>';
     tbody += '<td>'+DATA.pressure[i]+'</td><td>'+DATA.humidity[i]+'</td>';
     tbody += '<td>'+DATA.frostDays[i]+'</td><td>'+DATA.uvIndex[i]+'</td></tr>';
