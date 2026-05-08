@@ -87,6 +87,7 @@
     </div>
     <nav class="section-nav">
       <a class="section-nav-btn" href="#section-climate"><span class="section-nav-arrows">↓</span> Trends</a>
+      <a class="section-nav-btn" href="#section-jetstream"><span class="section-nav-arrows">↓</span> Jet Stream</a>
       <a class="section-nav-btn" href="#section-historical"><span class="section-nav-arrows">↓</span> Historical</a>
     </nav>
   </div>
@@ -123,6 +124,36 @@
   <div class="page-cta">
     <p class="page-cta-text">What's driving these changes? Explore sea surface temperature and polar ice coverage.</p>
     <a href="/sea.html" class="page-cta-btn">Explore sea data →</a>
+  </div>
+
+  <div class="section-sep"></div>
+
+  <div class="section-title" id="section-jetstream" style="margin-top:8px;">
+    Jet Stream Index
+    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">2000 – present · NAO / SAM · NOAA CPC</span>
+  </div>
+  <div class="chart-subtitle" id="jetStreamDesc" style="margin-bottom:12px;">The North Atlantic Oscillation (NAO) measures the state of the polar jet stream over the North Atlantic. A positive phase means the jet is strong and sits in its normal poleward position, keeping mild Atlantic air flowing into Europe. A negative phase means it has weakened and shifted toward the equator — allowing cold polar air to break through, driving the kind of sudden cold snaps that can reach as far south as the Mediterranean.</div>
+
+  <div id="jetStreamPrompt" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:40px;text-align:center;margin-bottom:0;">
+    <div id="jetStreamLoading" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);">Loading jet stream data&hellip;</div>
+  </div>
+
+  <div id="jetStreamContent" style="display:none;">
+    <div class="climate-stats-row" id="jetStreamStatsRow"></div>
+    <div class="chart-card full-width">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title" id="jetStreamChartTitle">Annual NAO Index</div>
+          <div class="chart-subtitle" id="jetStreamChartSub">North Atlantic Oscillation · NOAA Climate Prediction Center</div>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#fb923c"></div>Positive (jet poleward)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#38bdf8"></div>Negative (cold risk)</div>
+        </div>
+      </div>
+      <div class="chart-container" style="height:300px;"><canvas id="jetStreamChart"></canvas></div>
+      <div class="climate-note" id="jetStreamNote"></div>
+    </div>
   </div>
 
   <div class="section-sep"></div>
@@ -213,6 +244,7 @@
 <script src="js/panels.js"></script>
 <script src="js/climate.js"></script>
 <script src="js/range.js"></script>
+<script src="js/jet-stream.js"></script>
 <script src="js/init-history.js"></script>
 <script src="/js/cookies.js"></script>
 </body>

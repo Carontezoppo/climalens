@@ -22,6 +22,7 @@ function init() {
     filterLocations('');
     const { startYr, startMo, endYr, endMo } = currentRange();
     loadClimateData();
+    loadJetStreamData();
     loadRange(startYr, startMo, endYr, endMo);
   }
 
@@ -179,6 +180,7 @@ function init() {
   document.getElementById('climateSectionTitle').textContent = currentLocation.name + ' — Climate Trends';
   initClimate();
   loadClimateData();
+  loadJetStreamData();
   loadRange(startYr, startMo, endYr, endMo);
 }
 init();

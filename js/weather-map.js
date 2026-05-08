@@ -2,17 +2,18 @@
 
 // WEATHER MAP
 // ============================================================
-let currentMapLayer = 'wind';
+let currentMapLayer = 'satellite';
+let currentMapLevel = 'surface';
+let currentMapZoom  = 5;
 let mapVisible = true;
 
-function buildWindyUrl(layer) {
+function buildWindyUrl(layer, level, zoom) {
   const { lat, lon } = currentLocation;
-  const zoom = 6;
-  return `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&zoom=${zoom}&level=surface&overlay=${layer}&product=ecmwf&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
+  return `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&zoom=${zoom}&level=${level}&overlay=${layer}&product=ecmwf&menu=&message=true&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
 }
 
 function updateMap() {
-  document.getElementById('windyFrame').src = buildWindyUrl(currentMapLayer);
+  document.getElementById('windyFrame').src = buildWindyUrl(currentMapLayer, currentMapLevel, currentMapZoom);
 }
 
 function initMap() {
@@ -23,6 +24,8 @@ function initMap() {
     document.querySelectorAll('.map-layer-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentMapLayer = btn.dataset.layer;
+    currentMapLevel = btn.dataset.level || 'surface';
+    currentMapZoom  = parseInt(btn.dataset.zoom, 10) || 6;
     updateMap();
   });
 
