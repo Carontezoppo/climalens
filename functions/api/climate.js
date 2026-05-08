@@ -45,7 +45,7 @@ export async function onRequestGet({ request, env }) {
     // ── Fetch from NASA POWER ─────────────────────────────────────────────────
     const endYear = new Date().getFullYear() - 1;
     // Build URL manually — URLSearchParams encodes commas as %2C which NASA POWER rejects
-    const query = `parameters=T2MMAX,T2MMIN&community=RE&longitude=${lonN}&latitude=${latN}&start=19810101&end=${endYear}1231&format=JSON`;
+    const query = `parameters=T2M_MAX,T2M_MIN&community=AG&longitude=${lonN}&latitude=${latN}&start=19810101&end=${endYear}1231&format=JSON`;
 
     const upstream = await fetch(`${UPSTREAM}?${query}`, {
       headers: { 'User-Agent': 'ClimaLens/1.0' },
@@ -81,8 +81,8 @@ export async function onRequestGet({ request, env }) {
 
 /* ── Climate computation ─────────────────────────────────────────────────── */
 function processClimate(raw) {
-  const tmax = raw.properties.parameter.T2MMAX;
-  const tmin = raw.properties.parameter.T2MMIN;
+  const tmax = raw.properties.parameter.T2M_MAX;
+  const tmin = raw.properties.parameter.T2M_MIN;
 
   // NASA POWER uses YYYYMMDD date keys; -999 means missing
   const buckets = {};
