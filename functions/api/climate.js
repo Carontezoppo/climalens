@@ -1,14 +1,13 @@
 /**
  * GET /api/climate?lat=XX&lon=YY
  *
- * Fetches ERA5 daily temperature data from Open-Meteo, computes the full
- * climate analysis (annual means, 1981-2010 baseline, anomalies, linear
- * trend, stats) server-side, and caches the compact pre-computed result
- * in KV for 24 hours.
+ * Fetches daily temperature data from NASA POWER (MERRA-2 reanalysis),
+ * computes the full climate analysis (annual means, 1981-2010 baseline,
+ * anomalies, linear trend, stats) server-side, and caches the compact
+ * pre-computed result in KV for 90 days.
  *
- * With the paid plan (30 s CPU / request) we can do the number-crunching
- * here instead of shipping ~150 KB of raw daily records to every browser.
- * The cached payload is ~5 KB — a 30× reduction.
+ * NASA POWER is free, requires no API key, and has no per-minute or
+ * per-day rate limits that affect production use.
  *
  * Response shape (version 2, pre-computed):
  *   { _v:2, years[], anomalies[], trendLine[], baseline,
@@ -19,8 +18,8 @@
  * KV binding: CLIMATE_CACHE
  */
 
-const UPSTREAM  = 'https://archive-api.open-meteo.com/v1/archive';
-const CACHE_TTL = 60 * 60 * 24 * 90; // 90 days — ERA5 data is static until Jan 1
+const UPSTREAM  = 'https://power.larc.nasa.gov/api/temporal/daily/point';
+const CACHE_TTL = 60 * 60 * 24 * 90; // 90 days — MERRA-2 data is static once published
 
 export async function onRequestGet({ request, env }) {
   try {
@@ -35,9 +34,7 @@ export async function onRequestGet({ request, env }) {
     const latN = parseFloat(lat).toFixed(4);
     const lonN = parseFloat(lon).toFixed(4);
 
-    // Versioned cache key — no date, so expiry is staggered by TTL rather than
-    // all entries expiring simultaneously at midnight UTC.
-    const cacheKey = `climate3_${latN}_${lonN}`;
+    const cacheKey = `climate4_${latN}_${lonN}`;
 
     // ── KV cache read ─────────────────────────────────────────────────────────
     if (env.CLIMATE_CACHE) {
@@ -45,33 +42,36 @@ export async function onRequestGet({ request, env }) {
       if (cached) return json(cached, 200, { 'X-Cache': 'HIT' });
     }
 
-    // ── Fetch raw ERA5 data from Open-Meteo ───────────────────────────────────
+    // ── Fetch from NASA POWER ─────────────────────────────────────────────────
     const endYear = new Date().getFullYear() - 1;
     const params  = new URLSearchParams({
-      latitude:   latN,
+      parameters: 'T2MMAX,T2MMIN',
+      community:  'RE',
       longitude:  lonN,
-      start_date: '1970-01-01',
-      end_date:   `${endYear}-12-31`,
-      daily:      'temperature_2m_max,temperature_2m_min',
-      timezone:   'UTC',
+      latitude:   latN,
+      start:      '19810101',
+      end:        `${endYear}1231`,
+      format:     'JSON',
     });
 
-    let upstream = await fetch(`${UPSTREAM}?${params}`);
-    // Single retry on rate-limit — wall-clock sleep, no CPU cost
-    if (upstream.status === 429) {
-      await new Promise(r => setTimeout(r, 1500));
-      upstream = await fetch(`${UPSTREAM}?${params}`);
-    }
+    const upstream = await fetch(`${UPSTREAM}?${params}`, {
+      headers: { 'User-Agent': 'ClimaLens/1.0' },
+    });
     const body = await upstream.text();
 
     if (!upstream.ok) {
       let reason = `HTTP ${upstream.status}`;
-      try { reason = JSON.parse(body).reason || reason; } catch { /* non-JSON */ }
+      try { reason = JSON.parse(body).errors?.[0] || reason; } catch { /* non-JSON */ }
       return json({ error: reason }, 503, { 'X-Cache': 'MISS' });
     }
 
-    // ── Process: 150 KB raw → ~5 KB pre-computed ──────────────────────────────
-    const raw       = JSON.parse(body);
+    const raw = JSON.parse(body);
+
+    if (raw.errors && raw.errors.length > 0) {
+      return json({ error: raw.errors[0] }, 503, { 'X-Cache': 'MISS' });
+    }
+
+    // ── Process: keyed daily records → ~5 KB pre-computed ────────────────────
     const processed = processClimate(raw);
 
     // ── KV cache write (fire-and-forget) ──────────────────────────────────────
@@ -82,23 +82,24 @@ export async function onRequestGet({ request, env }) {
     return json(processed, 200, { 'X-Cache': 'MISS' });
 
   } catch (err) {
-    return json({ error: err.message }, 500);
+    return json({ error: err.message }, 503);
   }
 }
 
-/* ── Climate computation (mirrors js/climate.js processClimateData) ───────── */
+/* ── Climate computation ─────────────────────────────────────────────────── */
 function processClimate(raw) {
-  const { daily } = raw;
+  const tmax = raw.properties.parameter.T2MMAX;
+  const tmin = raw.properties.parameter.T2MMIN;
 
-  // Bucket daily readings into annual means
+  // NASA POWER uses YYYYMMDD date keys; -999 means missing
   const buckets = {};
-  for (let i = 0; i < daily.time.length; i++) {
-    const yr   = +daily.time[i].slice(0, 4);
-    const tmax = daily.temperature_2m_max[i];
-    const tmin = daily.temperature_2m_min[i];
-    if (tmax == null || tmin == null || isNaN(tmax) || isNaN(tmin)) continue;
+  for (const dateKey of Object.keys(tmax)) {
+    const mx = tmax[dateKey];
+    const mn = tmin[dateKey];
+    if (mx <= -998 || mn <= -998 || isNaN(mx) || isNaN(mn)) continue;
+    const yr = +dateKey.slice(0, 4);
     if (!buckets[yr]) buckets[yr] = { sum: 0, n: 0 };
-    buckets[yr].sum += (tmax + tmin) / 2;
+    buckets[yr].sum += (mx + mn) / 2;
     buckets[yr].n++;
   }
 
@@ -132,7 +133,7 @@ function processClimate(raw) {
   const minAnom     = Math.min(...anomalies);
 
   return {
-    _v: 2, // version flag — browser uses this to skip re-processing
+    _v: 2,
     years, anomalies, trendLine, baseline,
     decadeRate, totalChange,
     warmestYr:   years[anomalies.indexOf(maxAnom)],

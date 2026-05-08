@@ -13,8 +13,7 @@ async function fetchClimateData() {
   if (climateCache[cacheKey]) return climateCache[cacheKey];
 
   // Route through the Cloudflare Worker (/api/climate), which handles
-  // KV server-side caching (24 h TTL) so Open-Meteo's daily rate limit
-  // is only hit once per city per day across all visitors.
+  // KV server-side caching (90-day TTL) and proxies NASA POWER.
   const res = await fetch(
     `/api/climate?lat=${currentLocation.lat}&lon=${currentLocation.lon}`
   );
@@ -209,7 +208,7 @@ function renderClimateData(data) {
 
   // Source note
   document.getElementById('climateNote').textContent =
-    `Baseline: ${baseline.toFixed(2)}°C annual mean (1981–2010 WMO reference period) · ERA5 reanalysis via Open-Meteo · Copernicus Climate Change Service (C3S)`;
+    `Baseline: ${baseline.toFixed(2)}°C annual mean (1981–2010 WMO reference period) · MERRA-2 reanalysis via NASA POWER`;
 
   // Reveal content
   document.getElementById('climatePrompt').style.display = 'none';
