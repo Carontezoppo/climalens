@@ -24,7 +24,7 @@ export async function onRequestGet({ request, env }) {
 
     const latN = parseFloat(lat).toFixed(4);
     const lonN = parseFloat(lon).toFixed(4);
-    const cacheKey = `normals_v3_${latN}_${lonN}`;
+    const cacheKey = `normals_v4_${latN}_${lonN}`;
 
     if (env.CLIMATE_CACHE) {
       const cached = await env.CLIMATE_CACHE.get(cacheKey);
@@ -32,7 +32,7 @@ export async function onRequestGet({ request, env }) {
     }
 
     const endYear = new Date().getFullYear() - 1;
-    const query = `parameters=T2M_MAX,T2M_MIN,PRECTOTCORR,ALLSKY_SFC_SW_DWN,WS10M_MAX,PRECSNO&community=AG&longitude=${lonN}&latitude=${latN}&start=20000101&end=${endYear}1231&format=JSON`;
+    const query = `parameters=T2M_MAX,T2M_MIN,PRECTOTCORR,ALLSKY_SFC_SW_DWN,WS10M_MAX,PRECSNO,ALLSKY_SFC_UV_INDEX&community=AG&longitude=${lonN}&latitude=${latN}&start=20000101&end=${endYear}1231&format=JSON`;
 
     const upstream = await fetch(`${UPSTREAM}?${query}`, {
       headers: { 'User-Agent': 'ClimaLens/1.0' },
@@ -57,6 +57,7 @@ export async function onRequestGet({ request, env }) {
     const rad  = p.ALLSKY_SFC_SW_DWN;
     const wind = p.WS10M_MAX;
     const snow = p.PRECSNO;
+    const uvi  = p.ALLSKY_SFC_UV_INDEX;
 
     // Daily-averaged-per-month accumulators (temperature, wind)
     const sumHigh = Array(12).fill(0), sumLow  = Array(12).fill(0);
@@ -64,7 +65,8 @@ export async function onRequestGet({ request, env }) {
     const count   = Array(12).fill(0);
 
     // Per year-month total accumulators (precipitation, radiation, snow)
-    const ymPrec = {}, ymRad = {}, ymSnow = {};
+    // and per year-month UV / frost day accumulators
+    const ymPrec = {}, ymRad = {}, ymSnow = {}, ymUv = {}, ymFrost = {};
 
     for (const dateKey of Object.keys(tmax)) {
       const mx = tmax[dateKey];
@@ -78,10 +80,16 @@ export async function onRequestGet({ request, env }) {
       count[mo]++;
 
       const mn = tmin[dateKey];
-      if (mn > -998) sumLow[mo] += mn;
+      if (mn > -998) {
+        sumLow[mo] += mn;
+        if (mn < 0) ymFrost[ym] = (ymFrost[ym] || 0) + 1;
+      }
 
       const ws = wind[dateKey];
       if (ws > -998) sumWind[mo] += ws;
+
+      const uv = uvi[dateKey];
+      if (uv > -998) ymUv[ym] = (ymUv[ym] || { sum: 0, n: 0 }), ymUv[ym].sum += uv, ymUv[ym].n++;
 
       ymPrec[ym] = (ymPrec[ym] || 0) + (prec[dateKey] > -998 ? prec[dateKey] : 0);
       ymRad[ym]  = (ymRad[ym]  || 0) + (rad[dateKey]  > -998 ? rad[dateKey]  : 0);
@@ -90,23 +98,33 @@ export async function onRequestGet({ request, env }) {
 
     // Average monthly totals from year-month buckets
     const rainTot = Array(12).fill(0), radTot = Array(12).fill(0), snowTot = Array(12).fill(0);
+    const uvAvg = Array(12).fill(0), uvCount = Array(12).fill(0);
+    const frostAvg = Array(12).fill(0);
     const ymCount = Array(12).fill(0);
     for (const ym in ymPrec) {
       const mo = ym % 12;
-      rainTot[mo] += ymPrec[ym];
-      radTot[mo]  += ymRad[ym]  || 0;
-      snowTot[mo] += ymSnow[ym] || 0;
+      rainTot[mo]  += ymPrec[ym];
+      radTot[mo]   += ymRad[ym]   || 0;
+      snowTot[mo]  += ymSnow[ym]  || 0;
+      frostAvg[mo] += ymFrost[ym] || 0;
       ymCount[mo]++;
+    }
+    for (const ym in ymUv) {
+      const mo = ym % 12;
+      uvAvg[mo] += ymUv[ym].sum / ymUv[ym].n;
+      uvCount[mo]++;
     }
 
     const result = {
-      high:     sumHigh.map((v, m) => count[m]   > 0 ? Math.round(v / count[m])          : null),
-      low:      sumLow.map((v, m)  => count[m]   > 0 ? Math.round(v / count[m])          : null),
-      rain:     rainTot.map((v, m) => ymCount[m] > 0 ? Math.round(v / ymCount[m])        : null),
-      sun:      radTot.map((v, m)  => ymCount[m] > 0 ? Math.round(v / ymCount[m] / 2.5) : null),
-      wind:     sumWind.map((v, m) => count[m]   > 0 ? Math.round(v / count[m] * 3.6)    : null),
-      windGust: Array(12).fill(null),
-      snow:     snowTot.map((v, m) => ymCount[m] > 0 ? +(v / ymCount[m]).toFixed(1)      : null),
+      high:      sumHigh.map((v, m) => count[m]   > 0 ? Math.round(v / count[m])          : null),
+      low:       sumLow.map((v, m)  => count[m]   > 0 ? Math.round(v / count[m])          : null),
+      rain:      rainTot.map((v, m) => ymCount[m] > 0 ? Math.round(v / ymCount[m])        : null),
+      sun:       radTot.map((v, m)  => ymCount[m] > 0 ? Math.round(v / ymCount[m] / 2.5) : null),
+      wind:      sumWind.map((v, m) => count[m]   > 0 ? Math.round(v / count[m] * 3.6)    : null),
+      windGust:  Array(12).fill(null),
+      snow:      snowTot.map((v, m) => ymCount[m] > 0 ? +(v / ymCount[m]).toFixed(1)      : null),
+      uv:        uvAvg.map((v, m)   => uvCount[m] > 0 ? +(v / uvCount[m]).toFixed(1)      : null),
+      frostDays: frostAvg.map((v, m) => ymCount[m] > 0 ? +(v / ymCount[m]).toFixed(1)    : null),
     };
 
     const out = JSON.stringify(result);

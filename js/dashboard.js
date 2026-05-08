@@ -59,11 +59,13 @@ function renderDashboard(normals = null) {
   // MONTHS_FULL is ['January', 'February', ...] for each month slot in the selected range.
   // MONTH_NAMES_FULL is the canonical 12-element array from state.js.
   const monthIndices = MONTHS_FULL.map(name => MONTH_NAMES_FULL.indexOf(name));
-  const normHigh = normals && normals.high ? monthIndices.map(i => normals.high[i]) : null;
-  const normLow  = normals && normals.low  ? monthIndices.map(i => normals.low[i])  : null;
-  const normRain = normals && normals.rain ? monthIndices.map(i => normals.rain[i]) : null;
-  const normSun  = normals && normals.sun  ? monthIndices.map(i => normals.sun[i])  : null;
-  const normWind = normals && normals.wind ? monthIndices.map(i => normals.wind[i]) : null;
+  const normHigh  = normals && normals.high      ? monthIndices.map(i => normals.high[i])      : null;
+  const normLow   = normals && normals.low       ? monthIndices.map(i => normals.low[i])       : null;
+  const normRain  = normals && normals.rain      ? monthIndices.map(i => normals.rain[i])      : null;
+  const normSun   = normals && normals.sun       ? monthIndices.map(i => normals.sun[i])       : null;
+  const normWind  = normals && normals.wind      ? monthIndices.map(i => normals.wind[i])      : null;
+  const normUv    = normals && normals.uv        ? monthIndices.map(i => normals.uv[i])        : null;
+  const normFrost = normals && normals.frostDays ? monthIndices.map(i => normals.frostDays[i]) : null;
 
   // UPDATE CHART HEADERS (idempotent — fully replaced each render)
   const normNote = normals ? ' · dashed: 2000–2024 avg' : '';
@@ -140,6 +142,26 @@ function renderDashboard(normals = null) {
     type:'line',
     data:{ labels:MONTHS, datasets:windDs },
     options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, scales:{y:{beginAtZero:true,ticks:{callback:v=>v+' km/h'}}}, plugins:{tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y} km/h`}}} }
+  });
+
+  const frostDs = [
+    { data:DATA.frostDays, backgroundColor:DATA.frostDays.map(v=>v>0?'rgba(56,189,248,0.7)':'rgba(56,189,248,0.2)'), borderRadius:{topLeft:6,topRight:6,bottomLeft:0,bottomRight:0}, barPercentage:0.55 },
+  ];
+  if (normFrost) frostDs.push({ type:'line', label:'2000–2024 avg', data:normFrost, borderColor:'rgba(56,189,248,0.5)', borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
+  chartInstances.frost = new Chart(document.getElementById('frostChart'), {
+    type:'bar',
+    data:{ labels:MONTHS, datasets:frostDs },
+    options:{ responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true,ticks:{callback:v=>v+' d'}}}, plugins:{tooltip:{callbacks:{label:ctx=>ctx.dataset.label==='2000–2024 avg'?`Avg: ${ctx.parsed.y} days`:`${ctx.parsed.y} frost days`}}} }
+  });
+
+  const uvDs = [
+    { data:DATA.uvIndex, backgroundColor:DATA.uvIndex.map(v=>v>=3?'rgba(251,191,36,0.75)':'rgba(251,191,36,0.3)'), borderRadius:{topLeft:6,topRight:6,bottomLeft:0,bottomRight:0}, barPercentage:0.55 },
+  ];
+  if (normUv) uvDs.push({ type:'line', label:'2000–2024 avg', data:normUv, borderColor:'rgba(251,191,36,0.55)', borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
+  chartInstances.uv = new Chart(document.getElementById('uvChart'), {
+    type:'bar',
+    data:{ labels:MONTHS, datasets:uvDs },
+    options:{ responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true,grace:'10%'}}, plugins:{tooltip:{callbacks:{label:ctx=>ctx.dataset.label==='2000–2024 avg'?`Avg: ${ctx.parsed.y}`:`UV index: ${ctx.parsed.y}`}}} }
   });
 
   chartInstances.pressure = new Chart(document.getElementById('pressureChart'), {

@@ -37,7 +37,7 @@ export async function onRequestGet({ request, env }) {
     const latN = parseFloat(lat).toFixed(4);
     const lonN = parseFloat(lon).toFixed(4);
 
-    const cacheKey = `weather4_${latN}_${lonN}_${start}_${end}`;
+    const cacheKey = `weather5_${latN}_${lonN}_${start}_${end}`;
 
     if (env.CLIMATE_CACHE) {
       const cached = await env.CLIMATE_CACHE.get(cacheKey);
@@ -47,7 +47,7 @@ export async function onRequestGet({ request, env }) {
     // NASA POWER expects YYYYMMDD; incoming dates are YYYY-MM-DD
     const startNASA = start.replace(/-/g, '');
     const endNASA   = end.replace(/-/g, '');
-    const query = `parameters=T2M_MAX,T2M_MIN,PRECTOTCORR,ALLSKY_SFC_SW_DWN,WS10M_MAX,PRECSNO,RH2M,PS&community=AG&longitude=${lonN}&latitude=${latN}&start=${startNASA}&end=${endNASA}&format=JSON`;
+    const query = `parameters=T2M_MAX,T2M_MIN,PRECTOTCORR,ALLSKY_SFC_SW_DWN,WS10M_MAX,PRECSNO,RH2M,PS,ALLSKY_SFC_UV_INDEX&community=AG&longitude=${lonN}&latitude=${latN}&start=${startNASA}&end=${endNASA}&format=JSON`;
 
     const upstream = await fetch(`${UPSTREAM}?${query}`, {
       headers: { 'User-Agent': 'ClimaLens/1.0' },
@@ -98,23 +98,25 @@ function aggregateToMonthly(p, monthDefs) {
   for (const dateKey of Object.keys(p.T2M_MAX)) {
     const ym = dateKey.slice(0, 6);
     if (!buckets[ym]) buckets[ym] = {
-      highs: [], lows: [], wind: [], rh: [], pressure: [],
+      highs: [], lows: [], wind: [], rh: [], pressure: [], uv: [],
       rain: 0, rad: 0, snow: 0, rainDays: 0, frostDays: 0,
     };
     const b  = buckets[ym];
     const mx = p.T2M_MAX[dateKey],  mn = p.T2M_MIN[dateKey];
     const pr = p.PRECTOTCORR[dateKey], rd = p.ALLSKY_SFC_SW_DWN[dateKey];
     const ws = p.WS10M_MAX[dateKey],  sn = p.PRECSNO[dateKey];
-    const rh = p.RH2M[dateKey],      ps = p.PS[dateKey];
+    const rh  = p.RH2M[dateKey],              ps  = p.PS[dateKey];
+    const uvi = p.ALLSKY_SFC_UV_INDEX[dateKey];
 
-    if (mx > -998) b.highs.push(mx);
-    if (mn > -998) { b.lows.push(mn); if (mn < 0) b.frostDays++; }
-    if (ws > -998) b.wind.push(ws);
-    if (rh > -998) b.rh.push(rh);
-    if (ps > -998) b.pressure.push(ps);
-    if (pr > -998) { b.rain += pr; if (pr >= 1) b.rainDays++; }
-    if (rd > -998) b.rad += rd;
-    if (sn > -998) b.snow += sn;
+    if (mx  > -998) b.highs.push(mx);
+    if (mn  > -998) { b.lows.push(mn); if (mn < 0) b.frostDays++; }
+    if (ws  > -998) b.wind.push(ws);
+    if (rh  > -998) b.rh.push(rh);
+    if (ps  > -998) b.pressure.push(ps);
+    if (uvi > -998) b.uv.push(uvi);
+    if (pr  > -998) { b.rain += pr; if (pr >= 1) b.rainDays++; }
+    if (rd  > -998) b.rad += rd;
+    if (sn  > -998) b.snow += sn;
   }
 
   const avg = a => a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0;
@@ -141,7 +143,7 @@ function aggregateToMonthly(p, monthDefs) {
     out.humidity.push( Math.round(avg(b.rh       || [])));
     out.rainDays.push( b.rainDays  || 0);
     out.frostDays.push(b.frostDays || 0);
-    out.uvIndex.push(  Math.max(1, Math.round([1, 2, 3, 4, 5, 6, 6, 5, 4, 3, 2, 1][mo - 1] * 0.6)));
+    out.uvIndex.push(  +(avg(b.uv || [])).toFixed(1));
   }
 
   return out;
