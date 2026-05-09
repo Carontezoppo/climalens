@@ -1,6 +1,6 @@
-// Climate trends — ERA5 via Open-Meteo archive / Copernicus C3S
+// Climate trends — NASA POWER / MERRA-2 reanalysis
 
-// CLIMATE TRENDS (ERA5 via Open-Meteo Archive · Copernicus C3S)
+// CLIMATE TRENDS (NASA POWER · MERRA-2 reanalysis · 1981–present)
 // ============================================================
 let climateChartInstance = null;
 let climateLoaded = false;

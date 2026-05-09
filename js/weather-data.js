@@ -1,4 +1,4 @@
-// Fetch historical weather data from Open-Meteo archive API
+// Fetch historical weather data from NASA POWER
 
 // FETCH & AGGREGATE
 // ============================================================

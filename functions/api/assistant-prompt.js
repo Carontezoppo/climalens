@@ -14,7 +14,7 @@ Your purpose: help users understand what the data means, how climate and weather
 ClimaLens has five pages accessible from the top navigation bar.
 
 ### Weather & Forecast (/)
-Current conditions, 7-day forecast, hourly breakdown, and a live wind/pressure map for the selected location. Includes an air quality (AQI) card. Data from Open-Meteo (ERA5-based).
+Current conditions, up to 9-day forecast, hourly breakdown, and a live wind/pressure map for the selected location. Includes an air quality (AQI) card. Forecast data from MET Norway / ECMWF; current conditions and historical normals from NASA POWER.
 Best for: what's the weather now, what's coming this week, is the air quality bad today.
 
 ### Historical Climate (/history.html)

@@ -1,4 +1,4 @@
-// 7-day forecast fetch and render
+// 9-day forecast fetch and render
 
 // FORECAST
 // ============================================================
@@ -13,19 +13,23 @@ async function fetchForecast() {
   return json;
 }
 
-function weatherIcon(code, isDay) {
-  if (code === 0)  return isDay === 0
-    ? { icon: 'weather_icon/Clear_night.svg', label: 'Clear night' }
-    : { icon: 'weather_icon/Clear.svg',       label: 'Clear' };
-  if (code <= 2)   return { icon: 'weather_icon/Partly_cloudy.svg', label: 'Partly cloudy' };
-  if (code === 3)  return { icon: 'weather_icon/Overcast.svg',      label: 'Overcast' };
-  if (code <= 49)  return { icon: 'weather_icon/Fog.svg',           label: 'Fog' };
-  if (code <= 57)  return { icon: 'weather_icon/Drizzle.svg',       label: 'Drizzle' };
-  if (code <= 67)  return { icon: 'weather_icon/Rain.svg',          label: 'Rain' };
-  if (code <= 77)  return { icon: 'weather_icon/Snow_showers.svg',  label: 'Snow' };
-  if (code <= 82)  return { icon: 'weather_icon/Showers.svg',       label: 'Showers' };
-  if (code <= 86)  return { icon: 'weather_icon/Snow_showers.svg',  label: 'Snow showers' };
-  return           { icon: 'weather_icon/Thunderstorm.svg',         label: 'Thunderstorm' };
+function weatherIcon(sym) {
+  if (!sym)                                        return { icon: 'weather_icon/Overcast.svg',            label: 'Cloudy' };
+  if (sym.includes('thunder'))                     return { icon: 'weather_icon/Thunderstorm.svg',        label: 'Thunderstorm' };
+  if (sym.includes('snow') && sym.includes('shower')) return { icon: 'weather_icon/Snow_showers.svg',    label: 'Snow showers' };
+  if (sym.includes('snow'))                        return { icon: 'weather_icon/Snow.svg',                label: 'Snow' };
+  if (sym.includes('sleet'))                       return { icon: 'weather_icon/Sleet.svg',               label: 'Sleet' };
+  if (sym.includes('shower'))                      return { icon: 'weather_icon/Showers.svg',             label: 'Showers' };
+  if (sym.startsWith('lightrain'))                 return { icon: 'weather_icon/Drizzle.svg',             label: 'Drizzle' };
+  if (sym.includes('rain'))                        return { icon: 'weather_icon/Rain.svg',                label: 'Rain' };
+  if (sym.startsWith('fog'))                       return { icon: 'weather_icon/Fog.svg',                 label: 'Fog' };
+  if (sym.startsWith('cloudy'))                    return { icon: 'weather_icon/Overcast.svg',            label: 'Overcast' };
+  if (sym.includes('night') || sym.includes('polartwilight')) {
+    if (sym.startsWith('clearsky'))                return { icon: 'weather_icon/Clear_night.svg',         label: 'Clear night' };
+                                                   return { icon: 'weather_icon/Partly_cloudy_night.svg', label: 'Partly cloudy' };
+  }
+  if (sym.startsWith('clearsky'))                  return { icon: 'weather_icon/Clear.svg',               label: 'Clear' };
+                                                   return { icon: 'weather_icon/Partly_cloudy.svg',       label: 'Partly cloudy' };
 }
 
 let forecastChartInstance = null;
@@ -43,7 +47,7 @@ function renderForecast(json, normals) {
     const d = new Date(date + 'T12:00:00');
     const isToday = date === today;
     const name = isToday ? 'Today' : `${dayNames[d.getDay()]} ${d.getDate()}`;
-    const { icon, label } = weatherIcon(daily.weather_code[i]);
+    const { icon, label } = weatherIcon(daily.symbol_code[i]);
     const precip = daily.precipitation_sum[i];
     const wind = daily.wind_speed_10m_max[i];
     strip += `
@@ -72,7 +76,7 @@ function renderForecast(json, normals) {
       <div class="chart-header" style="margin-bottom:12px">
         <div>
           <div class="chart-title">Temperature Forecast</div>
-          <div class="chart-subtitle">High &amp; low over the next 7 days (°C)${normals ? ' · dashed: 2000–2024 monthly avg' : ''}</div>
+          <div class="chart-subtitle">High &amp; low over the next ${daily.time.length} days (°C)${normals ? ' · dashed: 2000–2024 monthly avg' : ''}</div>
         </div>
         <div class="chart-legend">
           <div class="legend-item"><div class="legend-dot" style="background:var(--temp-high)"></div>High</div>
@@ -135,7 +139,7 @@ function renderHourlyStrip(dayIdx) {
   const date   = daily.time[dayIdx];
   const today  = new Date().toISOString().slice(0, 10);
   const isToday = date === today;
-  const currentHour = isToday ? new Date().getHours() : -1;
+  const currentHour = isToday ? new Date().getUTCHours() : -1;
   const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const d = new Date(date + 'T12:00:00');
   const dayLabel = isToday ? 'Today' : dayNames[d.getDay()];
@@ -155,9 +159,9 @@ function renderHourlyStrip(dayIdx) {
   let html = '';
   hIdx.forEach(i => {
     const hour    = +hourly.time[i].slice(11, 13);
-    const timeStr =  hourly.time[i].slice(11, 16);
+    const timeStr = new Date(hourly.time[i] + ':00Z').toLocaleTimeString('en-GB', { timeZone: currentLocation.tz, hour: '2-digit', minute: '2-digit', hour12: false });
     const isNow   = isToday && hour === currentHour;
-    const { icon, label } = weatherIcon(hourly.weather_code[i], hourly.is_day[i]);
+    const { icon, label } = weatherIcon(hourly.symbol_code[i]);
     const temp    = Math.round(hourly.temperature_2m[i]);
     const precip  = hourly.precipitation[i];
     const wind    = Math.round(hourly.wind_speed_10m[i]);
@@ -202,7 +206,7 @@ async function loadNormals() {
 async function loadForecast() {
   const container = document.getElementById('forecastContent');
   container.innerHTML = '<div class="forecast-loading"><div class="forecast-spinner"></div></div>';
-  const cacheKey = `forecast_${currentLocation.lat}_${currentLocation.lon}`;
+  const cacheKey = `forecast_met_${currentLocation.lat}_${currentLocation.lon}`;
   try {
     const forecastPromise = (async () => {
       const cached = localStorage.getItem(cacheKey);

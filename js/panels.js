@@ -218,7 +218,7 @@ function showForecastDrill(dayIdx) {
   const today = new Date().toISOString().slice(0, 10);
   const dayLabel = date === today ? 'Today' : dayNames[d.getDay()];
   const dateLabel = d.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
-  const { icon, label } = weatherIcon(daily.weather_code[dayIdx]);
+  const { icon, label } = weatherIcon(daily.symbol_code[dayIdx]);
 
   // Extract the 24 hourly indices for this date
   const hIdx = hourly.time.reduce((acc, t, i) => {
@@ -226,12 +226,12 @@ function showForecastDrill(dayIdx) {
     return acc;
   }, []);
 
-  const hLabels = hIdx.map(i => hourly.time[i].slice(11, 16)); // "HH:MM"
+  const hLabels = hIdx.map(i => new Date(hourly.time[i] + ':00Z').toLocaleTimeString('en-GB', { timeZone: currentLocation.tz, hour: '2-digit', minute: '2-digit', hour12: false }));
   const hTemp   = hIdx.map(i => hourly.temperature_2m[i]);
   const hPrecip = hIdx.map(i => hourly.precipitation[i]);
   const hWind   = hIdx.map(i => hourly.wind_speed_10m[i]);
   const hHumid  = hIdx.map(i => hourly.relative_humidity_2m[i]);
-  const hCode   = hIdx.map(i => hourly.weather_code[i]);
+  const hCode   = hIdx.map(i => hourly.symbol_code[i]);
 
   panelBreadcrumb.innerHTML =
     `<span class="crumb" onclick="closePanel()">Overview</span>

@@ -672,7 +672,7 @@
   .forecast-strip::-webkit-scrollbar-track { background: transparent; }
   .forecast-strip::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 2px; }
   .forecast-day {
-    flex: 1 0 110px;
+    flex: 0 0 calc((100% - 80px) / 8.333); min-width: 100px;
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -715,7 +715,7 @@
   .hourly-scroll::-webkit-scrollbar-track { background: transparent; }
   .hourly-scroll::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 2px; }
   .hourly-card {
-    flex-shrink: 0; width: 68px;
+    flex: 0 0 calc((100% - 96px) / 12.333); min-width: 55px;
     background: var(--bg-panel); border: 1px solid var(--border);
     border-radius: 10px; padding: 10px 6px; text-align: center;
     cursor: pointer; transition: background 0.15s, border-color 0.15s;

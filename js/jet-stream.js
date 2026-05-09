@@ -149,6 +149,8 @@ async function loadJetStreamData() {
       el.style.color = '';
       document.getElementById('jetStreamContent').style.display = 'none';
       document.getElementById('jetStreamPrompt').style.display  = '';
+      const desc = document.getElementById('jetStreamDesc');
+      if (desc) desc.textContent = '';
       if (jetStreamChartInstance) { jetStreamChartInstance.destroy(); jetStreamChartInstance = null; }
       jetStreamLoaded = false;
       return;
