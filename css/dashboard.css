@@ -716,7 +716,7 @@
   .hourly-scroll::-webkit-scrollbar-track { background: transparent; }
   .hourly-scroll::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 2px; }
   .hourly-card {
-    flex: 0 0 calc((100% - 96px) / 12.333); min-width: 72px;
+    flex: 0 0 calc((100% - 96px) / 12.333); min-width: 84px;
     background: var(--bg-panel); border: 1px solid var(--border);
     border-radius: 10px; padding: 10px 6px; text-align: center;
     cursor: pointer; transition: background 0.15s, border-color 0.15s;
