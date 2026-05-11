@@ -691,6 +691,7 @@
   .forecast-low { font-size: 13px; color: var(--temp-low); margin-top: 2px; }
   .forecast-precip { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--rain); margin-top: 8px; }
   .forecast-wind { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text-muted); margin-top: 3px; }
+  .forecast-precip img, .forecast-wind img { width: 12px; height: 12px; vertical-align: middle; margin-right: 3px; }
 
   /* ── Hourly strip ── */
   .hourly-strip-wrap {
@@ -731,6 +732,7 @@
   .hourly-icon img { width: 24px; height: 24px; display: block; margin: 0 auto; }
   .hourly-temp { font-size: 14px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
   .hourly-rain { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--rain); }
+  .hourly-rain img, .hourly-wind img { width: 9px; height: 9px; vertical-align: middle; margin-right: 2px; }
   .hourly-wind { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-muted); margin-top: 2px; }
 
   .forecast-chart-card {
@@ -1843,21 +1845,26 @@
   color: var(--text-muted); margin-bottom: 16px;
 }
 /* ── Paleo ice toggle ────────────────────────────────────────────────────────── */
-.paleo-ice-btn {
-  width: 100%; padding: 8px 16px; margin-bottom: 14px;
-  border-radius: 6px; border: 1px solid var(--border);
-  background: transparent; cursor: pointer; transition: all 0.15s;
+.paleo-ice-toggle {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  cursor: pointer; user-select: none;
   font-family: 'DM Mono', monospace; font-size: 11px;
-  letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted);
+  letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted);
 }
-.paleo-ice-btn:hover { border-color: var(--accent); color: var(--text-secondary); }
-.paleo-ice-btn.active {
-  border-color: var(--accent); background: rgba(99,102,241,0.1); color: var(--accent-text);
+.paleo-ice-toggle input { display: none; }
+.paleo-ice-track {
+  position: relative; width: 48px; height: 26px; flex-shrink: 0;
+  background: var(--border); border-radius: 13px; transition: background 0.2s;
 }
-.paleo-ice-btn .pib-on  { display: none; }
-.paleo-ice-btn .pib-off { display: inline; }
-.paleo-ice-btn.active .pib-on  { display: inline; }
-.paleo-ice-btn.active .pib-off { display: none; }
+.paleo-ice-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--text-muted); transition: transform 0.2s, background 0.2s;
+}
+.paleo-ice-toggle input:checked + .paleo-ice-track { background: var(--accent); }
+.paleo-ice-toggle input:checked + .paleo-ice-track .paleo-ice-thumb {
+  transform: translateX(22px); background: #fff;
+}
 .paleo-ice-note {
   font-family: 'DM Mono', monospace; font-size: 10px;
   letter-spacing: 0.3px; color: var(--text-muted);

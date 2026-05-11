@@ -189,7 +189,7 @@
       if (iceAvailable) {
         const btn = document.getElementById('paleoIceToggle');
         btn.hidden = false;
-        btn.classList.add('active'); // ON by default
+        document.getElementById('paleoIceCheckbox').checked = true; // ON by default
         document.getElementById('paleoIceLegendItem').hidden    = false;
         document.getElementById('paleoSeaIceLegendItem').hidden = false;
       }
@@ -250,13 +250,11 @@
     document.getElementById('paleoLoadHigh').addEventListener('click', () => loadAndInit('high'));
     document.getElementById('paleoSlider').addEventListener('input', function () { updateDisplay(+this.value); });
 
-    document.getElementById('paleoIceToggle').addEventListener('click', function () {
+    document.getElementById('paleoIceCheckbox').addEventListener('change', function () {
       if (!paleoLayer) return;
-      const isOn = paleoLayer.options.showIce;
-      paleoLayer.options.showIce = !isOn;
-      this.classList.toggle('active', !isOn);
+      paleoLayer.options.showIce = this.checked;
       const noteEl = document.getElementById('paleoIceNote');
-      if (noteEl) noteEl.hidden = isOn || paleoLayer.options.iceStep <= ICE_MAX_STEP;
+      if (noteEl) noteEl.hidden = !this.checked || paleoLayer.options.iceStep <= ICE_MAX_STEP;
       paleoLayer.redraw();
     });
   }

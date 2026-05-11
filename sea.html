@@ -318,10 +318,11 @@
         <div class="sst-tick-row">
           <span>Today</span><span>25k ya</span><span>50k ya</span><span>75k ya</span><span>100k ya</span>
         </div>
-        <button class="paleo-ice-btn" id="paleoIceToggle" hidden aria-label="Toggle ice sheet overlay">
-          <span class="pib-on">Ice sheets · On</span>
-          <span class="pib-off">Ice sheets · Off</span>
-        </button>
+        <label class="paleo-ice-toggle" id="paleoIceToggle" hidden>
+          <input type="checkbox" id="paleoIceCheckbox">
+          <span class="paleo-ice-track"><span class="paleo-ice-thumb"></span></span>
+          Show ice sheet
+        </label>
         <p class="paleo-ice-note" id="paleoIceNote" hidden>Beyond 26 ka BP, ice sheet data is unavailable — the Last Glacial Maximum extent is shown as an approximation.</p>
         <div class="paleo-legend">
           <div class="paleo-legend-item" id="paleoIceLegendItem" hidden><span class="paleo-legend-swatch" style="background:#d2e4f8"></span>Ice sheets</div>
