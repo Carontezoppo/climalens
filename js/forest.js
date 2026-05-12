@@ -17,10 +17,25 @@ function initWorldCoverMap() {
     maxBoundsViscosity: 1.0,
   });
 
-  L.tileLayer(WORLDCOVER_WMTS, {
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri', maxZoom: 19,
+  }).addTo(worldcoverMap);
+
+  let wcTilesFailed = false;
+  const wcLayer = L.tileLayer(WORLDCOVER_WMTS, {
     attribution: '&copy; <a href="https://esa-worldcover.org">ESA WorldCover</a> 2021',
     maxNativeZoom: 13, maxZoom: 13, opacity: 0.92,
   }).addTo(worldcoverMap);
+  wcLayer.on('tileerror', () => {
+    if (wcTilesFailed) return;
+    wcTilesFailed = true;
+    const overlay = document.createElement('div');
+    overlay.className = 'map-tile-unavailable';
+    overlay.innerHTML =
+      '<strong>Map temporarily unavailable</strong>' +
+      '<p>The WorldCover tile service is currently experiencing a data outage. Check back later.</p>';
+    document.getElementById('worldcoverMap').appendChild(overlay);
+  });
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
     subdomains: 'abcd', maxZoom: 19, opacity: 0.8, pane: 'shadowPane',

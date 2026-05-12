@@ -1411,6 +1411,18 @@
   mix-blend-mode: screen;
   filter: brightness(1.6);
 }
+.map-tile-unavailable {
+  position: absolute; inset: 0; z-index: 1000; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(7, 10, 15, 0.70); text-align: center; padding: 24px;
+}
+.map-tile-unavailable strong {
+  display: block; color: var(--text-secondary); font-size: 15px;
+  font-weight: 600; margin-bottom: 8px;
+}
+.map-tile-unavailable p {
+  color: var(--text-muted); font-size: 13px; line-height: 1.6; max-width: 280px; margin: 0;
+}
 
 /* ========= FOREST ANIMATION GATE ========= */
 .forest-gate {
