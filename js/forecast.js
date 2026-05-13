@@ -56,8 +56,8 @@ function renderForecast(json, normals) {
         <div class="forecast-icon"><img src="${icon}" alt="${label}" title="${label}"></div>
         <div class="forecast-high">${Math.round(daily.temperature_2m_max[i])}°</div>
         <div class="forecast-low">${Math.round(daily.temperature_2m_min[i])}°</div>
-        ${precip > 0.2 ? `<div class="forecast-precip"><img src="weather_icon/Drop.svg" alt=""> ${precip.toFixed(1)} mm</div>` : '<div class="forecast-precip" style="opacity:0">·</div>'}
-        <div class="forecast-wind"><img src="weather_icon/Wind.svg" alt=""> ${Math.round(wind)} km/h</div>
+        ${precip > 0.2 ? `<div class="forecast-precip"><img src="weather_icon/Drop.svg" alt="" width="12" height="12"> ${precip.toFixed(1)} mm</div>` : '<div class="forecast-precip" style="opacity:0">·</div>'}
+        <div class="forecast-wind"><img src="weather_icon/Wind.svg" alt="" width="12" height="12"> ${Math.round(wind)} km/h</div>
       </div>`;
   });
   strip += '</div>';
@@ -171,8 +171,8 @@ function renderHourlyStrip(dayIdx) {
       <div class="hourly-time">${isNow ? 'Now' : timeStr}</div>
       <div class="hourly-icon"><img src="${icon}" alt="${label}" title="${label}"></div>
       <div class="hourly-temp" style="color:${tempColor}">${temp}°</div>
-      ${precip > 0.1 ? `<div class="hourly-rain"><img src="weather_icon/Drop.svg" alt=""> ${precip.toFixed(1)}</div>` : '<div class="hourly-rain" style="opacity:0">·</div>'}
-      <div class="hourly-wind"><img src="weather_icon/Wind.svg" alt=""> ${wind} km/h</div>
+      ${precip > 0.1 ? `<div class="hourly-rain"><img src="weather_icon/Drop.svg" alt="" width="9" height="9"> ${precip.toFixed(1)}</div>` : '<div class="hourly-rain" style="opacity:0">·</div>'}
+      <div class="hourly-wind"><img src="weather_icon/Wind.svg" alt="" width="9" height="9"> ${wind} km/h</div>
     </div>`;
   });
 
