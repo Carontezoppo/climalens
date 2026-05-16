@@ -145,6 +145,27 @@
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Global · 2003 – present · GHRSST</span>
   </div>
   <div class="chart-subtitle" style="margin-bottom: 12px;"><b>Note:</b> Frozen ocean surfaces are shown in grey.</div>
+
+  <div class="wl-vital-card" style="margin-bottom:16px;">
+    <div class="wl-vital-top">
+      <div class="wl-vital-metrics">
+        <div class="wl-metric-label">Current anomaly</div>
+        <div class="wl-metric-value" id="sstGlobalAnomaly">—</div>
+        <div class="wl-metric-sub" id="sstGlobalRate">Loading…</div>
+      </div>
+      <div class="wl-sparkline-wrap">
+        <svg id="sstGlobalSparkline" class="wl-sparkline" preserveAspectRatio="none" aria-label="Global ocean surface temperature anomaly 1950–present" role="img"></svg>
+        <div class="wl-sparkline-labels">
+          <span>1950</span><span id="sstGlobalSparklineEnd">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="wl-context-line">
+      Global ocean surface temperatures have been warming consistently since the mid-20th century, crossing the 1981–2010 average in the 1990s and accelerating sharply after 2015.
+    </div>
+    <div class="wl-vital-source" id="sstGlobalStatus">Loading…</div>
+  </div>
+
   <div class="sst-section">
     <div class="sst-map-card">
       <div class="sst-map-wrap" id="sstMap"></div>

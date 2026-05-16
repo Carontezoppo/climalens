@@ -198,14 +198,15 @@ function initSSTMap() {
     }
   });
 
-  // ---- Hover tooltip: live SST + anomaly vs 2003 baseline ----
-  // Uses Open-Meteo Marine API — browser-native CORS, no key, ERA5 reanalysis back to 1940.
+  // ---- Hover tooltip: live SST + anomaly vs 1981-2010 climatology ----
+  // Current temp: Open-Meteo Marine API (ERA5 reanalysis, no key required).
+  // Baseline: /api/sst-climatology → NOAA ERSSTv5 monthly mean 1981-2010 (KV-cached 30 days).
   const sstTip = document.createElement('div');
   sstTip.className = 'sst-tooltip';
   sstMap.getContainer().appendChild(sstTip);
 
-  const sstCurCache = new Map(); // "dateStr_bucket" → °C | null
-  const sstBlCache  = new Map(); // "blDate_bucket"  → °C | null
+  const sstCurCache  = new Map(); // "dateStr_bucket" → °C | null
+  const sstClimCache = new Map(); // "MM_bucket"      → °C | null  (month + location, year-independent)
   let sstHoverTimer = null, sstHoverLL = null;
 
   // 0.25° buckets — matches Open-Meteo/ERA5 native grid, keeps cache efficient
@@ -248,7 +249,7 @@ function initSSTMap() {
         h += `<div class="sst-tt-info">loading baseline\u2026</div>`;
       } else if (base != null) {
         const d = temp - base, s = d >= 0 ? '+' : '';
-        h += `<div class="sst-tt-delta ${d >= 0 ? 'pos' : 'neg'}">${s}${d.toFixed(1)}°C vs 2003 ref</div>`;
+        h += `<div class="sst-tt-delta ${d >= 0 ? 'pos' : 'neg'}">${s}${d.toFixed(1)}°C vs 1981–2010 avg</div>`;
       }
     }
     sstTip.innerHTML = h;
@@ -270,12 +271,12 @@ function initSSTMap() {
       const ll      = sstHoverLL;
       const dateStr = sstMonths[parseInt(slider.value)];
       const bucket  = sstBucket(ll.lat, ll.lng);
-      const blDate  = `2003-${dateStr.slice(5, 7)}-15`; // same calendar month in 2003
+      const month   = dateStr.slice(5, 7); // "01"–"12"
       const curKey  = `${dateStr}_${bucket}`;
-      const blKey   = `${blDate}_${bucket}`;
+      const climKey = `${month}_${bucket}`;
 
-      let temp = sstCurCache.has(curKey) ? sstCurCache.get(curKey) : undefined;
-      let base = sstBlCache.has(blKey)   ? sstBlCache.get(blKey)   : undefined;
+      let temp = sstCurCache.has(curKey)   ? sstCurCache.get(curKey)   : undefined;
+      let base = sstClimCache.has(climKey) ? sstClimCache.get(climKey) : undefined;
 
       if (temp !== undefined && base !== undefined) {
         sstRenderTip(ll, temp, base, false); return;
@@ -291,10 +292,10 @@ function initSSTMap() {
           .catch(() => { temp = null; sstCurCache.set(curKey, null); })
       );
       if (base === undefined) fx.push(
-        fetch(sstOpenMeteoUrl(ll.lat, ll.lng, blDate))
+        fetch(`/api/sst-climatology?lat=${ll.lat.toFixed(2)}&lon=${ll.lng.toFixed(2)}&month=${parseInt(month)}`)
           .then(r => r.json())
-          .then(d => { base = sstParseOpenMeteo(d); sstBlCache.set(blKey, base); })
-          .catch(() => { base = null; sstBlCache.set(blKey, null); })
+          .then(d => { base = (d.mean != null) ? d.mean : null; sstClimCache.set(climKey, base); })
+          .catch(() => { base = null; sstClimCache.set(climKey, null); })
       );
       await Promise.all(fx);
       if (sstTip.style.display !== 'none') sstRenderTip(ll, temp, base, false);
@@ -305,6 +306,81 @@ function initSSTMap() {
     clearTimeout(sstHoverTimer);
     sstTip.style.display = 'none';
   });
+}
+
+/* ========= SST GLOBAL TREND CARD ========= */
+
+async function fetchSSTGlobalTrend() {
+  try {
+    const res = await fetch('/api/sst-global-trend');
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    renderSSTGlobalCard(data);
+  } catch {
+    const el = document.getElementById('sstGlobalStatus');
+    if (el) el.textContent = 'Global trend data temporarily unavailable · NOAA ERSSTv5';
+  }
+}
+
+function renderSSTGlobalCard({ years, anomalies, trendPerDecade, latestYear, latestAnomaly }) {
+  const anomEl   = document.getElementById('sstGlobalAnomaly');
+  const rateEl   = document.getElementById('sstGlobalRate');
+  const statusEl = document.getElementById('sstGlobalStatus');
+  const endLblEl = document.getElementById('sstGlobalSparklineEnd');
+
+  const sign  = latestAnomaly >= 0 ? '+' : '';
+  const color = latestAnomaly >= 0 ? '#f87171' : '#60a5fa';
+  if (anomEl)   { anomEl.textContent = `${sign}${latestAnomaly.toFixed(2)} °C`; anomEl.style.color = color; }
+
+  const tSign = trendPerDecade >= 0 ? '+' : '';
+  if (rateEl)   rateEl.textContent = `${tSign}${trendPerDecade.toFixed(2)} °C / decade · vs 1981–2010`;
+  if (statusEl) statusEl.textContent = `NOAA ERSSTv5 · 1950–${latestYear} · January values · 1981–2010 baseline`;
+  if (endLblEl) endLblEl.textContent = String(latestYear);
+
+  renderSSTGlobalSparkline(years, anomalies);
+}
+
+function renderSSTGlobalSparkline(years, anomalies) {
+  const svg = document.getElementById('sstGlobalSparkline');
+  if (!svg) return;
+
+  const points = years
+    .map((y, i) => ({ year: y, value: anomalies[i] }))
+    .filter(p => p.value != null);
+  if (points.length < 2) return;
+
+  const W = 600, H = 60, padX = 2, padY = 4;
+  const vals    = points.map(p => p.value);
+  const minYear = points[0].year;
+  const maxYear = points[points.length - 1].year;
+
+  // Keep zero (baseline) always in range so the reference line is visible
+  const minVal = Math.min(-0.15, Math.min(...vals));
+  const maxVal = Math.max( 0.15, Math.max(...vals));
+
+  const sx = yr  => padX + (yr - minYear)  / (maxYear - minYear)  * (W - 2 * padX);
+  const sy = val => H - padY - (val - minVal) / (maxVal - minVal) * (H - 2 * padY);
+
+  const zeroY = sy(0).toFixed(1);
+  const pts   = points.map(p => [sx(p.year), sy(p.value)]);
+  const lineD = `M ${pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' L ')}`;
+  const fillD = `${lineD} L ${pts[pts.length - 1][0].toFixed(1)},${zeroY} L ${pts[0][0].toFixed(1)},${zeroY} Z`;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="sstSparkGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#f87171" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#f87171" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <line x1="${padX}" y1="${zeroY}" x2="${W - padX}" y2="${zeroY}"
+          stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,3"/>
+    <path d="${fillD}" fill="url(#sstSparkGrad)"/>
+    <path d="${lineD}" fill="none" stroke="#f87171" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  `;
 }
 
 /* ========= OCEAN CURRENTS ========= */
