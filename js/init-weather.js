@@ -9,11 +9,15 @@ function init() {
   const locationList      = document.getElementById('locationList');
   const locationNoResults = document.getElementById('locationNoResults');
 
+  function setForecastTitle(name) {
+    document.getElementById('forecastSectionTitle').textContent = name + ' — 9-Day Forecast';
+  }
+
   function selectLocation(idx) {
     currentLocation = LOCATIONS[idx];
     localStorage.setItem('selectedLocationIdx', String(idx));
     locationLabel.textContent = LOCATIONS[idx].name;
-    document.getElementById('forecastSectionTitle').textContent = LOCATIONS[idx].name + ', 9-Day Forecast';
+    setForecastTitle(LOCATIONS[idx].name);
     locationList.querySelectorAll('.location-option').forEach(el => {
       el.classList.toggle('active', +el.dataset.idx === idx);
     });
@@ -141,7 +145,7 @@ function init() {
   });
 
   // ── Initial load ──────────────────────────────────────────────────────────
-  document.getElementById('forecastSectionTitle').textContent = currentLocation.name + ' — 7-Day Forecast';
+  setForecastTitle(currentLocation.name);
   initMap();
   initAirQuality();
   loadForecast();
