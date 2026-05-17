@@ -13,7 +13,7 @@ function init() {
     currentLocation = LOCATIONS[idx];
     localStorage.setItem('selectedLocationIdx', String(idx));
     locationLabel.textContent = LOCATIONS[idx].name;
-    document.getElementById('forecastSectionTitle').textContent = LOCATIONS[idx].name + ' — 7-Day Forecast';
+    document.getElementById('forecastSectionTitle').textContent = LOCATIONS[idx].name + ', 9-Day Forecast';
     locationList.querySelectorAll('.location-option').forEach(el => {
       el.classList.toggle('active', +el.dataset.idx === idx);
     });
