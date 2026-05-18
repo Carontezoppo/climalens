@@ -6,6 +6,7 @@
 <title>ClimaLens — Historical Climate Data Since 1970</title>
 <meta name="description" content="Explore historical climate trends for any city from 1970 to today — temperature, precipitation, and extreme weather statistics from ERA5 reanalysis data.">
 <meta name="theme-color" content="#0c0f14">
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="canonical" href="https://climalens.org/history.html">
 <link rel="icon" href="/img/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
@@ -62,6 +63,10 @@
         <a class="page-tab" href="forest.html">Land Cover</a>
         <a class="page-tab" href="about.html">About</a>
       </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="theme-icon-sun" aria-hidden="true">☀</span>
+        <span class="theme-icon-moon" aria-hidden="true">◑</span>
+      </button>
       <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
         <span id="navHamburgerIcon">☰</span><span>Menu</span>
       </button>
@@ -255,5 +260,6 @@
 <script src="js/jet-stream.js"></script>
 <script src="js/init-history.js"></script>
 <script src="/js/cookies.js"></script>
+<script src="js/theme.js"></script>
 </body>
 </html>

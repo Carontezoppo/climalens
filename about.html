@@ -6,6 +6,7 @@
 <title>ClimaLens — About</title>
 <meta name="description" content="ClimaLens makes climate data legible — turning satellite observations, ocean measurements, and historical records into a visual narrative anyone can read.">
 <meta name="theme-color" content="#0c0f14">
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="canonical" href="https://climalens.org/about.html">
 <link rel="icon" href="/img/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
@@ -51,6 +52,10 @@
         <a class="page-tab" href="forest.html">Land Cover</a>
         <a class="page-tab active" href="about.html">About</a>
       </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="theme-icon-sun" aria-hidden="true">☀</span>
+        <span class="theme-icon-moon" aria-hidden="true">◑</span>
+      </button>
       <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
         <span id="navHamburgerIcon">☰</span><span>Menu</span>
       </button>
@@ -192,5 +197,6 @@
   }
 </script>
 <script src="/js/cookies.js"></script>
+<script src="js/theme.js"></script>
 </body>
 </html>

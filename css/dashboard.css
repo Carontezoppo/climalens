@@ -1,4 +1,5 @@
 :root {
+    color-scheme: dark;
     --bg-primary: #0c0f14;
     --bg-card: #141821;
     --bg-card-hover: #1a1f2b;
@@ -28,6 +29,14 @@
     --positive: #34d399;
     --negative: #f87171;
     --background-color: #2e3138;
+    --link-color: #009dff;
+    --status-good:     #34d399;
+    --status-fair:     #a3e635;
+    --status-moderate: #fbbf24;
+    --status-poor:     #f97316;
+    --status-verypoor: #ef4444;
+    --status-extreme:  #a855f7;
+    --forecast-day-selected: #6366f121;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -114,7 +123,7 @@
   .header-period { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
 
   .link a {
-    color: #009dff;
+    color: var(--link-color);
     text-decoration: none;
   }
 
@@ -222,7 +231,6 @@
     border-radius: 6px; color: var(--text-secondary);
     padding: 5px 8px; cursor: pointer; outline: none;
     transition: border-color 0.15s;
-    color-scheme: dark;
   }
   .range-custom input[type=month]:focus { border-color: var(--accent); }
   .range-apply {
@@ -682,7 +690,7 @@
   }
   .forecast-day:hover { background: var(--bg-card-hover); border-color: var(--border-accent); transform: translateY(-2px); }
   .forecast-day.today { border-color: var(--accent); background: rgba(99,102,241,0.07); }
-  .forecast-day.selected { border-color: var(--accent); background: rgba(99,102,241,0.13); box-shadow: inset 0 0 0 1px var(--accent); }
+  .forecast-day.selected { border-color: var(--accent); background: var(--forecast-day-selected); box-shadow: inset 0 0 0 1px var(--accent); }
   .forecast-day-name { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
   .forecast-day.today .forecast-day-name { color: var(--accent-text); }
   .forecast-icon { margin-bottom: 10px; line-height: 1; }
@@ -1328,6 +1336,7 @@
 
   /* Buttons — browser centres content by default */
   .nav-hamburger,
+  .theme-toggle,
   .map-layer-btn,
   .preset-btn,
   .map-toggle-btn,
@@ -1956,4 +1965,128 @@
 @media (max-width: 600px) {
   #cookie-banner { padding: 14px 16px; }
   .cookie-banner-actions { width: 100%; justify-content: flex-end; }
+}
+
+/* ===== THEME TOGGLE BUTTON ===== */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border-search);
+  border-radius: 50%;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  transition: color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+.theme-toggle:hover {
+  color: var(--text-primary);
+  border-color: var(--border-accent);
+}
+.theme-icon-moon { display: none; }
+.theme-icon-sun  { display: inline; }
+[data-theme="light"] .theme-icon-sun  { display: none; }
+[data-theme="light"] .theme-icon-moon { display: inline; }
+
+/* ===== LIGHT THEME ===== */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg-primary:     #f0f3fa;
+  --bg-card:        #ffffff;
+  --bg-card-hover:  #f5f7fd;
+  --bg-panel:       #f7f9fe;
+  --border:         #e2e7f5;
+  --border-search:  #9aa3c0;
+  --border-accent:  #c8cfec;
+  --text-primary:   #111827;
+  --text-secondary: #374151;
+  --text-muted:     #6b7280;
+  --rain:           #0d7ab0;
+  --rain-dim:       rgba(13,122,176,0.12);
+  --sun:            #875000;
+  --sun-dim:        rgba(135,80,0,0.12);
+  --wind:           #167740;
+  --wind-dim:       rgba(22,119,64,0.12);
+  --snow:           #3a4d6e;
+  --snow-dim:       rgba(58,77,110,0.12);
+  --pressure:       #5d30a0;
+  --pressure-dim:   rgba(93,48,160,0.12);
+  --humidity:       #9a1c68;
+  --humidity-dim:   rgba(154,28,104,0.12);
+  --temp-high:      #9c3b08;
+  --temp-low:       #0a5e8e;
+  --accent:         #3d43f2;
+  --accent-text:    #3338ae;
+  --positive:       #087249;
+  --negative:       #c01818;
+  --background-color: #d5daea;
+  --link-color:     #0033ff;
+  --status-good:     #0a7d52;
+  --status-fair:     #4a7200;
+  --status-moderate: #8c5a00;
+  --status-poor:     #c24a08;
+  --status-verypoor: #c01818;
+  --status-extreme:  #7c1abf;
+  --forecast-day-selected: #c7c8ff21;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --bg-primary:     #f0f3fa;
+    --bg-card:        #ffffff;
+    --bg-card-hover:  #f5f7fd;
+    --bg-panel:       #f7f9fe;
+    --border:         #e2e7f5;
+    --border-search:  #9aa3c0;
+    --border-accent:  #c8cfec;
+    --text-primary:   #111827;
+    --text-secondary: #374151;
+    --text-muted:     #6b7280;
+    --rain:           #0d7ab0;
+    --rain-dim:       rgba(13,122,176,0.12);
+    --sun:            #875000;
+    --sun-dim:        rgba(135,80,0,0.12);
+    --wind:           #167740;
+    --wind-dim:       rgba(22,119,64,0.12);
+    --snow:           #3a4d6e;
+    --snow-dim:       rgba(58,77,110,0.12);
+    --pressure:       #5d30a0;
+    --pressure-dim:   rgba(93,48,160,0.12);
+    --humidity:       #9a1c68;
+    --humidity-dim:   rgba(154,28,104,0.12);
+    --temp-high:      #9c3b08;
+    --temp-low:       #0a5e8e;
+    --accent:         #3d43f2;
+    --accent-text:    #3338ae;
+    --positive:       #087249;
+    --negative:       #c01818;
+    --background-color: #d5daea;
+    --link-color:     #0033ff;
+    --status-good:     #0a7d52;
+    --status-fair:     #4a7200;
+    --status-moderate: #8c5a00;
+    --status-poor:     #c24a08;
+    --status-verypoor: #c01818;
+    --status-extreme:  #7c1abf;
+    --forecast-day-selected: #c7c8ff21;
+  }
+}
+
+[data-theme="dark"] { color-scheme: dark; }
+
+/* Lighter shadows in light mode */
+[data-theme="light"] .location-dropdown { box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .location-dropdown { box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+}
+[data-theme="light"] .header-nav.open .header-nav-links { box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .header-nav.open .header-nav-links { box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
 }

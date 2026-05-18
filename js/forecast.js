@@ -104,9 +104,10 @@ function renderForecast(json, normals) {
     const d = new Date(date + 'T12:00:00');
     return date === today ? 'Today' : dayNames[d.getDay()];
   });
+  const _cardBg = getComputedStyle(document.documentElement).getPropertyValue('--bg-card').trim() || '#0c0f14';
   const datasets = [
-    { label:'High', data: daily.temperature_2m_max.map(v => Math.round(v)), borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#fb923c', pointBorderColor:'#0c0f14', pointBorderWidth:2 },
-    { label:'Low',  data: daily.temperature_2m_min.map(v => Math.round(v)), borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,0.08)',  fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#38bdf8', pointBorderColor:'#0c0f14', pointBorderWidth:2 },
+    { label:'High', data: daily.temperature_2m_max.map(v => Math.round(v)), borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#fb923c', pointBorderColor:_cardBg, pointBorderWidth:2 },
+    { label:'Low',  data: daily.temperature_2m_min.map(v => Math.round(v)), borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,0.08)',  fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#38bdf8', pointBorderColor:_cardBg, pointBorderWidth:2 },
   ];
   if (normals) {
     const normHigh = daily.time.map(d => normals.high[new Date(d + 'T12:00:00').getMonth()]);

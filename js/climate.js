@@ -184,7 +184,7 @@ function renderClimateData(data) {
           },
         },
         y: {
-          grid: { color: 'rgba(30,36,51,0.7)' },
+          grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || 'rgba(30,36,51,0.7)' },
           ticks: { callback: v => (v > 0 ? '+' : '') + v.toFixed(1) + '°' },
           grace: '10%',
         },

@@ -42,18 +42,22 @@ function renderDashboard(normals = null) {
   });
 
   // CHART DEFAULTS
-  Chart.defaults.color = '#8891a5';
-  Chart.defaults.borderColor = '#1e2433';
+  var _cs = getComputedStyle(document.documentElement);
+  var _cv = function(n) { return _cs.getPropertyValue(n).trim(); };
+  Chart.defaults.color = _cv('--text-muted') || '#8891a5';
+  Chart.defaults.borderColor = _cv('--border') || '#1e2433';
   Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
   Chart.defaults.font.size = 11;
   Chart.defaults.plugins.legend.display = false;
-  Chart.defaults.plugins.tooltip.backgroundColor = '#1a1f2b';
-  Chart.defaults.plugins.tooltip.borderColor = '#2a3148';
+  Chart.defaults.plugins.tooltip.backgroundColor = _cv('--bg-panel') || '#1a1f2b';
+  Chart.defaults.plugins.tooltip.borderColor = _cv('--border-accent') || '#2a3148';
+  Chart.defaults.plugins.tooltip.titleColor = _cv('--text-primary') || '#e8eaf0';
+  Chart.defaults.plugins.tooltip.bodyColor = _cv('--text-secondary') || '#b8bfd0';
   Chart.defaults.plugins.tooltip.borderWidth = 1;
   Chart.defaults.plugins.tooltip.padding = 10;
   Chart.defaults.plugins.tooltip.cornerRadius = 8;
   Chart.defaults.plugins.tooltip.titleFont = { weight: '600', size: 12 };
-  Chart.defaults.scale.grid.color = 'rgba(30,36,51,0.7)';
+  Chart.defaults.scale.grid.color = _cv('--border') || 'rgba(30,36,51,0.7)';
 
   // MAP NORMALS TO CURRENT MONTHS
   // MONTHS_FULL is ['January', 'February', ...] for each month slot in the selected range.
@@ -100,9 +104,10 @@ function renderDashboard(normals = null) {
     </div>`;
 
   // MAIN CHARTS
+  var _cardBg = _cv('--bg-card') || '#141821';
   const tempDs = [
-    { label:'Avg High', data:DATA.avgHigh, borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#fb923c', pointBorderColor:'#0c0f14', pointBorderWidth:2 },
-    { label:'Avg Low',  data:DATA.avgLow,  borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,0.08)',  fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#38bdf8', pointBorderColor:'#0c0f14', pointBorderWidth:2 },
+    { label:'Avg High', data:DATA.avgHigh, borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#fb923c', pointBorderColor:_cardBg, pointBorderWidth:2 },
+    { label:'Avg Low',  data:DATA.avgLow,  borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,0.08)',  fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#38bdf8', pointBorderColor:_cardBg, pointBorderWidth:2 },
   ];
   if (normHigh) tempDs.push({ label:'Norm High', data:normHigh, borderColor:'rgba(251,146,60,0.45)', borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
   if (normLow)  tempDs.push({ label:'Norm Low',  data:normLow,  borderColor:'rgba(56,189,248,0.45)',  borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
@@ -133,7 +138,7 @@ function renderDashboard(normals = null) {
   });
 
   const windDs = [
-    { label:'Avg Speed', data:DATA.windAvg, borderColor:'#7ee8a8', backgroundColor:'rgba(126,232,168,0.1)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#7ee8a8', pointBorderColor:'#0c0f14', pointBorderWidth:2 },
+    { label:'Avg Speed', data:DATA.windAvg, borderColor:'#7ee8a8', backgroundColor:'rgba(126,232,168,0.1)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#7ee8a8', pointBorderColor:_cardBg, pointBorderWidth:2 },
   ];
   if (normWind) windDs.push({ label:'Norm Avg', data:normWind, borderColor:'rgba(126,232,168,0.45)', borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
   chartInstances.wind = new Chart(document.getElementById('windChart'), {
@@ -164,7 +169,7 @@ function renderDashboard(normals = null) {
 
   chartInstances.pressure = new Chart(document.getElementById('pressureChart'), {
     type:'line',
-    data:{ labels:MONTHS, datasets:[{ data:DATA.pressure, borderColor:'#c084fc', backgroundColor:'rgba(192,132,252,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#c084fc', pointBorderColor:'#0c0f14', pointBorderWidth:2 }] },
+    data:{ labels:MONTHS, datasets:[{ data:DATA.pressure, borderColor:'#c084fc', backgroundColor:'rgba(192,132,252,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#c084fc', pointBorderColor:_cardBg, pointBorderWidth:2 }] },
     options:{ responsive:true, maintainAspectRatio:false, scales:{y:{grace:'5%',ticks:{callback:v=>v+' hPa'}}}, plugins:{tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y} hPa`}}} }
   });
 

@@ -22,29 +22,33 @@ async function fetchAirQuality() {
   return json;
 }
 
+function _aqC(key) {
+  return getComputedStyle(document.documentElement).getPropertyValue('--status-' + key).trim();
+}
+
 function aqiCat(aqi) {
-  if (aqi <= 20)  return { label:'Good',          color:'#34d399', advice:'Air quality is satisfactory — enjoy the outdoors.' };
-  if (aqi <= 40)  return { label:'Fair',           color:'#a3e635', advice:'Air quality is acceptable.' };
-  if (aqi <= 60)  return { label:'Moderate',       color:'#fbbf24', advice:'Unusually sensitive people may be affected.' };
-  if (aqi <= 80)  return { label:'Poor',           color:'#f97316', advice:'Sensitive groups should reduce outdoor exertion.' };
-  if (aqi <= 100) return { label:'Very Poor',      color:'#ef4444', advice:'Everyone may experience health effects.' };
-  return               { label:'Extremely Poor',  color:'#a855f7', advice:'Avoid all outdoor physical activity.' };
+  if (aqi <= 20)  return { label:'Good',          color:_aqC('good'),     advice:'Air quality is satisfactory — enjoy the outdoors.' };
+  if (aqi <= 40)  return { label:'Fair',           color:_aqC('fair'),     advice:'Air quality is acceptable.' };
+  if (aqi <= 60)  return { label:'Moderate',       color:_aqC('moderate'), advice:'Unusually sensitive people may be affected.' };
+  if (aqi <= 80)  return { label:'Poor',           color:_aqC('poor'),     advice:'Sensitive groups should reduce outdoor exertion.' };
+  if (aqi <= 100) return { label:'Very Poor',      color:_aqC('verypoor'), advice:'Everyone may experience health effects.' };
+  return               { label:'Extremely Poor',  color:_aqC('extreme'),  advice:'Avoid all outdoor physical activity.' };
 }
 
 function uvCat(uv) {
-  if (uv <= 2)  return { label:'Low',       color:'#34d399', advice:'No protection needed.' };
-  if (uv <= 5)  return { label:'Moderate',  color:'#fbbf24', advice:'Seek shade during midday hours.' };
-  if (uv <= 7)  return { label:'High',      color:'#f97316', advice:'Sun protection required.' };
-  if (uv <= 10) return { label:'Very High', color:'#ef4444', advice:'Extra protection essential.' };
-  return             { label:'Extreme',    color:'#a855f7', advice:'Avoid sun from 10am – 4pm.' };
+  if (uv <= 2)  return { label:'Low',       color:_aqC('good'),     advice:'No protection needed.' };
+  if (uv <= 5)  return { label:'Moderate',  color:_aqC('moderate'), advice:'Seek shade during midday hours.' };
+  if (uv <= 7)  return { label:'High',      color:_aqC('poor'),     advice:'Sun protection required.' };
+  if (uv <= 10) return { label:'Very High', color:_aqC('verypoor'), advice:'Extra protection essential.' };
+  return             { label:'Extreme',    color:_aqC('extreme'),  advice:'Avoid sun from 10am – 4pm.' };
 }
 
 function pollenCat(val) {
   if (val <= 0)  return { label:'None',   color:'var(--text-muted)' };
-  if (val <= 10) return { label:'Low',    color:'#34d399' };
-  if (val <= 30) return { label:'Medium', color:'#fbbf24' };
-  if (val <= 80) return { label:'High',   color:'#f97316' };
-  return              { label:'V.High',  color:'#ef4444' };
+  if (val <= 10) return { label:'Low',    color:_aqC('good') };
+  if (val <= 30) return { label:'Medium', color:_aqC('moderate') };
+  if (val <= 80) return { label:'High',   color:_aqC('poor') };
+  return              { label:'V.High',  color:_aqC('verypoor') };
 }
 
 function renderAirQuality(json) {
@@ -69,7 +73,7 @@ function renderAirQuality(json) {
   const ac = aqiCat(aqi);
   const uc = uvCat(uv);
   const pct = (v, max) => Math.min(100, (v / max) * 100).toFixed(0);
-  const pollColor = (v, safe) => v > safe ? '#f97316' : '#34d399';
+  const pollColor = (v, safe) => v > safe ? _aqC('poor') : _aqC('good');
 
   const pollutants = [
     { label:'PM2.5', val:pm25, unit:'µg/m³', guideline:'Daily mean · WHO: 15 µg/m³', safe:15,  max:75,  color:pollColor(pm25, 15)  },
