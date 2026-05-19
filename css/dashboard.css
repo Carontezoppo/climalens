@@ -694,7 +694,7 @@
   .forecast-day-name { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
   .forecast-day.today .forecast-day-name { color: var(--accent-text); }
   .forecast-icon { margin-bottom: 10px; line-height: 1; }
-  .forecast-icon img { width: 40px; height: 40px; display: block; margin: 0 auto; }
+  .forecast-icon img { width: 48px; height: 48px; display: block; margin: 0 auto; }
   .forecast-high { font-size: 18px; font-weight: 700; color: var(--temp-high); letter-spacing: -0.5px; }
   .forecast-low { font-size: 13px; color: var(--temp-low); margin-top: 2px; }
   .forecast-precip { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--rain); margin-top: 8px; }
@@ -737,7 +737,7 @@
   }
   .hourly-card.now .hourly-time { color: var(--accent-text); font-weight: 500; }
   .hourly-icon { margin-bottom: 6px; line-height: 1; }
-  .hourly-icon img { width: 24px; height: 24px; display: block; margin: 0 auto; }
+  .hourly-icon img { width: 38px; height: 38px; display: block; margin: 0 auto; }
   .hourly-temp { font-size: 14px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
   .hourly-rain { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--rain); }
   .hourly-rain img, .hourly-wind img { width: 9px; height: 9px; vertical-align: middle; margin-right: 2px; }
