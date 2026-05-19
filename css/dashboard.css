@@ -758,7 +758,7 @@
   }
   @media (max-width: 560px) {
     .forecast-day { padding: 10px 6px; }
-    .forecast-icon img { width: 22px; height: 22px; }
+    .forecast-icon img { width: 64px; height: 48px; }
     .forecast-high { font-size: 15px; }
   }
 
