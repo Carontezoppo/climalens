@@ -13,23 +13,28 @@ async function fetchForecast() {
   return json;
 }
 
-function weatherIcon(sym) {
-  if (!sym)                                        return { icon: 'weather_icon/Overcast.svg',            label: 'Cloudy' };
-  if (sym.includes('thunder'))                     return { icon: 'weather_icon/Thunderstorm.svg',        label: 'Thunderstorm' };
-  if (sym.includes('snow') && sym.includes('shower')) return { icon: 'weather_icon/Snow_showers.svg',    label: 'Snow showers' };
-  if (sym.includes('snow'))                        return { icon: 'weather_icon/Snow.svg',                label: 'Snow' };
-  if (sym.includes('sleet'))                       return { icon: 'weather_icon/Sleet.svg',               label: 'Sleet' };
-  if (sym.includes('shower'))                      return { icon: 'weather_icon/Showers.svg',             label: 'Showers' };
-  if (sym.startsWith('lightrain'))                 return { icon: 'weather_icon/Drizzle.svg',             label: 'Drizzle' };
-  if (sym.includes('rain'))                        return { icon: 'weather_icon/Rain.svg',                label: 'Rain' };
-  if (sym.startsWith('fog'))                       return { icon: 'weather_icon/Fog.svg',                 label: 'Fog' };
-  if (sym.startsWith('cloudy'))                    return { icon: 'weather_icon/Overcast.svg',            label: 'Overcast' };
-  if (sym.includes('night') || sym.includes('polartwilight')) {
-    if (sym.startsWith('clearsky'))                return { icon: 'weather_icon/Clear_night.svg',         label: 'Clear night' };
-                                                   return { icon: 'weather_icon/Partly_cloudy_night.svg', label: 'Partly cloudy' };
+function weatherIcon(sym, localHour = -1) {
+  const nightSym  = !!sym && (sym.includes('night') || sym.includes('polartwilight'));
+  const nightHour = localHour >= 0 && (localHour < 6 || localHour >= 21);
+  const night     = nightSym || nightHour;
+  const n         = night ? '_night' : '';
+
+  if (!sym)                                            return { icon: `weather_icon/Overcast${n}.svg`,        label: 'Cloudy' };
+  if (sym.includes('thunder'))                         return { icon: `weather_icon/Thunderstorm${n}.svg`,    label: 'Thunderstorm' };
+  if (sym.includes('snow') && sym.includes('shower'))  return { icon: `weather_icon/Snow_showers${n}.svg`,   label: 'Snow showers' };
+  if (sym.includes('snow'))                            return { icon: `weather_icon/Snow${n}.svg`,            label: 'Snow' };
+  if (sym.includes('sleet'))                           return { icon: `weather_icon/Sleet${n}.svg`,           label: 'Sleet' };
+  if (sym.includes('shower'))                          return { icon: `weather_icon/Showers${n}.svg`,         label: 'Showers' };
+  if (sym.startsWith('lightrain'))                     return { icon: `weather_icon/Drizzle${n}.svg`,         label: 'Drizzle' };
+  if (sym.includes('rain'))                            return { icon: `weather_icon/Rain${n}.svg`,            label: 'Rain' };
+  if (sym.startsWith('fog'))                           return { icon: `weather_icon/Fog${n}.svg`,             label: 'Fog' };
+  if (sym.startsWith('cloudy'))                        return { icon: `weather_icon/Overcast${n}.svg`,        label: 'Overcast' };
+  if (night) {
+    if (sym.startsWith('clearsky'))                    return { icon: 'weather_icon/Clear_night.svg',          label: 'Clear night' };
+                                                       return { icon: 'weather_icon/Partly_cloudy_night.svg', label: 'Partly cloudy' };
   }
-  if (sym.startsWith('clearsky'))                  return { icon: 'weather_icon/Clear.svg',               label: 'Clear' };
-                                                   return { icon: 'weather_icon/Partly_cloudy.svg',       label: 'Partly cloudy' };
+  if (sym.startsWith('clearsky'))                      return { icon: 'weather_icon/Clear.svg',                label: 'Clear' };
+                                                       return { icon: 'weather_icon/Partly_cloudy.svg',       label: 'Partly cloudy' };
 }
 
 let forecastChartInstance = null;
@@ -47,7 +52,7 @@ function renderForecast(json, normals) {
     const d = new Date(date + 'T12:00:00');
     const isToday = date === today;
     const name = isToday ? 'Today' : `${dayNames[d.getDay()]} ${d.getDate()}`;
-    const { icon, label } = weatherIcon(daily.symbol_code[i]);
+    const { icon, label } = weatherIcon((daily.symbol_code[i] || '').replace(/_night|_polartwilight/g, ''));
     const precip = daily.precipitation_sum[i];
     const wind = daily.wind_speed_10m_max[i];
     strip += `
@@ -162,7 +167,7 @@ function renderHourlyStrip(dayIdx) {
     const hour    = +hourly.time[i].slice(11, 13);
     const timeStr = new Date(hourly.time[i] + ':00Z').toLocaleTimeString('en-GB', { timeZone: currentLocation.tz, hour: '2-digit', minute: '2-digit', hour12: false });
     const isNow   = isToday && hour === currentHour;
-    const { icon, label } = weatherIcon(hourly.symbol_code[i]);
+    const { icon, label } = weatherIcon(hourly.symbol_code[i], +timeStr.slice(0, 2));
     const temp    = Math.round(hourly.temperature_2m[i]);
     const precip  = hourly.precipitation[i];
     const wind    = Math.round(hourly.wind_speed_10m[i]);

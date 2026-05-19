@@ -218,7 +218,7 @@ function showForecastDrill(dayIdx) {
   const today = new Date().toISOString().slice(0, 10);
   const dayLabel = date === today ? 'Today' : dayNames[d.getDay()];
   const dateLabel = d.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
-  const { icon, label } = weatherIcon(daily.symbol_code[dayIdx]);
+  const { icon, label } = weatherIcon((daily.symbol_code[dayIdx] || '').replace(/_night|_polartwilight/g, ''));
 
   // Extract the 24 hourly indices for this date
   const hIdx = hourly.time.reduce((acc, t, i) => {
@@ -271,7 +271,7 @@ function showForecastDrill(dayIdx) {
   h += '<div class="panel-hint">Hour-by-hour breakdown</div>';
   h += '<table class="daily-table"><thead><tr><th>Time</th><th>Conditions</th><th>Temp °C</th><th>Rain (mm)</th><th>Wind (km/h)</th><th>Humidity (%)</th></tr></thead><tbody>';
   hIdx.forEach((_, j) => {
-    const { icon: hIcon, label: hLabel } = weatherIcon(hCode[j]);
+    const { icon: hIcon, label: hLabel } = weatherIcon(hCode[j], +hLabels[j].slice(0, 2));
     h += `<tr>
       <td>${hLabels[j]}</td>
       <td style="text-align:center"><img src="${hIcon}" alt="${hLabel}" title="${hLabel}" style="width:18px;height:18px;vertical-align:middle;"></td>
