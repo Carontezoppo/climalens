@@ -38,10 +38,11 @@
 <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <!-- DRILL-DOWN PANEL -->
 <div class="panel-overlay" id="panelOverlay"></div>
-<div class="drill-panel" id="drillPanel">
+<div class="drill-panel" id="drillPanel" role="dialog" aria-modal="true" aria-labelledby="panelBreadcrumb">
   <div class="panel-top-bar">
     <div class="panel-breadcrumb" id="panelBreadcrumb"></div>
     <button class="panel-close" id="panelClose" aria-label="Close panel">&#x2715;</button>
@@ -58,7 +59,7 @@
     <nav class="header-nav" id="pageTabsNav">
       <div class="header-nav-links">
         <a class="page-tab" href="index.html">Weather</a>
-        <a class="page-tab active" href="history.html">History</a>
+        <a class="page-tab active" href="history.html" aria-current="page">History</a>
         <a class="page-tab" href="sea.html">Sea</a>
         <a class="page-tab" href="forest.html">Land Cover</a>
         <a class="page-tab" href="about.html">About</a>
@@ -72,6 +73,8 @@
       </button>
     </nav>
   </header>
+
+  <main id="main-content">
 
   <div class="controls-bar">
     <div class="nav-location">
@@ -97,10 +100,10 @@
     </nav>
   </div>
 
-  <div class="section-title" id="section-climate" style="margin-top:8px;">
+  <h2 class="section-title" id="section-climate" style="margin-top:8px;">
     <span id="climateSectionTitle">Climate Trends</span>
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">1981 – present · MERRA-2 / NASA</span>
-  </div>
+  </h2>
   <div class="chart-subtitle" style="margin-bottom:12px;">This data shows long-term climate trends across the selected area. When a season feels unseasonably warm or cold, these trends are the wider context, and a single extreme event often makes more sense against them.</div>
   <div class="climate-section">
     <div id="climatePrompt" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:40px;text-align:center;margin-bottom:0;">
@@ -120,8 +123,8 @@
             <div class="legend-item"><div style="width:20px;height:2.5px;background:#fb923c;border-radius:1px;margin-right:6px;"></div>Trend</div>
           </div>
         </div>
-        <div class="chart-container" style="height:320px;"><canvas id="climateChart"></canvas></div>
-        <canvas class="climate-stripes" id="climateStripes"></canvas>
+        <div class="chart-container" style="height:320px;"><canvas id="climateChart" role="img" aria-label="Annual temperature anomaly chart — deviation from 1981–2010 baseline"></canvas></div>
+        <canvas class="climate-stripes" id="climateStripes" role="img" aria-label="Climate stripes — annual temperature relative to 1981–2010 baseline"></canvas>
         <div class="climate-note" id="climateNote"></div>
       </div>
     </div>
@@ -133,10 +136,10 @@
 
   <div class="section-sep"></div>
 
-  <div class="section-title" id="section-jetstream" style="margin-top:8px;">
+  <h2 class="section-title" id="section-jetstream" style="margin-top:8px;">
     Jet Stream Index
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">2000 – present · NAO / SAM · NOAA CPC</span>
-  </div>
+  </h2>
   <div class="chart-subtitle" id="jetStreamDesc" style="margin-bottom:12px;"></div>
 
   <div id="jetStreamPrompt" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:40px;text-align:center;margin-bottom:0;">
@@ -156,7 +159,7 @@
           <div class="legend-item"><div class="legend-dot" style="background:#38bdf8"></div>Negative (cold risk)</div>
         </div>
       </div>
-      <div class="chart-container" style="height:300px;"><canvas id="jetStreamChart"></canvas></div>
+      <div class="chart-container" style="height:300px;"><canvas id="jetStreamChart" role="img" aria-label="Annual NAO / SAM jet stream index chart"></canvas></div>
       <div class="climate-note" id="jetStreamNote"></div>
     </div>
   </div>
@@ -168,15 +171,15 @@
   <div class="forecast-section" id="section-historical">
     <div class="section-controls">
       <div>
-        <div class="section-title" style="margin-bottom:4px">Historical Data</div>
+        <h2 class="section-title" style="margin-bottom:4px">Historical Data</h2>
         <div class="header-period" id="headerPeriod"></div>
       </div>
       <div class="range-picker">
         <div class="range-presets">
-          <button class="preset-btn" data-months="3">3 mo</button>
-          <button class="preset-btn active" data-months="6">6 mo</button>
-          <button class="preset-btn" data-months="12">12 mo</button>
-          <button class="preset-btn" data-months="24">24 mo</button>
+          <button class="preset-btn" data-months="3" aria-pressed="false">3 mo</button>
+          <button class="preset-btn active" data-months="6" aria-pressed="true">6 mo</button>
+          <button class="preset-btn" data-months="12" aria-pressed="false">12 mo</button>
+          <button class="preset-btn" data-months="24" aria-pressed="false">24 mo</button>
         </div>
         <div class="range-custom">
           <label for="rangeFrom">From</label>
@@ -193,7 +196,7 @@
 
   <div class="section-sep"></div>
 
-  <div class="section-title">Trends &amp; Patterns</div>
+  <h2 class="section-title">Trends &amp; Patterns</h2>
   <div class="chart-grid">
     <div class="chart-card full-width">
       <div class="chart-header">
@@ -206,15 +209,15 @@
           <div class="legend-item"><div class="legend-dot" style="background:var(--temp-low)"></div>Avg Low</div>
         </div>
       </div>
-      <div class="chart-container"><canvas id="tempChart"></canvas></div>
+      <div class="chart-container"><canvas id="tempChart" role="img" aria-label="Monthly temperature range chart — average high and low"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-header"><div><div class="chart-title">Precipitation</div><div class="chart-subtitle">Rainfall in mm per month</div></div></div>
-      <div class="chart-container"><canvas id="rainChart"></canvas></div>
+      <div class="chart-container"><canvas id="rainChart" role="img" aria-label="Monthly precipitation chart — rainfall in mm"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-header"><div><div class="chart-title">Sunshine Hours</div><div class="chart-subtitle">Total hours of sunlight per month</div></div></div>
-      <div class="chart-container"><canvas id="sunChart"></canvas></div>
+      <div class="chart-container"><canvas id="sunChart" role="img" aria-label="Monthly sunshine hours chart"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-header">
@@ -224,26 +227,28 @@
           <div class="legend-item"><div class="legend-dot" style="background:rgba(126,232,168,0.35)"></div>Gusts</div>
         </div>
       </div>
-      <div class="chart-container"><canvas id="windChart"></canvas></div>
+      <div class="chart-container"><canvas id="windChart" role="img" aria-label="Monthly wind speed chart — average and peak gusts"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-header"><div><div class="chart-title">Atmospheric Pressure</div><div class="chart-subtitle">Mean sea-level pressure (hPa)</div></div></div>
-      <div class="chart-container"><canvas id="pressureChart"></canvas></div>
+      <div class="chart-container"><canvas id="pressureChart" role="img" aria-label="Monthly atmospheric pressure chart — mean sea-level pressure in hPa"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-header"><div><div class="chart-title">Frost Days</div><div class="chart-subtitle">Days with minimum temperature below 0°C</div></div></div>
-      <div class="chart-container"><canvas id="frostChart"></canvas></div>
+      <div class="chart-container"><canvas id="frostChart" role="img" aria-label="Monthly frost days chart — days with minimum temperature below 0°C"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-header"><div><div class="chart-title">UV Index</div><div class="chart-subtitle">Monthly average UV index · NASA POWER / MERRA-2</div></div></div>
-      <div class="chart-container"><canvas id="uvChart"></canvas></div>
+      <div class="chart-container"><canvas id="uvChart" role="img" aria-label="Monthly UV index chart"></canvas></div>
     </div>
   </div>
 
   <div class="section-sep"></div>
 
-  <div class="section-title">Monthly Breakdown</div>
+  <h2 class="section-title">Monthly Breakdown</h2>
   <div class="table-card"><table id="detailTable"></table></div>
+
+  </main>
 
   <footer class="footer">
     <p>ClimaLens · Open data, open source</p>

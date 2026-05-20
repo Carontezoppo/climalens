@@ -39,6 +39,7 @@
 <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <div class="dashboard">
   <header class="header">
@@ -51,7 +52,7 @@
         <a class="page-tab" href="index.html">Weather</a>
         <a class="page-tab" href="history.html">History</a>
         <a class="page-tab" href="sea.html">Sea</a>
-        <a class="page-tab active" href="forest.html">Land Cover</a>
+        <a class="page-tab active" href="forest.html" aria-current="page">Land Cover</a>
         <a class="page-tab" href="about.html">About</a>
       </div>
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -63,16 +64,18 @@
       </button>
     </nav>
   </header>
-  
+
+  <main id="main-content">
+
   <div class="page-cta" style="margin-bottom: 32px;">
   <p class="page-cta-text">This page loads <strong>significant amounts of data</strong> to display its animations and maps. Please <strong>allow a few moments</strong>, especially on slower connections.</p>
 </div>
 
   <!-- ── WorldCover: current state ─────────────────────────── -->
-  <div class="section-title" style="margin-top:8px;">
+  <h2 class="section-title" style="margin-top:8px;">
     Global Land Cover — Current State
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Global · 2021 · ESA WorldCover · 10 m</span>
-  </div>
+  </h2>
   <div class="chart-subtitle" style="margin-bottom:12px;">High-resolution land surface classification at 10 m, derived from Sentinel-1 and Sentinel-2 data. Zoom in to distinguish individual fields, forest patches, and urban fabric at a level of detail the MODIS animation below cannot show.</div>
 
   <div class="sst-section">
@@ -99,10 +102,10 @@
   <!-- ── MODIS animation: 24-year change ───────────────────── -->
   <div class="section-sep"></div>
 
-  <div class="section-title">
+  <h2 class="section-title">
     Land Cover Change — 2001 to 2024
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Global · 2001–2024 · MODIS IGBP · 500 m</span>
-  </div>
+  </h2>
   <div class="chart-subtitle" style="margin-bottom:12px;">Annual land cover classification from MODIS satellite data. Dark greens are forest — watch the Amazon, Congo Basin, and Southeast Asia as cropland and urban areas expand across two decades.</div>
 
   <div class="forest-gate" id="forestGate">
@@ -127,7 +130,7 @@
           <div class="forest-year-display" id="forestYearDisplay">—</div>
           <button class="sst-play-btn" id="forestPlayBtn">&#9654; Play</button>
         </div>
-        <input type="range" class="sst-slider" id="forestSlider" min="2001" max="2024" value="2024">
+        <input type="range" class="sst-slider" id="forestSlider" min="2001" max="2024" value="2024" aria-label="Select year for land cover animation">
         <div class="sst-tick-row" id="forestTickRow"></div>
         <div class="forest-legend">
           <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#1a6b1a"></span>Evergreen forest</div>
@@ -143,6 +146,8 @@
       </div>
     </div>
   </div>
+
+  </main>
 
   <footer class="footer">
     <p>ClimaLens · Open data, open source</p>

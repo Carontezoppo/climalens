@@ -21,8 +21,12 @@ function initMap() {
   document.getElementById('mapLayerBar').addEventListener('click', e => {
     const btn = e.target.closest('.map-layer-btn');
     if (!btn) return;
-    document.querySelectorAll('.map-layer-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.map-layer-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
     currentMapLayer = btn.dataset.layer;
     currentMapLevel = btn.dataset.level || 'surface';
     currentMapZoom  = parseInt(btn.dataset.zoom, 10) || 6;

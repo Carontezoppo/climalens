@@ -7,21 +7,40 @@ const panelEl = document.getElementById('drillPanel');
 const panelBody = document.getElementById('panelBody');
 const panelBreadcrumb = document.getElementById('panelBreadcrumb');
 let drillChart = null;
+let panelOpener = null;
 
 function openPanel() {
+  panelOpener = document.activeElement;
   overlay.classList.add('open');
   panelEl.classList.add('open');
   document.body.style.overflow = 'hidden';
+  document.getElementById('panelClose').focus();
 }
 function closePanel() {
   overlay.classList.remove('open');
   panelEl.classList.remove('open');
   document.body.style.overflow = '';
   if (drillChart) { drillChart.destroy(); drillChart = null; }
+  if (panelOpener) { panelOpener.focus(); panelOpener = null; }
 }
 overlay.addEventListener('click', closePanel);
 document.getElementById('panelClose').addEventListener('click', closePanel);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+panelEl.addEventListener('keydown', e => {
+  if (e.key !== 'Tab') return;
+  const focusable = [...panelEl.querySelectorAll(
+    'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )].filter(el => el.offsetParent !== null);
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last  = focusable[focusable.length - 1];
+  if (e.shiftKey) {
+    if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+  } else {
+    if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+  }
+});
 
 function getCSSColor(varStr) {
   const t = document.createElement('div');

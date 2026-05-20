@@ -19,9 +19,12 @@ function init() {
     locationLabel.textContent = LOCATIONS[idx].name;
     setForecastTitle(LOCATIONS[idx].name);
     locationList.querySelectorAll('.location-option').forEach(el => {
-      el.classList.toggle('active', +el.dataset.idx === idx);
+      const selected = +el.dataset.idx === idx;
+      el.classList.toggle('active', selected);
+      el.setAttribute('aria-selected', String(selected));
     });
     locationDropdown.classList.remove('open');
+    locationBtn.setAttribute('aria-expanded', 'false');
     locationSearch.value = '';
     filterLocations('');
     updateMap();
@@ -29,17 +32,23 @@ function init() {
     loadAirQuality();
   }
 
+  locationList.setAttribute('role', 'listbox');
+  locationList.setAttribute('aria-label', 'Select city');
+
   const groupHeaders = [];
   let globalIdx = 0;
   LOCATION_GROUPS.forEach(group => {
     const header = document.createElement('div');
     header.className = 'location-optgroup-label';
+    header.setAttribute('role', 'presentation');
     header.textContent = group.continent;
     locationList.appendChild(header);
     const itemsInGroup = [];
     group.locations.forEach(loc => {
       const item = document.createElement('div');
       item.className = 'location-option';
+      item.setAttribute('role', 'option');
+      item.setAttribute('aria-selected', 'false');
       item.textContent = loc.name;
       item.dataset.idx = globalIdx++;
       item.addEventListener('click', () => selectLocation(+item.dataset.idx));
@@ -71,11 +80,14 @@ function init() {
   locationLabel.textContent = currentLocation.name;
   const _activeIdx = parseInt(localStorage.getItem('selectedLocationIdx'), 10);
   locationList.querySelectorAll('.location-option').forEach(el => {
-    el.classList.toggle('active', +el.dataset.idx === (_activeIdx || 0));
+    const selected = +el.dataset.idx === (_activeIdx || 0);
+    el.classList.toggle('active', selected);
+    el.setAttribute('aria-selected', String(selected));
   });
 
   locationBtn.setAttribute('aria-expanded', 'false');
   locationBtn.setAttribute('aria-haspopup', 'listbox');
+  locationBtn.setAttribute('aria-controls', 'locationList');
   locationBtn.addEventListener('click', e => {
     e.stopPropagation();
     const opening = !locationDropdown.classList.contains('open');

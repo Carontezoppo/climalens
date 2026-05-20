@@ -44,6 +44,7 @@
 <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <div class="dashboard">
   <header class="header">
@@ -55,7 +56,7 @@
       <div class="header-nav-links">
         <a class="page-tab" href="index.html">Weather</a>
         <a class="page-tab" href="history.html">History</a>
-        <a class="page-tab active" href="sea.html">Sea</a>
+        <a class="page-tab active" href="sea.html" aria-current="page">Sea</a>
         <a class="page-tab" href="forest.html">Land Cover</a>
         <a class="page-tab" href="about.html">About</a>
       </div>
@@ -68,6 +69,8 @@
       </button>
     </nav>
   </header>
+
+  <main id="main-content">
 
   <div class="controls-bar">
     <nav class="section-nav">
@@ -85,10 +88,10 @@
 
 
   <!-- ── Sea Level ──────────────────────────────────────────────────────────── -->
-  <div class="section-title" id="section-water-level" style="margin-top:8px;">
+  <h2 class="section-title" id="section-water-level" style="margin-top:8px;">
     Sea Level
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Global · 1993 – present · Satellite Altimetry</span>
-  </div>
+  </h2>
   <div class="chart-subtitle" style="margin-bottom:12px;">Global Mean Sea Level (GMSL) from merged satellite altimetry. Click a coastal city to see local rates, causes, and context.<br><strong>Note:</strong> Eustatic sea level refers to the <strong>global, absolute change in ocean volume</strong> (ice melt, thermal expansion), affecting the whole planet uniformly.<br>Relative sea level is the <strong> height of the sea compared to the land</strong>, which changes due to both eustatic changes and vertical land movement (subsidence or uplift).</div>
 
   <!-- Section A: Global Vital Sign -->
@@ -145,10 +148,10 @@
 
   <div class="section-sep"></div>
 
-  <div class="section-title" id="section-sst">
+  <h2 class="section-title" id="section-sst">
     Sea Surface Temperature
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Global · 2003 – present · GHRSST</span>
-  </div>
+  </h2>
   <div class="chart-subtitle" style="margin-bottom: 12px;"><b>Note:</b> Frozen ocean surfaces are shown in grey.</div>
 
   <div class="wl-vital-card" style="margin-bottom:16px;">
@@ -180,7 +183,7 @@
         <div class="sst-date-display" id="sstDateDisplay">—</div>
         <button class="sst-play-btn" id="sstPlayBtn">&#9654; Play</button>
       </div>
-      <input type="range" class="sst-slider" id="sstSlider" min="0" max="0" value="0">
+      <input type="range" class="sst-slider" id="sstSlider" min="0" max="0" value="0" aria-label="Select date for sea surface temperature map">
       <div class="sst-tick-row" id="sstTickRow"></div>
       <div class="sst-legend">
         <span class="sst-legend-label">−2°C</span>
@@ -197,10 +200,10 @@
 
   <div class="section-sep"></div>
 
-  <div class="section-title" id="section-polar-ice">
+  <h2 class="section-title" id="section-polar-ice">
     Polar Ice Coverage
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">1979 – present · NSIDC Sea Ice Index</span>
-  </div>
+  </h2>
   <div class="chart-subtitle" style="margin-bottom:12px;">Arctic minimum (September) and Antarctic maximum (February) sea ice extent. Dashed line marks the 1981–2010 WMO baseline. Bars below the line indicate below-average ice coverage.<br><strong>Note:</strong> The black hole in the polar regions represents areas where ice data is unavailable due to Satellite Data Gap. Basically, most polar-orbiting satellites do not fly directly over the 90° North or South poles. Those parts are often called <strong>Zone of Silence</strong>.</div>
 
   <div class="polar-ice-grid">
@@ -219,14 +222,14 @@
       </div>
       <div class="climate-stats-row" id="arcticStatsRow" style="margin-bottom:12px;"></div>
       <div id="arcticIceStatus" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);text-align:center;padding:40px">Loading Arctic data…</div>
-      <div class="chart-container" style="height:260px;"><canvas id="arcticIceChart"></canvas></div>
+      <div class="chart-container" style="height:260px;"><canvas id="arcticIceChart" role="img" aria-label="Arctic September minimum sea ice extent 1979–present"></canvas></div>
       <div class="polar-map-section">
         <div class="polar-map-top-row">
           <div class="polar-map-year-display" id="arcticLeafletMapYear">—</div>
           <button class="polar-live-btn" id="arcticLeafletMapLiveBtn"><span class="plb-play" aria-hidden="true">&#9654;</span><span class="plb-pause" aria-hidden="true">&#9646;&#9646;</span> Live</button>
           <button class="sst-play-btn" id="arcticLeafletMapPlayBtn">&#9654; Play</button>
         </div>
-        <input type="range" class="sst-slider" id="arcticLeafletMapSlider" min="1979" max="2025" value="2025">
+        <input type="range" class="sst-slider" id="arcticLeafletMapSlider" min="1979" max="2025" value="2025" aria-label="Select year for Arctic sea ice map">
         <div class="polar-map-wrap" id="arcticLeafletMap"></div>
         <div class="polar-map-source">Orange line = 1981–2010 median extent · Live: Copernicus Marine OSI-SAF AMSR2 · Historical: NASA GIBS SSMIS · Basemap: BlueMarble</div>
       </div>
@@ -246,14 +249,14 @@
       </div>
       <div class="climate-stats-row" id="antarcticStatsRow" style="margin-bottom:12px;"></div>
       <div id="antarcticIceStatus" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);text-align:center;padding:40px">Loading Antarctic data…</div>
-      <div class="chart-container" style="height:260px;"><canvas id="antarcticIceChart"></canvas></div>
+      <div class="chart-container" style="height:260px;"><canvas id="antarcticIceChart" role="img" aria-label="Antarctic February maximum sea ice extent 1979–present"></canvas></div>
       <div class="polar-map-section">
         <div class="polar-map-top-row">
           <div class="polar-map-year-display" id="antarcticLeafletMapYear">—</div>
           <button class="polar-live-btn" id="antarcticLeafletMapLiveBtn"><span class="plb-play" aria-hidden="true">&#9654;</span><span class="plb-pause" aria-hidden="true">&#9646;&#9646;</span> Live</button>
           <button class="sst-play-btn" id="antarcticLeafletMapPlayBtn">&#9654; Play</button>
         </div>
-        <input type="range" class="sst-slider" id="antarcticLeafletMapSlider" min="1979" max="2025" value="2025">
+        <input type="range" class="sst-slider" id="antarcticLeafletMapSlider" min="1979" max="2025" value="2025" aria-label="Select year for Antarctic sea ice map">
         <div class="polar-map-wrap" id="antarcticLeafletMap"></div>
         <div class="polar-map-source">Orange line = 1981–2010 median extent · Live: Copernicus Marine OSI-SAF AMSR2 · Historical: NASA GIBS SSMIS · Basemap: BlueMarble</div>
       </div>
@@ -264,10 +267,10 @@
 
   <div class="section-sep"></div>
 
-  <div class="section-title" id="section-currents-live">
+  <h2 class="section-title" id="section-currents-live">
     Ocean Currents
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Live · Geostrophic Surface Velocity</span>
-  </div>
+  </h2>
   <div class="chart-subtitle" style="margin-bottom: 12px;">Hover over any ocean region to identify the current.</div>
   <div class="live-currents-section">
     <div class="live-currents-map-card">
@@ -280,8 +283,8 @@
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Colour by</div>
           <div class="currents-mode-bar" id="currentsModeBar">
-            <button class="currents-mode-btn active" data-mode="temperature"><span aria-hidden="true">&#127777;</span> Temperature</button>
-            <button class="currents-mode-btn" data-mode="speed"><span aria-hidden="true">&#9654;</span> Speed</button>
+            <button class="currents-mode-btn active" data-mode="temperature" aria-pressed="true"><span aria-hidden="true">&#127777;</span> Temperature</button>
+            <button class="currents-mode-btn" data-mode="speed" aria-pressed="false"><span aria-hidden="true">&#9654;</span> Speed</button>
           </div>
         </div>
         <div id="currentsSpeedLegend" style="display:none;padding-bottom:2px;">
@@ -305,10 +308,10 @@
 
   <div class="section-sep"></div>
 
-  <div class="section-title" id="section-paleo">
+  <h2 class="section-title" id="section-paleo">
     Paleocoastlines
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Last 100,000 Years · ETOPO 2022 · 0.25°</span>
-  </div>
+  </h2>
   <div class="chart-subtitle" style="margin-bottom:12px;">Global coastlines as they appeared during the last glacial cycle. At the Last Glacial Maximum (~20,000 years ago) sea level was 120–130 m lower — exposing the Bering land bridge between Asia and North America, Sundaland in Southeast Asia, and the floor of the North Sea as dry land. Sandy areas show continental shelf that was above water at the selected time. Ice sheets show grounded and floating glacial ice; Arctic Ocean sea ice is not included in the reconstruction.</div>
 
   <div class="forest-gate" id="paleoGate">
@@ -362,6 +365,8 @@
       </div>
     </div>
   </div>
+
+  </main>
 
   <footer class="footer">
     <p>ClimaLens · Open data, open source</p>

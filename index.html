@@ -50,9 +50,10 @@
 </script>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 <div class="panel-overlay" id="panelOverlay"></div>
-<div class="drill-panel" id="drillPanel">
+<div class="drill-panel" id="drillPanel" role="dialog" aria-modal="true" aria-labelledby="panelBreadcrumb">
   <div class="panel-top-bar">
     <div class="panel-breadcrumb" id="panelBreadcrumb"></div>
     <button class="panel-close" id="panelClose" aria-label="Close panel">&#x2715;</button>
@@ -68,7 +69,7 @@
     </div>
     <nav class="header-nav" id="pageTabsNav">
       <div class="header-nav-links">
-        <a class="page-tab active" href="index.html">Weather</a>
+        <a class="page-tab active" href="index.html" aria-current="page">Weather</a>
         <a class="page-tab" href="history.html">History</a>
         <a class="page-tab" href="sea.html">Sea</a>
         <a class="page-tab" href="forest.html">Land Cover</a>
@@ -83,6 +84,8 @@
       </button>
     </nav>
   </header>
+
+  <main id="main-content">
 
   <!-- ── Discover cards ──────────────────────────────────────────────────── -->
   <div class="discover-grid">
@@ -106,6 +109,7 @@
     </a>
   </div>
 
+  <div style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase; margin-bottom: 12px;"><strong>94</strong> Locations currently available</div>
   <div class="controls-bar">
     <div class="nav-location">
       <div class="location-select-wrapper">
@@ -132,7 +136,7 @@
   </div>
 
   <div class="forecast-section" id="section-forecast">
-    <div class="section-title" id="forecastSectionTitle">9-Day Forecast</div>
+    <h2 class="section-title" id="forecastSectionTitle">9-Day Forecast</h2>
     <div id="forecastContent" style="font-size:12px;padding:20px 0">Loading forecast&hellip;</div>
     <div class="page-cta">
       <p class="page-cta-text">Does this weather feel normal? Check it against historical months and years.</p>
@@ -145,15 +149,15 @@
   <div class="map-section" id="section-map">
     <div class="map-section-header">
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-        <div class="section-title" style="margin-bottom:0">Weather Map</div>
+        <h2 class="section-title" style="margin-bottom:0">Weather Map</h2>
         <div class="map-layer-bar" id="mapLayerBar">
-          <button class="map-layer-btn active" data-layer="satellite" data-zoom="5"><span aria-hidden="true">🛰️</span> Satellite</button>
-          <button class="map-layer-btn" data-layer="wind" data-level="250h" data-zoom="3"><span aria-hidden="true">🌬️</span> Jet Stream</button>
-          <button class="map-layer-btn" data-layer="wind"><img src="weather_icon/Wind.svg" alt="" aria-hidden="true" style="width:14px;height:14px;vertical-align:middle;margin-right:3px"> Wind</button>
-          <button class="map-layer-btn" data-layer="clouds"><span aria-hidden="true">☁️</span> Clouds</button>
-          <button class="map-layer-btn" data-layer="rain"><img src="weather_icon/Drop.svg" alt="" aria-hidden="true" style="width:14px;height:14px;vertical-align:middle;margin-right:3px"> Rain</button>
-          <button class="map-layer-btn" data-layer="pressure"><span aria-hidden="true">🔵</span> Pressure</button>
-          <button class="map-layer-btn" data-layer="temp"><span aria-hidden="true">🌡️</span> Temp</button>
+          <button class="map-layer-btn active" data-layer="satellite" data-zoom="5" aria-pressed="true"><span aria-hidden="true">🛰️</span> Satellite</button>
+          <button class="map-layer-btn" data-layer="wind" data-level="250h" data-zoom="3" aria-pressed="false"><span aria-hidden="true">🌬️</span> Jet Stream</button>
+          <button class="map-layer-btn" data-layer="wind" aria-pressed="false"><img src="weather_icon/Wind.svg" alt="" aria-hidden="true" style="width:14px;height:14px;vertical-align:middle;margin-right:3px"> Wind</button>
+          <button class="map-layer-btn" data-layer="clouds" aria-pressed="false"><span aria-hidden="true">☁️</span> Clouds</button>
+          <button class="map-layer-btn" data-layer="rain" aria-pressed="false"><img src="weather_icon/Drop.svg" alt="" aria-hidden="true" style="width:14px;height:14px;vertical-align:middle;margin-right:3px"> Rain</button>
+          <button class="map-layer-btn" data-layer="pressure" aria-pressed="false"><span aria-hidden="true">🔵</span> Pressure</button>
+          <button class="map-layer-btn" data-layer="temp" aria-pressed="false"><span aria-hidden="true">🌡️</span> Temp</button>
         </div>
       </div>
       <button class="map-toggle-btn" id="mapToggleBtn">Hide Map</button>
@@ -167,7 +171,7 @@
 
   <div class="aq-section" id="section-aq">
     <div class="aq-section-header">
-      <div class="section-title" style="margin-bottom:0">Air Quality</div>
+      <h2 class="section-title" style="margin-bottom:0">Air Quality</h2>
       <button class="aq-toggle-btn" id="aqToggleBtn">Hide</button>
     </div>
     <div class="aq-wrap" id="aqWrap">
@@ -178,6 +182,8 @@
       <a href="/forest.html" class="page-cta-btn">Explore land cover →</a>
     </div>
   </div>
+
+  </main>
 
   <footer class="footer">
     <p>ClimaLens · Open data, open source</p>

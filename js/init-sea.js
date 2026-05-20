@@ -53,8 +53,12 @@ function init() {
   // ── Currents colour-mode toggle ───────────────────────────────────────────
   document.querySelectorAll('.currents-mode-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.currents-mode-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.currents-mode-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
       colorMode = btn.dataset.mode;
       const isTemp = colorMode === 'temperature';
       document.getElementById('currentsTempLegend').style.display  = isTemp ? '' : 'none';
