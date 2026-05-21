@@ -32,10 +32,9 @@ export async function onRequestGet({ request, env }) {
 
   params.set('token', env.ECMWF_TOKEN);
 
-  // Default to latest available CAMS run if client omits TIME
-  if (!params.has('TIME') && !params.has('time')) {
-    params.set('TIME', latestCamsTime());
-  }
+  // Do not inject TIME — ECMWF uses its own default (most recent available step).
+  // The composition layers run on 3-hourly steps; injecting 00:00/12:00 UTC causes
+  // a ServiceException for invalid time values.
 
   const upstreamUrl = `${ECCHARTS_WMS}?${params.toString()}`;
   const cacheKey    = `ecmwf_pm25_${simpleHash(upstreamUrl)}`;
@@ -71,19 +70,6 @@ export async function onRequestGet({ request, env }) {
   }
 
   return tile(buf, {}, contentType);
-}
-
-// CAMS NRT runs at 00:00 UTC and 12:00 UTC, available ~3 h after analysis.
-// 4-hour safety margin ensures we never request a run not yet published.
-function latestCamsTime() {
-  const safeMs = Date.now() - 4 * 3600 * 1000;
-  const d      = new Date(safeMs);
-  const run    = d.getUTCHours() >= 12 ? 12 : 0;
-  const yy     = d.getUTCFullYear();
-  const mm     = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const dd     = String(d.getUTCDate()).padStart(2, '0');
-  const hh     = String(run).padStart(2, '0');
-  return `${yy}-${mm}-${dd}T${hh}:00:00Z`;
 }
 
 function tile(body, extraHeaders = {}, contentType = 'image/png') {

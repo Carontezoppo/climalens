@@ -36,6 +36,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
 <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
@@ -73,68 +74,65 @@
     Air Pollution &amp; Light Pollution
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Global · CAMS NRT / NASA Black Marble</span>
   </h2>
-  <div class="chart-subtitle" style="margin-bottom:16px;">Two complementary views of the human footprint on the planet. Daytime shows surface PM₂.₅ — fine particulate matter driving respiratory disease and climate forcing — updated twice daily from Copernicus CAMS. Night mode switches to NASA Black Marble, annual composites of artificial light emission from 2012 to 2024.</div>
+  <div class="chart-subtitle" style="margin-bottom:16px;">Two complementary views of the human footprint on the planet. Day mode shows Aerosol Optical Depth at 550 nm — the fraction of sunlight scattered and absorbed by particulates and haze in the atmosphere, a direct proxy for air pollution — updated in near-real-time from Copernicus CAMS. Night mode switches to NASA Black Marble, annual composites of artificial light emission from 2012 to 2024.</div>
 
-  <div class="sst-section">
-    <div class="sst-map-card">
-      <div class="pollution-map-wrap" id="pollutionMap"></div>
+  <div class="sst-map-card" style="margin-bottom:12px;">
+    <div class="pollution-map-wrap" id="pollutionMap"></div>
+  </div>
+
+  <div class="pollution-controls-row">
+
+    <!-- Mode toggle -->
+    <div class="pmode-toggle-row" role="group" aria-label="Map mode">
+      <button class="pmode-btn" id="pollutionModeDay" aria-pressed="false">
+        ☀ Day &middot; AOD
+      </button>
+      <button class="pmode-btn active" id="pollutionModeNight" aria-pressed="true">
+        ◑ Night &middot; Light
+      </button>
     </div>
 
-    <div class="sst-controls-card">
-
-      <!-- Mode toggle -->
-      <div class="pmode-toggle-row" role="group" aria-label="Map mode">
-        <button class="pmode-btn active" id="pollutionModeDay" aria-pressed="true">
-          ☀ Day &middot; PM₂.₅
-        </button>
-        <button class="pmode-btn" id="pollutionModeNight" aria-pressed="false">
-          ◑ Night &middot; Light
-        </button>
+    <!-- Day status / night slider -->
+    <div class="pollution-center-ctrl">
+      <div class="pollution-status" id="dayStatus" hidden>
+        Current &middot; CAMS NRT &middot; 00 UTC run
       </div>
-
-      <!-- Day mode: current data timestamp -->
-      <div class="pollution-status" id="dayStatus">
-        Current &middot; <span id="dayDataTime">—</span>
-      </div>
-
-      <!-- Night mode: year slider (hidden in day mode) -->
-      <div id="nightControls" hidden>
+      <div id="nightControls">
         <div class="sst-top-row">
-          <div class="forest-year-display" id="nightYearDisplay">2024</div>
+          <div class="forest-year-display" id="nightYearDisplay">2016</div>
         </div>
         <input type="range" class="sst-slider" id="nightYearSlider"
-               min="2012" max="2024" value="2024"
+               min="2012" max="2016" step="4" value="2016"
                aria-label="Select year for light pollution map">
         <div class="sst-tick-row">
-          <span>2012</span><span>2016</span><span>2020</span><span>2024</span>
+          <span>2012</span><span>2016</span>
         </div>
       </div>
+    </div>
 
-      <!-- Day legend -->
-      <div id="dayLegend">
+    <!-- Legend -->
+    <div class="pollution-legend-wrap">
+      <div id="dayLegend" hidden>
         <div class="sst-legend">
-          <span class="sst-legend-label">Low</span>
-          <div class="sst-legend-bar" style="background:linear-gradient(to right,#0d0887,#7e03a8,#cc4778,#f89441,#f0f921)"></div>
-          <span class="sst-legend-label">High PM₂.₅</span>
+          <span class="sst-legend-label">Clean</span>
+          <div class="sst-legend-bar" style="background:linear-gradient(to right,#2166ac,#74add1,#abd9e9,#ffffbf,#fdae61,#d73027,#a50026)"></div>
+          <span class="sst-legend-label">Heavy haze</span>
         </div>
-        <div class="sst-source" style="margin-top:4px;">Plasma colour scale &mdash; ECMWF ecCharts default style</div>
       </div>
-
-      <!-- Night legend -->
-      <div id="nightLegend" hidden>
+      <div id="nightLegend">
         <div class="sst-legend">
           <span class="sst-legend-label">Dark</span>
           <div class="sst-legend-bar" style="background:linear-gradient(to right,#000000,#1a1000,#5c3d00,#c08000,#ffe080,#ffffff)"></div>
           <span class="sst-legend-label">Bright</span>
         </div>
       </div>
-
-      <div class="sst-source" style="margin-top:12px;">
-        PM₂.₅: CAMS NRT &middot; ECMWF / Copernicus &middot; updated twice daily<br>
-        Night lights: NASA Black Marble VNP46A4 &middot; VIIRS &middot; annual composites 2012–2024
-      </div>
-
     </div>
+
+  </div>
+
+  <div class="sst-source" style="margin-bottom:36px;">
+    Aerosol Optical Depth: CAMS NRT &middot; ECMWF / Copernicus &middot; 00 UTC run, 3-hourly steps &nbsp;|&nbsp;
+    Night lights: NASA Black Marble VNP46A4 &middot; VIIRS &middot; NASA GIBS &middot; 2012 &amp; 2016
   </div>
 
   </main>

@@ -2149,8 +2149,15 @@
   font-size: 9px !important;
 }
 
+.pollution-controls-row {
+  display: flex; align-items: flex-start; gap: 24px;
+  padding: 14px 0 8px; flex-wrap: wrap;
+}
+.pollution-center-ctrl { flex: 1; min-width: 200px; }
+.pollution-legend-wrap { min-width: 200px; }
+
 .pmode-toggle-row {
-  display: flex; gap: 8px; margin-bottom: 14px;
+  display: flex; gap: 8px; margin-bottom: 0; flex-shrink: 0;
 }
 .pmode-btn {
   flex: 1; padding: 7px 10px;
@@ -2173,6 +2180,7 @@
   letter-spacing: 0.5px; color: var(--text-muted);
   margin-bottom: 14px;
 }
+
 
 @media (max-width: 768px) {
   .pollution-map-wrap { height: 320px; }
