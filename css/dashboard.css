@@ -2162,7 +2162,7 @@
 .pmode-btn {
   flex: 1; padding: 7px 10px;
   font-family: 'DM Mono', monospace; font-size: 11px;
-  letter-spacing: 0.5px; text-transform: uppercase;
+  letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
   color: var(--text-muted); background: transparent;
   border: 1px solid var(--border); border-radius: 6px;
   cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s;

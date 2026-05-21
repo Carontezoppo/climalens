@@ -92,19 +92,9 @@
     document.getElementById('pollutionModeNight').addEventListener('click',
       () => setMode('night'));
 
-    // Night year slider
-    const slider = document.getElementById('nightYearSlider');
-    slider.min   = NIGHT_MIN_YEAR;
-    slider.max   = NIGHT_MAX_YEAR;
-    slider.value = NIGHT_MAX_YEAR;
-    updateSliderFill(slider);
-
-    slider.addEventListener('input', () => {
-      activeNightYear = +slider.value;
-      document.getElementById('nightYearDisplay').textContent = activeNightYear;
-      updateSliderFill(slider);
-      if (mode === 'night') nightLayer.setUrl(blackMarbleUrl(activeNightYear));
-    });
+    // Night year toggle buttons (only 2012 and 2016 available on GIBS)
+    document.getElementById('nightYear2012').addEventListener('click', () => setNightYear(2012));
+    document.getElementById('nightYear2016').addEventListener('click', () => setNightYear(2016));
   }
 
   function setMode(newMode) {
@@ -147,16 +137,17 @@
     }
   }
 
+  function setNightYear(year) {
+    activeNightYear = year;
+    document.getElementById('nightYear2012').classList.toggle('active', year === 2012);
+    document.getElementById('nightYear2016').classList.toggle('active', year === 2016);
+    if (mode === 'night') nightLayer.setUrl(blackMarbleUrl(year));
+  }
+
   function blackMarbleUrl(year) {
     // GIBS Black Marble (VNP46A4) annual composites — only 2012 and 2016 available.
     // TileMatrixSet: GoogleMapsCompatible_Level8 (256px, up to zoom 8). Format: png.
     return `${GIBS_BASE}/VIIRS_Black_Marble/default/${year}-01-01/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png`;
-  }
-
-  function updateSliderFill(el) {
-    const pct = ((+el.value - +el.min) / (+el.max - +el.min)) * 100;
-    el.style.background =
-      `linear-gradient(to right,#6366f1 ${pct}%,#2a3148 ${pct}%)`;
   }
 
   init();

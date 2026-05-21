@@ -98,14 +98,9 @@
         Current &middot; CAMS NRT &middot; 00 UTC run
       </div>
       <div id="nightControls">
-        <div class="sst-top-row">
-          <div class="forest-year-display" id="nightYearDisplay">2016</div>
-        </div>
-        <input type="range" class="sst-slider" id="nightYearSlider"
-               min="2012" max="2016" step="4" value="2016"
-               aria-label="Select year for light pollution map">
-        <div class="sst-tick-row">
-          <span>2012</span><span>2016</span>
+        <div class="pmode-toggle-row" role="group" aria-label="Select year">
+          <button class="pmode-btn" id="nightYear2012">2012</button>
+          <button class="pmode-btn active" id="nightYear2016">2016</button>
         </div>
       </div>
     </div>
