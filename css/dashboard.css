@@ -2133,4 +2133,48 @@
 [data-theme="light"] .header-nav.open .header-nav-links { box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) .header-nav.open .header-nav-links { box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+
+/* ===== FOOTPRINT PAGE ===== */
+.pollution-map-wrap {
+  height: 600px; background: #0a0e17; isolation: isolate;
+}
+.pollution-map-wrap .leaflet-container { background: #0a0e17 !important; }
+.pollution-map-wrap .leaflet-control-zoom a {
+  background: #1a2035 !important; color: var(--text-secondary) !important;
+  border-color: var(--border) !important;
+}
+.pollution-map-wrap .leaflet-control-zoom a:hover { color: var(--text-primary) !important; }
+.pollution-map-wrap .leaflet-control-attribution {
+  background: rgba(10,14,23,0.75) !important; color: var(--text-muted) !important;
+  font-size: 9px !important;
+}
+
+.pmode-toggle-row {
+  display: flex; gap: 8px; margin-bottom: 14px;
+}
+.pmode-btn {
+  flex: 1; padding: 7px 10px;
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--text-muted); background: transparent;
+  border: 1px solid var(--border); border-radius: 6px;
+  cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.pmode-btn:hover { border-color: var(--border-accent); color: var(--text-secondary); }
+.pmode-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pmode-btn.active {
+  background: var(--accent); border-color: var(--accent);
+  color: #fff;
+}
+.pmode-btn.active:hover { opacity: 0.9; }
+
+.pollution-status {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: 0.5px; color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+@media (max-width: 768px) {
+  .pollution-map-wrap { height: 320px; }
+}
 }

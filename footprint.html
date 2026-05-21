@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClimaLens — Human Footprint: Air Pollution &amp; Light Pollution</title>
+<meta name="description" content="Global air pollution (PM2.5) from CAMS and light pollution (NASA Black Marble) — two signatures of human activity visible from space.">
+<meta name="theme-color" content="#0c0f14">
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);})()</script>
+<link rel="canonical" href="https://climalens.org/footprint.html">
+<link rel="icon" href="/img/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/img/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="128x128" href="/img/favicon-128x128.png">
+<link rel="icon" type="image/png" sizes="196x196" href="/img/favicon-196x196.png">
+<link rel="apple-touch-icon" sizes="57x57" href="/img/apple-touch-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/img/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/img/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/img/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/img/apple-touch-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon-180x180.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/img/apple-touch-icon-192x192.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://climalens.org/footprint.html">
+<meta property="og:title" content="ClimaLens — Human Footprint: Air Pollution &amp; Light Pollution">
+<meta property="og:description" content="Global air pollution (PM2.5) from CAMS and light pollution (NASA Black Marble) — two signatures of human activity visible from space.">
+<meta property="og:image" content="https://climalens.org/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ClimaLens — Human Footprint: Air Pollution &amp; Light Pollution">
+<meta name="twitter:description" content="Global air pollution (PM2.5) from CAMS and light pollution (NASA Black Marble) — two signatures of human activity visible from space.">
+<meta name="twitter:image" content="https://climalens.org/img/og-image.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<div class="dashboard">
+  <header class="header">
+    <div class="header-left">
+      <h1 class="header-title"><a href="index.html" style="color:inherit;text-decoration:none;">Clima<span>Lens</span></a></h1>
+      <p class="header-subtitle">Local weather in global context</p>
+    </div>
+    <nav class="header-nav" id="pageTabsNav">
+      <div class="header-nav-links">
+        <a class="page-tab" href="index.html">Weather</a>
+        <a class="page-tab" href="history.html">History</a>
+        <a class="page-tab" href="sea.html">Sea</a>
+        <a class="page-tab" href="forest.html">Land Cover</a>
+        <a class="page-tab active" href="footprint.html" aria-current="page">Footprint</a>
+        <a class="page-tab" href="about.html">About</a>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="theme-icon-sun" aria-hidden="true">☀</span>
+        <span class="theme-icon-moon" aria-hidden="true">◑</span>
+      </button>
+      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
+        <span id="navHamburgerIcon">☰</span><span>Menu</span>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main-content">
+
+  <!-- ── Pollution map ─────────────────────────────────────────────────────── -->
+  <h2 class="section-title" style="margin-top:8px;">
+    Air Pollution &amp; Light Pollution
+    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Global · CAMS NRT / NASA Black Marble</span>
+  </h2>
+  <div class="chart-subtitle" style="margin-bottom:16px;">Two complementary views of the human footprint on the planet. Daytime shows surface PM₂.₅ — fine particulate matter driving respiratory disease and climate forcing — updated twice daily from Copernicus CAMS. Night mode switches to NASA Black Marble, annual composites of artificial light emission from 2012 to 2024.</div>
+
+  <div class="sst-section">
+    <div class="sst-map-card">
+      <div class="pollution-map-wrap" id="pollutionMap"></div>
+    </div>
+
+    <div class="sst-controls-card">
+
+      <!-- Mode toggle -->
+      <div class="pmode-toggle-row" role="group" aria-label="Map mode">
+        <button class="pmode-btn active" id="pollutionModeDay" aria-pressed="true">
+          ☀ Day &middot; PM₂.₅
+        </button>
+        <button class="pmode-btn" id="pollutionModeNight" aria-pressed="false">
+          ◑ Night &middot; Light
+        </button>
+      </div>
+
+      <!-- Day mode: current data timestamp -->
+      <div class="pollution-status" id="dayStatus">
+        Current &middot; <span id="dayDataTime">—</span>
+      </div>
+
+      <!-- Night mode: year slider (hidden in day mode) -->
+      <div id="nightControls" hidden>
+        <div class="sst-top-row">
+          <div class="forest-year-display" id="nightYearDisplay">2024</div>
+        </div>
+        <input type="range" class="sst-slider" id="nightYearSlider"
+               min="2012" max="2024" value="2024"
+               aria-label="Select year for light pollution map">
+        <div class="sst-tick-row">
+          <span>2012</span><span>2016</span><span>2020</span><span>2024</span>
+        </div>
+      </div>
+
+      <!-- Day legend -->
+      <div id="dayLegend">
+        <div class="sst-legend">
+          <span class="sst-legend-label">Low</span>
+          <div class="sst-legend-bar" style="background:linear-gradient(to right,#0d0887,#7e03a8,#cc4778,#f89441,#f0f921)"></div>
+          <span class="sst-legend-label">High PM₂.₅</span>
+        </div>
+        <div class="sst-source" style="margin-top:4px;">Plasma colour scale &mdash; ECMWF ecCharts default style</div>
+      </div>
+
+      <!-- Night legend -->
+      <div id="nightLegend" hidden>
+        <div class="sst-legend">
+          <span class="sst-legend-label">Dark</span>
+          <div class="sst-legend-bar" style="background:linear-gradient(to right,#000000,#1a1000,#5c3d00,#c08000,#ffe080,#ffffff)"></div>
+          <span class="sst-legend-label">Bright</span>
+        </div>
+      </div>
+
+      <div class="sst-source" style="margin-top:12px;">
+        PM₂.₅: CAMS NRT &middot; ECMWF / Copernicus &middot; updated twice daily<br>
+        Night lights: NASA Black Marble VNP46A4 &middot; VIIRS &middot; annual composites 2012–2024
+      </div>
+
+    </div>
+  </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>ClimaLens &middot; Open data, open source</p>
+  </footer>
+</div>
+
+<script src="js/pollution-map.js"></script>
+<script src="/js/cookies.js"></script>
+<script src="js/theme.js"></script>
+</body>
+</html>

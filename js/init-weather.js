@@ -10,7 +10,7 @@ function init() {
   const locationNoResults = document.getElementById('locationNoResults');
 
   function setForecastTitle(name) {
-    document.getElementById('forecastSectionTitle').textContent = name + ' — 9-Day Forecast';
+    document.getElementById('forecastSectionTitle').textContent = name + ', 9-Day Forecast';
   }
 
   function selectLocation(idx) {
