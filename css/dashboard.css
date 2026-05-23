@@ -500,10 +500,11 @@
 
   .section-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 21px;
+    font-size: 24px;
     font-weight: 700;
     margin-bottom: 16px;
     padding-left: 2px;
+    letter-spacing: -0.5px;
   }
 
   /* CHART GRID */
@@ -703,10 +704,10 @@
   .forecast-strip {
     display: flex;
     gap: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
     overflow-x: auto;
     padding-top: 3px;   /* prevents overflow-y clipping of hover transform */
-    padding-bottom: 4px;
+    padding-bottom: 12px;
     scroll-behavior: smooth;
   }
   .forecast-strip::-webkit-scrollbar { height: 4px; }
@@ -737,7 +738,7 @@
   /* ── Hourly strip ── */
   .hourly-strip-wrap {
     background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; overflow: hidden;
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 32px; overflow: hidden;
   }
   .hourly-strip-header {
     display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
@@ -751,7 +752,7 @@
   .hourly-detail-btn:hover { color: var(--accent-text); }
   .hourly-scroll {
     display: flex; gap: 8px; overflow-x: auto;
-    padding-bottom: 6px; scroll-behavior: smooth;
+    padding-bottom: 12px; scroll-behavior: smooth;
   }
   .hourly-scroll::-webkit-scrollbar { height: 4px; }
   .hourly-scroll::-webkit-scrollbar-track { background: transparent; }
@@ -2136,7 +2137,7 @@
 
 /* ===== FOOTPRINT PAGE ===== */
 .pollution-map-wrap {
-  height: 600px; background: #0a0e17; isolation: isolate;
+  height: 700px; background: #0a0e17; isolation: isolate;
 }
 .pollution-map-wrap .leaflet-container { background: #0a0e17 !important; }
 .pollution-map-wrap .leaflet-control-zoom a {
