@@ -37,6 +37,9 @@
     --status-verypoor: #ef4444;
     --status-extreme:  #a855f7;
     --forecast-day-selected: #6366f121;
+    --discover-bg: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.08) 85%);
+    --discover-bg-hover: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.15) 85%);
+    --discovery-text-shadow: 0 1px 4px rgba(0,0,0,0.6);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1835,22 +1838,29 @@
 .discover-card-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.08) 65%);
+  background: var(--discover-bg);
   display: flex;
   align-items: flex-end;
   padding: 14px 16px;
   transition: background 0.25s ease;
+  height: 30%;
+  top:auto;
 }
 .discover-card:hover .discover-card-overlay {
-  background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.15) 65%);
+  background: var(--discover-bg-hover);
 }
 .discover-card-label {
   color: #fff;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.1px;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  text-shadow: var(--discovery-text-shadow);
+}
+.discover-card:hover .discover-card-label {
+  font-size:18px;
+  color: #aebeff;
+  transition: font-size 0.25s ease, color 0.25s ease;
 }
 .discover-card:focus-visible {
   outline: 2px solid var(--accent);
@@ -2079,6 +2089,9 @@
   --status-verypoor: #c01818;
   --status-extreme:  #7c1abf;
   --forecast-day-selected: #c7c8ff21;
+  --discover-bg: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.08) 85%);
+  --discover-bg-hover: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.15) 85%);
+  --discovery-text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
 
 @media (prefers-color-scheme: light) {
@@ -2121,6 +2134,9 @@
     --status-verypoor: #c01818;
     --status-extreme:  #7c1abf;
     --forecast-day-selected: #c7c8ff21;
+    --discover-bg: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.08) 85%);
+    --discover-bg-hover: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.15) 85%);
+    --discovery-text-shadow: 0 1px 4px rgba(0,0,0,0.6);
   }
 }
 
