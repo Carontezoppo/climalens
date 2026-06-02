@@ -741,7 +741,7 @@
   /* ── Hourly strip ── */
   .hourly-strip-wrap {
     background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 16px 20px; margin-bottom: 32px; overflow: hidden;
+    border-radius: 12px; padding: 16px 8px; margin-bottom: 32px; overflow: hidden;
   }
   .hourly-strip-header {
     display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
@@ -780,11 +780,39 @@
   .hourly-rain img, .hourly-wind img { width: 9px; height: 9px; vertical-align: middle; margin-right: 2px; }
   .hourly-wind { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-muted); margin-top: 2px; }
 
+  /* Sun / Moon bar */
+  .sun-moon-bar {
+    display: flex; gap: 10px; margin-bottom: 14px; margin-top: 16px;
+  }
+  .moon-panel {
+    flex: 1 1 0;
+    background: var(--bg-primary); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
+  }
+  .moon-panel-label {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .moon-panel-label strong { color: var(--text-secondary); font-weight: 600; text-transform: none; }
+  .moon-icons-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+  .moon-phase-icon { width: 32px; height: auto; opacity: 0.4; flex-shrink: 0; display: block; }
+  .moon-phase-icon.active { width: 64px; height: auto; opacity: 1; }
+  .sun-panel {
+    flex: 1; min-width: 0;
+    background: var(--bg-panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 6px 14px;
+    display: flex; align-items: center;
+  }
+  .sun-arc-svg { width: 100%; height: 80px; overflow: visible; }
+  .sun-arc-label { font-family: 'DM Mono', monospace; font-size: 9px; fill: var(--text-muted); letter-spacing: 0.3px; }
+
   .forecast-chart-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 20px 24px;
+    padding: 20px 8px;
     min-width: 0;
     overflow: hidden;
   }
@@ -797,6 +825,7 @@
     .forecast-day { padding: 10px 6px; }
     .forecast-icon img { width: 64px; height: 48px; }
     .forecast-high { font-size: 15px; }
+    .sun-moon-bar { flex-direction: column; }
   }
 
   /* ========= DRILL-DOWN PANEL ========= */
@@ -2064,7 +2093,7 @@
   --text-muted:     #6b7280;
   --rain:           #0d7ab0;
   --rain-dim:       rgba(13,122,176,0.12);
-  --sun:            #875000;
+  --sun:            #679FFF;
   --sun-dim:        rgba(135,80,0,0.12);
   --wind:           #167740;
   --wind-dim:       rgba(22,119,64,0.12);
@@ -2109,7 +2138,7 @@
     --text-muted:     #6b7280;
     --rain:           #0d7ab0;
     --rain-dim:       rgba(13,122,176,0.12);
-    --sun:            #875000;
+    --sun:            #679FFF;
     --sun-dim:        rgba(135,80,0,0.12);
     --wind:           #167740;
     --wind-dim:       rgba(22,119,64,0.12);

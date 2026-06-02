@@ -74,6 +74,7 @@ function renderForecast(json, normals) {
         <button class="hourly-detail-btn" id="hourlyDetailBtn">Full detail →</button>
       </div>
       <div class="hourly-scroll" id="hourlyScroll"></div>
+      <div id="sunMoonBar"></div>
     </div>`;
 
   strip += `
@@ -154,6 +155,8 @@ function renderHourlyStrip(dayIdx) {
   const labelEl = document.getElementById('hourlyStripLabel');
   if (labelEl) labelEl.textContent = `${dayLabel}, ${dateStr}`;
 
+  renderSunMoonBar(date, isToday);
+
   const detailBtn = document.getElementById('hourlyDetailBtn');
   if (detailBtn) detailBtn.onclick = () => showForecastDrill(dayIdx);
 
@@ -192,6 +195,123 @@ function renderHourlyStrip(dayIdx) {
   } else {
     scrollEl.scrollLeft = 0;
   }
+}
+
+// ============================================================
+// Astronomy — sun times and moon phase (client-side, no API)
+// ============================================================
+
+const MOON_PHASES = [
+  { name: 'New Moon',        file: 'new' },
+  { name: 'Waxing Crescent', file: 'waxing_crescent' },
+  { name: 'First Quarter',   file: 'first_quarter' },
+  { name: 'Waxing Gibbous',  file: 'waxing_gibbous' },
+  { name: 'Full Moon',       file: 'full' },
+  { name: 'Waning Gibbous',  file: 'waning_gibbous' },
+  { name: 'Last Quarter',    file: 'last_quarter' },
+  { name: 'Waning Crescent', file: 'waning_crescent' },
+];
+
+function getMoonPhaseIndex(dateStr) {
+  const JD = new Date(dateStr + 'T12:00:00Z').getTime() / 86400000 + 2440587.5;
+  // Reference new moon: 6 Jan 2000 18:14 UTC = JD 2451550.26
+  const daysSince = ((JD - 2451550.26) % 29.53059 + 29.53059) % 29.53059;
+  return Math.round(daysSince / 29.53059 * 8) % 8;
+}
+
+function getSunTimes(lat, lon, dateStr) {
+  const [Y, M, D] = dateStr.split('-').map(Number);
+  const a   = Math.floor((14 - M) / 12);
+  const y   = Y + 4800 - a;
+  const mo  = M + 12 * a - 3;
+  // Julian Day Number (= JD at noon UTC of the given date)
+  const JDN = D + Math.floor((153 * mo + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+  const n   = JDN - 2451545.0; // days since J2000.0
+
+  const Lsun     = ((280.460 + 0.9856474 * n) % 360 + 360) % 360;
+  const gRad     = (((357.528 + 0.9856003 * n) % 360 + 360) % 360) * Math.PI / 180;
+  const lambdaRad = (Lsun + 1.915 * Math.sin(gRad) + 0.020 * Math.sin(2 * gRad)) * Math.PI / 180;
+  const epsRad   = 23.439 * Math.PI / 180;
+  const dec      = Math.asin(Math.sin(epsRad) * Math.sin(lambdaRad));
+  const RA_deg   = ((Math.atan2(Math.cos(epsRad) * Math.sin(lambdaRad), Math.cos(lambdaRad)) * 180 / Math.PI) % 360 + 360) % 360;
+
+  let diff = Lsun - RA_deg;
+  if (diff > 180) diff -= 360;
+  if (diff < -180) diff += 360;
+  const EoT = diff * 4; // equation of time, minutes
+
+  const noon   = 720 - 4 * lon - EoT; // solar noon, minutes from midnight UTC
+  const latRad = lat * Math.PI / 180;
+  const cosHA  = (Math.cos(90.833 * Math.PI / 180) - Math.sin(latRad) * Math.sin(dec)) / (Math.cos(latRad) * Math.cos(dec));
+  if (cosHA < -1 || cosHA > 1) return null; // midnight sun or polar night
+
+  const HA         = Math.acos(cosHA) * 180 / Math.PI;
+  const sunriseMin = noon - 4 * HA;
+  const sunsetMin  = noon + 4 * HA;
+
+  const toStr = min => {
+    const d = new Date(dateStr + 'T00:00:00Z');
+    d.setUTCMinutes(Math.round(min));
+    return d.toLocaleTimeString('en-GB', { timeZone: currentLocation.tz, hour: '2-digit', minute: '2-digit', hour12: false });
+  };
+
+  return { sunriseStr: toStr(sunriseMin), sunsetStr: toStr(sunsetMin), sunriseMin, sunsetMin };
+}
+
+function renderSunMoonBar(dateStr, isToday) {
+  const bar = document.getElementById('sunMoonBar');
+  if (!bar) return;
+
+  // Moon
+  const phaseIdx  = getMoonPhaseIndex(dateStr);
+  const phase     = MOON_PHASES[phaseIdx];
+  const moonIcons = MOON_PHASES.map((p, i) => {
+    const active = i === phaseIdx;
+    return `<img src="weather_icon/moon/${p.file}.svg" alt="${p.name}" title="${p.name}" class="moon-phase-icon${active ? ' active' : ''}">`;
+  }).join('');
+
+  // Sun arc
+  const sun = getSunTimes(currentLocation.lat, currentLocation.lon, dateStr);
+  let arcFill = '', sunDot = '';
+  if (sun && isToday) {
+    const now           = new Date();
+    const currentUTCMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+    if (currentUTCMin > sun.sunriseMin && currentUTCMin < sun.sunsetMin) {
+      const t = (currentUTCMin - sun.sunriseMin) / (sun.sunsetMin - sun.sunriseMin);
+      // Quadratic bezier P0=(10,62) P1=(150,-42) P2=(290,62); split at t via De Casteljau
+      // Peak of curve = y: 62 - 208*t*(1-t); at t=0.5 → y=10
+      const Q0x = 10  + t * 140, Q0y = 62 - t * 104;
+      const Q1x = 150 + t * 140, Q1y = -42 + t * 104;
+      const Bx  = Q0x + t * (Q1x - Q0x), By = Q0y + t * (Q1y - Q0y);
+      arcFill = `<path d="M 10 62 Q ${Q0x.toFixed(1)} ${Q0y.toFixed(1)} ${Bx.toFixed(1)} ${By.toFixed(1)}" style="fill:none;stroke:var(--sun);stroke-width:2.5;stroke-linecap:round"/>`;
+      // full_sun centered at (Bx, By); flat-edge of half_sun at y=35.75/48 of its height
+      sunDot  = `<image href="weather_icon/full_sun.svg" x="${(Bx - 11).toFixed(1)}" y="${(By - 11).toFixed(1)}" width="22" height="22" style="filter:drop-shadow(0 0 5px var(--sun))"/>`;
+    }
+  }
+
+  // half_sun: flat edge at y=35.75 in 48px viewBox → at height 20 it sits 14.9px from icon top
+  // Place so flat edge aligns with the horizon (y=62): icon_y = 62 - 14.9 ≈ 47
+  const sunContent = sun
+    ? `<svg class="sun-arc-svg" viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg">
+        <line x1="10" y1="62" x2="290" y2="62" style="stroke:var(--border);stroke-width:1"/>
+        <path d="M 10 62 Q 150 -42 290 62" style="fill:none;stroke:var(--sun-dim);stroke-width:2.5;stroke-linecap:round"/>
+        ${arcFill}
+        <image href="weather_icon/half_sun.svg" x="0"   y="47" width="20" height="20"/>
+        <image href="weather_icon/half_sun.svg" x="280" y="47" width="20" height="20"/>
+        ${sunDot}
+        <text x="10"  y="76" class="sun-arc-label">Sunrise: ${sun.sunriseStr}</text>
+        <text x="290" y="76" class="sun-arc-label" text-anchor="end">Sunset: ${sun.sunsetStr}</text>
+      </svg>`
+    : `<span class="sun-arc-label" style="padding:0 4px">No solar data for this location</span>`;
+
+  bar.innerHTML = `
+    <div class="sun-moon-bar">
+      <div class="moon-panel">
+        <div class="moon-panel-label">Moon phase: <strong>${phase.name}</strong></div>
+        <div class="moon-icons-row">${moonIcons}</div>
+      </div>
+      <div class="sun-panel">${sunContent}</div>
+    </div>`;
 }
 
 async function loadNormals() {
