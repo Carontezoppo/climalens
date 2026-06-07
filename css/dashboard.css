@@ -422,7 +422,7 @@
   }
   .kpi-card {
     background: var(--bg-card);
-    border: 1px solid var(--border);
+    border: 0px solid var(--border);
     border-radius: 12px;
     padding: 20px;
     position: relative;
@@ -519,7 +519,7 @@
   }
   .chart-card {
     background: var(--bg-card);
-    border: 1px solid var(--border);
+    border: 0px solid var(--border);
     border-radius: 12px;
     padding: 24px;
     transition: border-color 0.2s;
@@ -541,7 +541,7 @@
   /* TABLE */
   .table-card {
     background: var(--bg-card);
-    border: 1px solid var(--border);
+    border: 0px solid var(--border);
     border-radius: 12px;
     padding: 24px;
     margin-bottom: 32px;
@@ -640,7 +640,7 @@
   }
   .aq-aqi-card {
     grid-column: span 2;
-    background: var(--bg-card); border: 1px solid var(--border);
+    background: var(--bg-card); border: 0px solid var(--border);
     border-radius: 12px; padding: 20px 24px; transition: border-color 0.2s;
   }
   .aq-aqi-badge {
@@ -654,7 +654,7 @@
   .aq-aqi-advice { font-size: 13px; color: var(--text-secondary); }
   .aq-aqi-source { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-top: 12px; }
   .aq-pollutant-card {
-    background: var(--bg-card); border: 1px solid var(--border);
+    background: var(--bg-card); border: 0px solid var(--border);
     border-radius: 12px; padding: 16px 20px; transition: border-color 0.2s; min-width: 0;
   }
   .aq-pollutant-card:hover { border-color: var(--border-accent); }
@@ -672,7 +672,7 @@
   .aq-bar-fill { position: absolute; top:0; left:0; bottom:0; border-radius: 2px; transition: width 0.5s ease; }
   .aq-bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .aq-card {
-    background: var(--bg-card); border: 1px solid var(--border);
+    background: var(--bg-card); border: 0px solid var(--border);
     border-radius: 12px; padding: 20px 24px; transition: border-color 0.2s;
   }
   .aq-card:hover { border-color: var(--border-accent); }
@@ -719,7 +719,7 @@
   .forecast-day {
     flex: 0 0 calc((100% - 80px) / 8.333); min-width: 100px;
     background: var(--bg-card);
-    border: 1px solid var(--border);
+    border: 0px solid var(--border);
     border-radius: 12px;
     padding: 14px 10px;
     text-align: center;
@@ -740,7 +740,7 @@
 
   /* ── Hourly strip ── */
   .hourly-strip-wrap {
-    background: var(--bg-card); border: 1px solid var(--border);
+    background: var(--bg-card); border: 0px solid var(--border);
     border-radius: 12px; padding: 16px 8px; margin-bottom: 32px; overflow: hidden;
   }
   .hourly-strip-header {
@@ -762,7 +762,7 @@
   .hourly-scroll::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 2px; }
   .hourly-card {
     flex: 0 0 calc((100% - 96px) / 12.333); min-width: 84px;
-    background: var(--bg-panel); border: 1px solid var(--border);
+    background: var(--bg-panel); border: 0px solid var(--border);
     border-radius: 10px; padding: 10px 6px; text-align: center;
     cursor: pointer; transition: background 0.15s, border-color 0.15s;
   }
@@ -786,7 +786,7 @@
   }
   .moon-panel {
     flex: 1 1 0;
-    background: var(--bg-primary); border: 1px solid var(--border);
+    background: var(--bg-primary); border: 0px solid var(--border);
     border-radius: 10px; padding: 12px 14px;
     display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
   }
@@ -801,7 +801,7 @@
   .moon-phase-icon.active { width: 48px; height: auto; opacity: 1; }
   .sun-panel {
     flex: 1; min-width: 0;
-    background: var(--bg-panel); border: 1px solid var(--border);
+    background: var(--bg-panel); border: 0px solid var(--border);
     border-radius: 10px; padding: 6px 14px;
     display: flex; align-items: center;
   }
@@ -810,7 +810,7 @@
 
   .forecast-chart-card {
     background: var(--bg-card);
-    border: 1px solid var(--border);
+    border: 0px solid var(--border);
     border-radius: 12px;
     padding: 20px 16px;
     min-width: 0;
@@ -870,7 +870,7 @@
 
   .panel-close {
     width: 36px; height: 36px; border-radius: 10px;
-    border: 1px solid var(--border); background: var(--bg-card);
+    border: 0px solid var(--border); background: var(--bg-card);
     color: var(--text-secondary); font-size: 18px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: background 0.15s, color 0.15s;
@@ -898,11 +898,11 @@
   .panel-metric-range { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
   .panel-stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 28px; }
-  .panel-stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .panel-stat { background: var(--bg-card); border: 0px solid var(--border); border-radius: 10px; padding: 14px 16px; }
   .panel-stat-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
   .panel-stat-value { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
 
-  .panel-chart-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+  .panel-chart-wrap { background: var(--bg-card); border: 0px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
   .panel-chart-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
   .panel-chart-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; }
   .panel-chart-container { position: relative; height: 260px; }
@@ -1065,7 +1065,7 @@
     margin-bottom: 20px;
   }
   .climate-stat-card {
-    background: var(--bg-card); border: 1px solid var(--border);
+    background: var(--bg-card); border: 0px solid var(--border);
     border-radius: 12px; padding: 18px 20px; transition: border-color 0.2s;
   }
   .climate-stat-card:hover { border-color: var(--border-accent); }
@@ -1101,7 +1101,7 @@
   /* ========= SEA SURFACE TEMPERATURE SECTION ========= */
   .sst-section { margin-bottom: 36px; }
   .sst-map-card {
-    border: 1px solid var(--border); border-radius: 12px;
+    border: 0px solid var(--border); border-radius: 12px;
     overflow: hidden; margin-bottom: 12px;
   }
   .sst-map-wrap { height: 600px; background: #141821; isolation: isolate; }
@@ -1116,7 +1116,7 @@
     color: rgba(136,145,165,0.6) !important; font-size: 9px !important;
   }
   .sst-controls-card {
-    background: var(--bg-card); border: 1px solid var(--border);
+    background: var(--bg-card); border: 0px solid var(--border);
     border-radius: 12px; padding: 20px 24px;
   }
   .sst-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -1181,7 +1181,7 @@
   /* OCEAN CURRENTS MAP */
   .currents-section { margin-bottom: 36px; }
   .currents-map-card {
-    border: 1px solid var(--border); border-radius: 12px;
+    border: 0px solid var(--border); border-radius: 12px;
     overflow: hidden; margin-bottom: 12px;
   }
   .currents-map-wrap { height: 550px; background: #141821; }
@@ -1196,7 +1196,7 @@
     color: rgba(136,145,165,0.6) !important; font-size: 9px !important;
   }
   .currents-legend-card {
-    background: var(--bg-card); border: 1px solid var(--border);
+    background: var(--bg-card); border: 0px solid var(--border);
     border-radius: 12px; padding: 20px 24px;
   }
   .currents-legend-title {
@@ -1216,7 +1216,7 @@
   /* SST hover tooltip */
   .sst-tooltip {
     position: absolute; pointer-events: none; z-index: 1000;
-    background: rgba(7,10,15,0.92); border: 1px solid var(--border);
+    background: rgba(7,10,15,0.92); border: 0px solid var(--border);
     border-radius: 8px; padding: 10px 14px;
     font-family: 'DM Mono', monospace;
     backdrop-filter: blur(8px); min-width: 155px; display: none;
@@ -1310,7 +1310,7 @@
 /* ── LIVE OCEAN CURRENTS ─────────────────────────────────────────────────── */
 .live-currents-section { margin-bottom: 36px; }
 .live-currents-map-card {
-  border: 1px solid var(--border); border-radius: 12px;
+  border: 0px solid var(--border); border-radius: 12px;
   overflow: hidden; margin-bottom: 12px; position: relative;
 }
 .live-currents-map-wrap { height: 550px; background: #141821; position: relative; isolation: isolate; }
@@ -1325,7 +1325,7 @@
   color: rgba(136,145,165,0.6) !important; font-size: 9px !important;
 }
 .live-currents-legend-card {
-  background: var(--bg-card); border: 1px solid var(--border);
+  background: var(--bg-card); border: 0px solid var(--border);
   border-radius: 12px; padding: 16px 24px;
 }
 /* ── Clickable current list ────────────────────────────────────────────────── */
@@ -1512,7 +1512,7 @@
 
 /* ========= FOREST ANIMATION GATE ========= */
 .forest-gate {
-  border: 1px solid var(--border); border-radius: 12px;
+  border: 0px solid var(--border); border-radius: 12px;
   background: var(--bg-card); min-height: 240px;
   display: flex; align-items: center; justify-content: center;
   padding: 40px 24px; margin-bottom: 12px;
@@ -1541,7 +1541,7 @@
 /* ── Water Level ─────────────────────────────────────────────────────────────── */
 .wl-vital-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 0px solid var(--border);
   border-radius: 12px;
   padding: 24px 28px;
   margin-bottom: 12px;
@@ -1588,7 +1588,7 @@
   display: flex; gap: 12px; margin-bottom: 8px;
 }
 .wl-regional-map-card {
-  flex: 1; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  flex: 1; border: 0px solid var(--border); border-radius: 12px; overflow: hidden;
 }
 .wl-map-wrap {
   height: 600px; background: #0d1b2a; isolation: isolate;
@@ -1605,7 +1605,7 @@
 }
 .wl-regional-panel {
   width: 280px; flex-shrink: 0;
-  background: var(--bg-card); border: 1px solid var(--border);
+  background: var(--bg-card); border: 0px solid var(--border);
   border-radius: 12px; padding: 20px;
   display: flex; flex-direction: column;
   overflow-y: auto;
@@ -1853,7 +1853,7 @@
   border-radius: 16px;
   overflow: hidden;
   text-decoration: none;
-  border: 1px solid var(--border);
+  border: 0px solid var(--border);
 }
 .discover-card img {
   width: 100%;
