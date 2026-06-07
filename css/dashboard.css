@@ -798,7 +798,7 @@
   .moon-panel-label strong { color: var(--text-secondary); font-weight: 600; text-transform: none; }
   .moon-icons-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
   .moon-phase-icon { width: 32px; height: auto; opacity: 0.4; flex-shrink: 0; display: block; }
-  .moon-phase-icon.active { width: 64px; height: auto; opacity: 1; }
+  .moon-phase-icon.active { width: 48px; height: auto; opacity: 1; }
   .sun-panel {
     flex: 1; min-width: 0;
     background: var(--bg-panel); border: 1px solid var(--border);
@@ -812,7 +812,7 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 20px 8px;
+    padding: 20px 16px;
     min-width: 0;
     overflow: hidden;
   }
