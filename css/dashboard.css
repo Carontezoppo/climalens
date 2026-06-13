@@ -1476,38 +1476,13 @@
 }
 @media (max-width: 768px) {
   .forest-map-wrap { height: 320px; }
-  .worldcover-map-wrap { height: 320px; }
+  .landcover-globe-wrap { height: 320px; }
 }
 
-/* ========= WORLDCOVER MAP ========= */
-.worldcover-map-wrap {
-  height: 600px; background: #004ca3; isolation: isolate;
-}
-.worldcover-map-wrap .leaflet-container { background: #004ca3 !important; }
-.worldcover-map-wrap .leaflet-control-zoom a {
-  background: var(--bg-card) !important; border-color: var(--border) !important;
-  color: var(--text-secondary) !important;
-}
-.worldcover-map-wrap .leaflet-control-zoom a:hover { color: var(--text-primary) !important; }
-.worldcover-map-wrap .leaflet-control-attribution {
-  background: rgba(7,10,15,0.75) !important;
-  color: rgba(136,145,165,0.6) !important; font-size: 9px !important;
-}
-.worldcover-map-wrap .leaflet-shadow-pane {
-  mix-blend-mode: screen;
-  filter: brightness(1.6);
-}
-.map-tile-unavailable {
-  position: absolute; inset: 0; z-index: 1000; pointer-events: none;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: rgba(7, 10, 15, 0.70); text-align: center; padding: 24px;
-}
-.map-tile-unavailable strong {
-  display: block; color: var(--text-secondary); font-size: 15px;
-  font-weight: 600; margin-bottom: 8px;
-}
-.map-tile-unavailable p {
-  color: var(--text-muted); font-size: 13px; line-height: 1.6; max-width: 280px; margin: 0;
+/* ========= LAND COVER GLOBE ========= */
+.landcover-globe-wrap {
+  height: 800px; background: #0a0e17; isolation: isolate;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
 
 /* ========= FOREST ANIMATION GATE ========= */

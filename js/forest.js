@@ -1,54 +1,49 @@
-// WorldCover 2021 — ESA · Terrascope WMTS · 10 m
+// Land cover globe — MODIS IGBP 2024 global composite · NASA GIBS
 
-let worldcoverMap = null;
+const LANDCOVER_GLOBE_YEAR = 2024;
 
-const WORLDCOVER_WMTS =
-  'https://services.terrascope.be/wmts/v2?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile' +
-  '&LAYER=WORLDCOVER_2021_MAP&STYLE=&TILEMATRIXSET=EPSG%3A3857' +
-  '&TILEMATRIX=EPSG%3A3857%3A{z}&TILEROW={y}&TILECOL={x}&FORMAT=image%2Fpng';
+function landCoverGlobeImageUrl() {
+  return `/api/forest-wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap` +
+    `&LAYERS=MODIS_Combined_L3_IGBP_Land_Cover_Type_Annual` +
+    `&FORMAT=image%2Fpng&TRANSPARENT=FALSE` +
+    `&CRS=EPSG%3A4326&BBOX=-90,-180,90,180` +
+    `&WIDTH=4096&HEIGHT=2048&TIME=${LANDCOVER_GLOBE_YEAR}-01-01`;
+}
 
-function initWorldCoverMap() {
-  if (!window.L || worldcoverMap) return;
+let landcoverGlobe = null;
 
-  worldcoverMap = L.map('worldcoverMap', {
-    center: [15, 10], zoom: 2, minZoom: 2, maxZoom: 13,
-    zoomSnap: 0.5, worldCopyJump: false, attributionControl: true,
-    maxBounds: [[-90, -180], [90, 180]],
-    maxBoundsViscosity: 1.0,
-  });
+function initLandCoverGlobe() {
+  if (!window.Globe || landcoverGlobe) return;
 
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri', maxZoom: 19,
-  }).addTo(worldcoverMap);
+  const el = document.getElementById('landcoverGlobe');
+  if (!el) return;
 
-  let wcTilesFailed = false;
-  const wcLayer = L.tileLayer(WORLDCOVER_WMTS, {
-    attribution: '&copy; <a href="https://esa-worldcover.org">ESA WorldCover</a> 2021',
-    maxNativeZoom: 13, maxZoom: 13, opacity: 0.92,
-  }).addTo(worldcoverMap);
-  wcLayer.on('tileerror', () => {
-    if (wcTilesFailed) return;
-    wcTilesFailed = true;
-    const overlay = document.createElement('div');
-    overlay.className = 'map-tile-unavailable';
-    overlay.innerHTML =
-      '<strong>Map temporarily unavailable</strong>' +
-      '<p>The WorldCover tile service is currently experiencing a data outage. Check back later.</p>';
-    document.getElementById('worldcoverMap').appendChild(overlay);
-  });
+  landcoverGlobe = Globe()
+    .globeImageUrl(landCoverGlobeImageUrl())
+    .backgroundColor('rgba(0,0,0,0)')
+    .showAtmosphere(true)
+    .atmosphereColor('#6366f1')
+    .atmosphereAltitude(0.18)
+    (el);
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd', maxZoom: 19, opacity: 0.8, pane: 'shadowPane',
-  }).addTo(worldcoverMap);
+  landcoverGlobe.controls().autoRotate = true;
+  landcoverGlobe.controls().autoRotateSpeed = 0.6;
+  landcoverGlobe.pointOfView({ lat: 15, lng: 10, altitude: 2.2 });
 
-  setTimeout(() => {
-    if (!worldcoverMap) return;
-    worldcoverMap.invalidateSize();
-    const w = worldcoverMap.getContainer().offsetWidth;
-    const h = worldcoverMap.getContainer().offsetHeight;
-    const coverZoom = Math.log2(Math.max(w, h) / 256);
-    worldcoverMap.setView([15, 10], Math.max(2, coverZoom));
-  }, 200);
+  const resize = () => landcoverGlobe.width(el.offsetWidth).height(el.offsetHeight);
+  window.addEventListener('resize', resize);
+  setTimeout(resize, 0);
+
+  const rotateBtn = document.getElementById('landcoverRotateBtn');
+  if (rotateBtn) {
+    rotateBtn.addEventListener('click', () => {
+      const controls = landcoverGlobe.controls();
+      controls.autoRotate = !controls.autoRotate;
+      rotateBtn.innerHTML = controls.autoRotate ? '&#9646;&#9646; Pause' : '&#9654; Play';
+      rotateBtn.classList.toggle('playing', controls.autoRotate);
+      rotateBtn.setAttribute('aria-pressed', String(controls.autoRotate));
+    });
+  }
 }
 
 // Forest cover map — MODIS IGBP Land Cover 2001–2024 · NASA GIBS

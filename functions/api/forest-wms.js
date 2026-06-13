@@ -6,18 +6,26 @@
  *
  * All WMS params (SERVICE, REQUEST, LAYERS, BBOX, WIDTH, HEIGHT,
  * FORMAT, CRS, TIME, STYLES …) are forwarded verbatim to upstream.
+ * The upstream endpoint is picked from CRS: EPSG:4326 (equirectangular,
+ * used for the land cover globe) vs EPSG:3857 (the 2001–2024 animation).
  *
  * KV: CLIMATE_CACHE (24-hour tile cache — annual data never changes)
  */
 
-const CCI_WMS = 'https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi';
+const GIBS_WMS = {
+  'EPSG:3857': 'https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi',
+  'EPSG:4326': 'https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi',
+};
 const CACHE_TTL = 60 * 60 * 24; // 24 h — annual data never changes
 
 export async function onRequestGet({ request, env }) {
   const url    = new URL(request.url);
   const params = new URLSearchParams(url.searchParams);
 
-  const upstreamUrl = `${CCI_WMS}?${params.toString()}`;
+  const crs  = (params.get('CRS') || params.get('SRS') || 'EPSG:3857').toUpperCase();
+  const base = GIBS_WMS[crs] || GIBS_WMS['EPSG:3857'];
+
+  const upstreamUrl = `${base}?${params.toString()}`;
   const cacheKey    = `forest_wms_${simpleHash(upstreamUrl)}`;
 
   if (env.CLIMATE_CACHE) {

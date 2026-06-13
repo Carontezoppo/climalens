@@ -28,8 +28,8 @@ function init() {
     window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
   }
 
-  // ── WorldCover map: load immediately ─────────────────────────────────────
-  setTimeout(initWorldCoverMap, 0);
+  // ── Land cover globe: load immediately ────────────────────────────────────
+  setTimeout(initLandCoverGlobe, 0);
 
   // ── MODIS animation: user-triggered via gate ──────────────────────────────
   const forestLoadBtn  = document.getElementById('forestLoadBtn');
