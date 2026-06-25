@@ -18,8 +18,14 @@ const BASELINE_START = 1981;
 const BASELINE_END   = 2010;
 const CACHE_TTL = 60 * 60 * 24; // 24 hours
 
+// ERDDAP is shared with currents-live.js and is known to be flaky (occasional
+// 522s under load). Keep a long-lived fallback copy so a transient outage
+// doesn't break the card — the underlying anomaly series barely moves day to day.
+const STALE_CACHE_TTL = 60 * 60 * 24 * 30; // 30 days
+
 export async function onRequestGet({ env }) {
-  const cacheKey = 'sst_global_trend_v1';
+  const cacheKey  = 'sst_global_trend_v1';
+  const staleKey  = 'sst_global_trend_v1_stale';
 
   if (env.CLIMATE_CACHE) {
     const cached = await env.CLIMATE_CACHE.get(cacheKey);
@@ -36,17 +42,17 @@ export async function onRequestGet({ env }) {
   try {
     upstream = await fetch(`${ERDDAP}?${q}`);
   } catch (e) {
-    return err(`ERDDAP fetch failed: ${e.message}`, 503);
+    return staleOrErr(env, staleKey, `ERDDAP fetch failed: ${e.message}`);
   }
 
-  if (!upstream.ok) return err(`ERDDAP returned ${upstream.status}`, 503);
+  if (!upstream.ok) return staleOrErr(env, staleKey, `ERDDAP returned ${upstream.status}`);
 
   let data;
   try { data = await upstream.json(); }
-  catch { return err('ERDDAP parse error', 503); }
+  catch { return staleOrErr(env, staleKey, 'ERDDAP parse error'); }
 
   const rows = data?.table?.rows;
-  if (!rows?.length) return err('No data returned', 503);
+  if (!rows?.length) return staleOrErr(env, staleKey, 'No data returned');
 
   // Group rows by year; accumulate cos(lat)-weighted SST sum
   // ERDDAP row order: [time, depth, latitude, longitude, sst]
@@ -73,7 +79,7 @@ export async function onRequestGet({ env }) {
   const baselineVals = years
     .map((y, i) => (y >= BASELINE_START && y <= BASELINE_END) ? means[i] : null)
     .filter(v => v != null);
-  if (!baselineVals.length) return err('Baseline years not in dataset', 503);
+  if (!baselineVals.length) return staleOrErr(env, staleKey, 'Baseline years not in dataset');
   const baselineMean = baselineVals.reduce((a, b) => a + b, 0) / baselineVals.length;
 
   // Annual anomalies vs 1981–2010
@@ -103,9 +109,21 @@ export async function onRequestGet({ env }) {
 
   if (env.CLIMATE_CACHE) {
     await env.CLIMATE_CACHE.put(cacheKey, body, { expirationTtl: CACHE_TTL });
+    await env.CLIMATE_CACHE.put(staleKey, body, { expirationTtl: STALE_CACHE_TTL });
   }
 
   return json(body);
+}
+
+// On any upstream failure, fall back to the last known-good response rather
+// than failing outright — annual anomalies move slowly, so a stale copy is
+// still accurate, and ERDDAP's intermittent 522s shouldn't break the card.
+async function staleOrErr(env, staleKey, msg) {
+  if (env.CLIMATE_CACHE) {
+    const stale = await env.CLIMATE_CACHE.get(staleKey);
+    if (stale) return json(stale, { 'X-Cache': 'STALE' });
+  }
+  return err(msg, 503);
 }
 
 function json(body, extraHeaders = {}) {

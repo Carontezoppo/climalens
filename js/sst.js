@@ -9,6 +9,9 @@ let sstMap = null, sstLayerA = null, sstLayerB = null, sstActiveSide = 'A', sstM
 let sstPlaying = false;
 const SST_MIN_FRAME_MS = 700; // minimum ms a frame stays visible
 
+// GIBS GHRSST L4 MUR processing lag is ~2 days; 3-day margin keeps the "latest" frame reliable.
+const SST_LATEST_LAG_DAYS = 3;
+
 function buildSSTMonths() {
   const months = [];
   let y = 2003, m = 1;
@@ -18,11 +21,21 @@ function buildSSTMonths() {
     months.push(`${y}-${String(m).padStart(2,'0')}-15`);
     m++; if (m > 12) { m = 1; y++; }
   }
+  // Append the most recent real daily snapshot so the map can show ongoing
+  // events (e.g. El Niño) instead of stopping a month-plus behind.
+  const latest = new Date(now);
+  latest.setUTCDate(latest.getUTCDate() - SST_LATEST_LAG_DAYS);
+  const latestStr = latest.toISOString().slice(0, 10);
+  if (latestStr > months[months.length - 1]) months.push(latestStr);
   return months;
 }
 
-function sstDateLabel(dateStr) {
-  return new Date(dateStr + 'T12:00:00').toLocaleDateString('en-GB', { month:'long', year:'numeric' });
+function sstDateLabel(dateStr, idx) {
+  const d = new Date(dateStr + 'T12:00:00');
+  if (idx === sstMonths.length - 1 && dateStr.slice(8, 10) !== '15') {
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ' (latest available)';
+  }
+  return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 }
 
 const GIBS_WMS = 'https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi';
@@ -126,7 +139,7 @@ function initSSTMap() {
 
   // Update date display
   const dateDisplay = document.getElementById('sstDateDisplay');
-  dateDisplay.textContent = sstDateLabel(latestDate);
+  dateDisplay.textContent = sstDateLabel(latestDate, sstMonths.length - 1);
 
   // ---- Double-buffer frame loader ----
   // Loads `idx` into the hidden buffer layer; swaps when all tiles are ready.
@@ -149,7 +162,7 @@ function initSSTMap() {
       sstSwapLayers();
       slider.value = idx;
       updateSliderFill(slider);
-      dateDisplay.textContent = sstDateLabel(sstMonths[idx]);
+      dateDisplay.textContent = sstDateLabel(sstMonths[idx], idx);
       if (onSwapped) onSwapped(idx);
     }
 
@@ -167,7 +180,7 @@ function initSSTMap() {
   slider.addEventListener('input', () => {
     const idx = parseInt(slider.value);
     updateSliderFill(slider);
-    dateDisplay.textContent = sstDateLabel(sstMonths[idx]);
+    dateDisplay.textContent = sstDateLabel(sstMonths[idx], idx);
     clearTimeout(sstScrubTimer);
     sstScrubTimer = setTimeout(() => sstLoadFrame(idx), 150);
   });

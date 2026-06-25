@@ -338,7 +338,10 @@ async function loadForecast() {
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
         const { ts, data } = JSON.parse(cached);
-        if (Date.now() - ts < 60 * 60 * 1000) return data;
+        // Elapsed check alone isn't enough to guarantee a same-day refetch
+        // after a long-lived tab, so also require the cached UTC date to match today's.
+        const sameDay = new Date(ts).toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10);
+        if (sameDay && Date.now() - ts < 60 * 60 * 1000) return data;
       }
       const json = await fetchForecast();
       localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: json }));
