@@ -1474,15 +1474,15 @@
   width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0;
   border: 1px solid rgba(255,255,255,0.1);
 }
-@media (max-width: 768px) {
-  .forest-map-wrap { height: 320px; }
-  .landcover-globe-wrap { height: 320px; }
-}
-
 /* ========= LAND COVER GLOBE ========= */
 .landcover-globe-wrap {
   height: 800px; background: #0a0e17; isolation: isolate;
   display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .forest-map-wrap { height: 320px; }
+  .landcover-globe-wrap { height: 320px; }
 }
 
 /* ========= FOREST ANIMATION GATE ========= */
