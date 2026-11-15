@@ -19,7 +19,7 @@ const SAM_URL = 'https://www.cpc.ncep.noaa.gov/products/precip/CWlink/daily_ao_i
 const CACHE_TTL = 60 * 60 * 24 * 3; // 3 days
 const START_YEAR = 2000;
 
-export async function onRequestGet({ request, env }) {
+export async function onRequestGet({ request, env, waitUntil }) {
   try {
     const url = new URL(request.url);
     const lat = parseFloat(url.searchParams.get('lat'));
@@ -73,7 +73,7 @@ export async function onRequestGet({ request, env }) {
 
     const result = JSON.stringify({ index: indexName, annual });
     if (env.CLIMATE_CACHE) {
-      env.CLIMATE_CACHE.put(cacheKey, result, { expirationTtl: CACHE_TTL });
+      waitUntil(env.CLIMATE_CACHE.put(cacheKey, result, { expirationTtl: CACHE_TTL }));
     }
 
     return json(result, 200, { 'X-Cache': 'MISS' });

@@ -8,7 +8,7 @@
 const UPSTREAM  = 'https://air-quality-api.open-meteo.com/v1/air-quality';
 const CACHE_TTL = 60 * 30; // 30 minutes in seconds
 
-export async function onRequestGet({ request, env }) {
+export async function onRequestGet({ request, env, waitUntil }) {
   try {
     const url = new URL(request.url);
     const lat = url.searchParams.get('lat');
@@ -42,7 +42,7 @@ export async function onRequestGet({ request, env }) {
     if (!upstream.ok) return json(body, upstream.status, { 'X-Cache': 'MISS' });
 
     if (env.CLIMATE_CACHE) {
-      env.CLIMATE_CACHE.put(cacheKey, body, { expirationTtl: CACHE_TTL });
+      waitUntil(env.CLIMATE_CACHE.put(cacheKey, body, { expirationTtl: CACHE_TTL }));
     }
 
     return json(body, 200, { 'X-Cache': 'MISS' });

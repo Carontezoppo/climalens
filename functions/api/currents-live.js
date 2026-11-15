@@ -32,7 +32,7 @@ const STRIDE  = 16;
 const LAT_MIN = -80, LAT_MAX = 80;
 const LON_MIN = -180, LON_MAX = 179;
 
-export async function onRequestGet({ env }) {
+export async function onRequestGet({ env, waitUntil }) {
   try {
     // ── KV cache (pre-built grid) ─────────────────────────────────────────────
     const today    = new Date().toISOString().slice(0, 10);
@@ -81,7 +81,7 @@ export async function onRequestGet({ env }) {
 
     // ── KV cache write (fire-and-forget) ──────────────────────────────────────
     if (env.CLIMATE_CACHE) {
-      env.CLIMATE_CACHE.put(cacheKey, payload, { expirationTtl: CACHE_TTL });
+      waitUntil(env.CLIMATE_CACHE.put(cacheKey, payload, { expirationTtl: CACHE_TTL }));
     }
 
     return respond(payload, 200, { 'X-Cache': 'MISS' });

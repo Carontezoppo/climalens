@@ -15,7 +15,7 @@
 const MET_URL  = 'https://api.met.no/weatherapi/locationforecast/2.0/compact';
 const CACHE_TTL = 60 * 60; // 1 hour
 
-export async function onRequestGet({ request, env }) {
+export async function onRequestGet({ request, env, waitUntil }) {
   try {
     const url = new URL(request.url);
     const lat = url.searchParams.get('lat');
@@ -123,7 +123,7 @@ export async function onRequestGet({ request, env }) {
 
     const result = JSON.stringify({ daily, hourly });
     if (env.CLIMATE_CACHE) {
-      env.CLIMATE_CACHE.put(cacheKey, result, { expirationTtl: CACHE_TTL });
+      waitUntil(env.CLIMATE_CACHE.put(cacheKey, result, { expirationTtl: CACHE_TTL }));
     }
     return json(result, 200, { 'X-Cache': 'MISS' });
 

@@ -22,7 +22,7 @@
 const UPSTREAM  = 'https://power.larc.nasa.gov/api/temporal/daily/point';
 const CACHE_TTL = 60 * 60 * 24 * 7; // 7 days
 
-export async function onRequestGet({ request, env }) {
+export async function onRequestGet({ request, env, waitUntil }) {
   try {
     const url   = new URL(request.url);
     const lat   = url.searchParams.get('lat');
@@ -69,7 +69,7 @@ export async function onRequestGet({ request, env }) {
     const aggregated = aggregateToMonthly(raw.properties.parameter, monthDefs);
 
     if (env.CLIMATE_CACHE) {
-      env.CLIMATE_CACHE.put(cacheKey, JSON.stringify(aggregated), { expirationTtl: CACHE_TTL });
+      waitUntil(env.CLIMATE_CACHE.put(cacheKey, JSON.stringify(aggregated), { expirationTtl: CACHE_TTL }));
     }
 
     return json(aggregated, 200, { 'X-Cache': 'MISS' });

@@ -21,7 +21,7 @@
 const UPSTREAM  = 'https://power.larc.nasa.gov/api/temporal/daily/point';
 const CACHE_TTL = 60 * 60 * 24 * 90; // 90 days — MERRA-2 data is static once published
 
-export async function onRequestGet({ request, env }) {
+export async function onRequestGet({ request, env, waitUntil }) {
   try {
     const url = new URL(request.url);
     const lat = url.searchParams.get('lat');
@@ -69,7 +69,7 @@ export async function onRequestGet({ request, env }) {
 
     // ── KV cache write (fire-and-forget) ──────────────────────────────────────
     if (env.CLIMATE_CACHE) {
-      env.CLIMATE_CACHE.put(cacheKey, JSON.stringify(processed), { expirationTtl: CACHE_TTL });
+      waitUntil(env.CLIMATE_CACHE.put(cacheKey, JSON.stringify(processed), { expirationTtl: CACHE_TTL }));
     }
 
     return json(processed, 200, { 'X-Cache': 'MISS' });
