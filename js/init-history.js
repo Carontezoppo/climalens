@@ -26,6 +26,7 @@ function init() {
     const { startYr, startMo, endYr, endMo } = currentRange();
     loadClimateData();
     loadJetStreamData();
+    loadVortexData();
     loadRange(startYr, startMo, endYr, endMo);
   }
 
@@ -197,6 +198,7 @@ function init() {
   initClimate();
   loadClimateData();
   loadJetStreamData();
+  loadVortexData();
   loadRange(startYr, startMo, endYr, endMo);
 }
 init();

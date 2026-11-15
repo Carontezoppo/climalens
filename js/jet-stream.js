@@ -5,7 +5,7 @@ let jetStreamLoaded = false;
 const jetStreamCache = {};
 
 async function fetchJetStreamData() {
-  const hemisphere = currentLocation.lat >= 0 ? 'nh' : 'sh';
+  const hemisphere = Math.abs(currentLocation.lat) < 20 ? 'tropical' : currentLocation.lat >= 0 ? 'nh' : 'sh';
   if (jetStreamCache[hemisphere]) return jetStreamCache[hemisphere];
 
   const res  = await fetch(`/api/jet-stream?lat=${currentLocation.lat}&lon=${currentLocation.lon}`);
@@ -45,12 +45,12 @@ function renderJetStreamData(data) {
   document.getElementById('jetStreamStatsRow').innerHTML = `
     <div class="climate-stat-card">
       <div class="climate-stat-label">Most Negative Year</div>
-      <div class="climate-stat-value" style="color:#38bdf8">${minEntry.year}<span class="climate-stat-unit"> (${minEntry.value})</span></div>
+      <div class="climate-stat-value" style="color:var(--temp-low)">${minEntry.year}<span class="climate-stat-unit"> (${minEntry.value})</span></div>
       <div class="climate-stat-note">Jet furthest equatorward — highest cold risk</div>
     </div>
     <div class="climate-stat-card">
       <div class="climate-stat-label">Most Positive Year</div>
-      <div class="climate-stat-value" style="color:#fb923c">${maxEntry.year}<span class="climate-stat-unit"> (${s(maxEntry.value)}${maxEntry.value})</span></div>
+      <div class="climate-stat-value" style="color:var(--temp-high)">${maxEntry.year}<span class="climate-stat-unit"> (${s(maxEntry.value)}${maxEntry.value})</span></div>
       <div class="climate-stat-note">Jet furthest poleward — mildest conditions</div>
     </div>
     <div class="climate-stat-card">
@@ -60,7 +60,7 @@ function renderJetStreamData(data) {
     </div>
     <div class="climate-stat-card">
       <div class="climate-stat-label">${last.year} Index</div>
-      <div class="climate-stat-value" style="color:${last.value < 0 ? '#38bdf8' : '#fb923c'}">${s(last.value)}${last.value}</div>
+      <div class="climate-stat-value" style="color:${last.value < 0 ? 'var(--temp-low)' : 'var(--temp-high)'}">${s(last.value)}${last.value}</div>
       <div class="climate-stat-note">${last.value < 0 ? 'Negative — jet displaced equatorward' : 'Positive — jet in normal or poleward position'}</div>
     </div>`;
 
@@ -145,7 +145,7 @@ async function loadJetStreamData() {
     const data = await fetchJetStreamData();
     if (data.tropical) {
       const el = document.getElementById('jetStreamLoading');
-      el.textContent = `${currentLocation.name} is in the tropics — the polar jet stream does not directly influence this region.`;
+      el.textContent = `${currentLocation.name} is in the tropics — the polar jet stream and polar vortex do not directly influence this region.`;
       el.style.color = '';
       document.getElementById('jetStreamContent').style.display = 'none';
       document.getElementById('jetStreamPrompt').style.display  = '';

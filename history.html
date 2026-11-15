@@ -138,8 +138,8 @@
   <div class="section-sep"></div>
 
   <h2 class="section-title" id="section-jetstream" style="margin-top:8px;">
-    Jet Stream Index
-    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">2000 – present · NAO / SAM · NOAA CPC</span>
+    Jet Stream &amp; Polar Vortex
+    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">NAO / SAM · NOAA CPC · Polar vortex · NASA GSFC</span>
   </h2>
   <div class="chart-subtitle" id="jetStreamDesc" style="margin-bottom:12px;"></div>
 
@@ -156,12 +156,40 @@
           <div class="chart-subtitle" id="jetStreamChartSub">North Atlantic Oscillation · NOAA Climate Prediction Center</div>
         </div>
         <div class="chart-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:#fb923c"></div>Positive (jet poleward)</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#38bdf8"></div>Negative (cold risk)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--temp-high)"></div>Positive (jet poleward)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--temp-low)"></div>Negative (cold risk)</div>
         </div>
       </div>
       <div class="chart-container" style="height:300px;"><canvas id="jetStreamChart" role="img" aria-label="Annual NAO / SAM jet stream index chart"></canvas></div>
       <div class="climate-note" id="jetStreamNote"></div>
+    </div>
+  </div>
+
+  <div id="vortexBlock" style="margin-top:32px;">
+    <div class="chart-subtitle" id="vortexDesc" style="margin-bottom:12px;">The polar vortex is a ring of strong westerly winds circling the pole about 30 km up, in the stratosphere.</div>
+
+    <div id="vortexPrompt" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:40px;text-align:center;">
+      <div id="vortexLoading" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);">Loading polar vortex data&hellip;</div>
+    </div>
+
+    <div id="vortexContent" style="display:none;">
+      <div class="climate-stats-row" id="vortexStatsRow" aria-live="polite"></div>
+      <div class="chart-card full-width">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title" id="vortexChartTitle">Polar Vortex Strength</div>
+            <div class="chart-subtitle">This season compared with every season since 1979</div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--text-primary)"></div>This season</div>
+            <div class="legend-item"><div class="legend-dot" style="background:transparent;border:1.5px dashed var(--text-primary)"></div>Forecast</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--temp-low);opacity:0.45"></div>Typical range (10–90%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:transparent;border:1.5px dotted var(--text-muted)"></div>Record high / low</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height:300px;"><canvas id="vortexChart" role="img" aria-label="Polar vortex wind speed this season compared with the historical record"></canvas></div>
+        <div class="climate-note" id="vortexNote"></div>
+      </div>
     </div>
   </div>
 
@@ -264,6 +292,7 @@
 <script src="js/climate.js"></script>
 <script src="js/range.js"></script>
 <script src="js/jet-stream.js"></script>
+<script src="js/polar-vortex.js"></script>
 <script src="js/init-history.js"></script>
 <script src="/js/cookies.js"></script>
 <script src="js/theme.js"></script>
