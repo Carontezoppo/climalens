@@ -28,6 +28,8 @@
     --accent-text: #a5b4fc;
     --positive: #34d399;
     --negative: #f87171;
+    --anomaly-warm: #f87171;
+    --anomaly-cool: #60a5fa;
     --background-color: #2e3138;
     --link-color: #009dff;
     --status-good:     #34d399;
@@ -1543,6 +1545,7 @@
 }
 .wl-sparkline-wrap { flex: 1; min-width: 0; }
 .wl-sparkline { width: 100%; height: 60px; display: block; }
+.wl-sparkline--tall { height: 120px; }
 .wl-sparkline-labels {
   display: flex; justify-content: space-between;
   font-family: 'DM Mono', monospace;
@@ -2084,6 +2087,8 @@
   --accent-text:    #3338ae;
   --positive:       #087249;
   --negative:       #c01818;
+  --anomaly-warm:   #c01818;
+  --anomaly-cool:   #1d4ed8;
   --background-color: #d5daea;
   --link-color:     #0033ff;
   --status-good:     #0a7d52;
@@ -2129,6 +2134,8 @@
     --accent-text:    #3338ae;
     --positive:       #087249;
     --negative:       #c01818;
+    --anomaly-warm:   #c01818;
+    --anomaly-cool:   #1d4ed8;
     --background-color: #d5daea;
     --link-color:     #0033ff;
     --status-good:     #0a7d52;

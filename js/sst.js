@@ -343,7 +343,7 @@ function renderSSTGlobalCard({ years, anomalies, trendPerDecade, latestYear, lat
   const endLblEl = document.getElementById('sstGlobalSparklineEnd');
 
   const sign  = latestAnomaly >= 0 ? '+' : '';
-  const color = latestAnomaly >= 0 ? '#f87171' : '#60a5fa';
+  const color = latestAnomaly >= 0 ? 'var(--anomaly-warm)' : 'var(--anomaly-cool)';
   if (anomEl)   { anomEl.textContent = `${sign}${latestAnomaly.toFixed(2)} °C`; anomEl.style.color = color; }
 
   const tSign = trendPerDecade >= 0 ? '+' : '';
@@ -384,14 +384,14 @@ function renderSSTGlobalSparkline(years, anomalies) {
   svg.innerHTML = `
     <defs>
       <linearGradient id="sstSparkGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="#f87171" stop-opacity="0.35"/>
-        <stop offset="100%" stop-color="#f87171" stop-opacity="0"/>
+        <stop offset="0%"   style="stop-color:var(--anomaly-warm)" stop-opacity="0.35"/>
+        <stop offset="100%" style="stop-color:var(--anomaly-warm)" stop-opacity="0"/>
       </linearGradient>
     </defs>
     <line x1="${padX}" y1="${zeroY}" x2="${W - padX}" y2="${zeroY}"
-          stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,3"/>
+          style="stroke:var(--text-muted)" stroke-opacity="0.5" stroke-width="1" stroke-dasharray="3,3"/>
     <path d="${fillD}" fill="url(#sstSparkGrad)"/>
-    <path d="${lineD}" fill="none" stroke="#f87171" stroke-width="1.5"
+    <path d="${lineD}" fill="none" style="stroke:var(--anomaly-warm)" stroke-width="1.5"
           stroke-linecap="round" stroke-linejoin="round"/>
   `;
 }
