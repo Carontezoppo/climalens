@@ -2154,6 +2154,7 @@
 [data-theme="light"] .header-nav.open .header-nav-links { box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) .header-nav.open .header-nav-links { box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+}
 
 /* ===== FOOTPRINT PAGE ===== */
 .pollution-map-wrap {
@@ -2205,5 +2206,4 @@
 
 @media (max-width: 768px) {
   .pollution-map-wrap { height: 320px; }
-}
 }
