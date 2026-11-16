@@ -3,23 +3,12 @@
 let seaIceCharts = {};
 
 function seaIceColor(anomaly) {
-  // Negative anomaly (less ice than baseline) → warm orange/red
-  // Positive anomaly (more ice than baseline) → cool blue
+  // Hue = direction (blue above baseline, orange below), opacity = distance
+  // from it. Fading the colour itself toward white made near-baseline years
+  // vanish on the light theme's white card; opacity alone stays visible on both.
   const t = Math.max(-1, Math.min(1, anomaly / 2));
-  if (t >= 0) {
-    // above baseline: white → blue
-    const r = Math.round(56 + 199 * (1 - t));
-    const g = Math.round(189 + 66 * (1 - t));
-    const b = 248;
-    return `rgba(${r},${g},${b},${(0.5 + t * 0.45).toFixed(2)})`;
-  } else {
-    // below baseline: white → orange
-    const f = -t;
-    const r = 255;
-    const g = Math.round(255 - 150 * f);
-    const b = Math.round(255 - 200 * f);
-    return `rgba(${r},${g},${b},${(0.5 + f * 0.45).toFixed(2)})`;
-  }
+  const alpha = (0.35 + Math.abs(t) * 0.65).toFixed(2);
+  return t >= 0 ? `rgba(56,189,248,${alpha})` : `rgba(251,146,60,${alpha})`;
 }
 
 function renderPoleChart(pole, data, canvasId, title) {
@@ -52,7 +41,7 @@ function renderPoleChart(pole, data, canvasId, title) {
           label: '1981–2010 baseline',
           data: baselineArr,
           type: 'line',
-          borderColor: 'rgba(251,146,60,0.85)',
+          borderColor: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim(),
           borderDash: [6, 4],
           backgroundColor: 'transparent',
           borderWidth: 2,
