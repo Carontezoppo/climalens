@@ -6,7 +6,7 @@
 <title>ClimaLens — Global Land Cover</title>
 <meta name="description" content="Global land cover from 2001 to 2024 — high-resolution ESA WorldCover imagery alongside 24 years of MODIS annual animation.">
 <meta name="theme-color" content="#0c0f14">
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);})()</script>
+<script>(function(){var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark')t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);})()</script>
 <link rel="canonical" href="https://climalens.org/forest.html">
 <link rel="icon" href="/img/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">

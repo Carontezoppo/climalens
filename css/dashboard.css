@@ -2071,7 +2071,7 @@
   --text-muted:     #6b7280;
   --rain:           #0d7ab0;
   --rain-dim:       rgba(13,122,176,0.12);
-  --sun:            #679FFF;
+  --sun:            #875000;
   --sun-dim:        rgba(135,80,0,0.12);
   --wind:           #167740;
   --wind-dim:       rgba(22,119,64,0.12);
@@ -2103,65 +2103,11 @@
   --discovery-text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
 
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme]) {
-    color-scheme: light;
-    --bg-primary:     #f0f3fa;
-    --bg-card:        #ffffff;
-    --bg-card-hover:  #f5f7fd;
-    --bg-panel:       #f7f9fe;
-    --border:         #e2e7f5;
-    --border-search:  #9aa3c0;
-    --border-accent:  #c8cfec;
-    --text-primary:   #111827;
-    --text-secondary: #374151;
-    --text-muted:     #6b7280;
-    --rain:           #0d7ab0;
-    --rain-dim:       rgba(13,122,176,0.12);
-    --sun:            #679FFF;
-    --sun-dim:        rgba(135,80,0,0.12);
-    --wind:           #167740;
-    --wind-dim:       rgba(22,119,64,0.12);
-    --snow:           #3a4d6e;
-    --snow-dim:       rgba(58,77,110,0.12);
-    --pressure:       #5d30a0;
-    --pressure-dim:   rgba(93,48,160,0.12);
-    --humidity:       #9a1c68;
-    --humidity-dim:   rgba(154,28,104,0.12);
-    --temp-high:      #9c3b08;
-    --temp-low:       #0a5e8e;
-    --accent:         #3d43f2;
-    --accent-text:    #3338ae;
-    --positive:       #087249;
-    --negative:       #c01818;
-    --anomaly-warm:   #c01818;
-    --anomaly-cool:   #1d4ed8;
-    --background-color: #d5daea;
-    --link-color:     #0033ff;
-    --status-good:     #0a7d52;
-    --status-fair:     #4a7200;
-    --status-moderate: #8c5a00;
-    --status-poor:     #c24a08;
-    --status-verypoor: #c01818;
-    --status-extreme:  #7c1abf;
-    --forecast-day-selected: #c7c8ff21;
-    --discover-bg: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.08) 85%);
-    --discover-bg-hover: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.15) 85%);
-    --discovery-text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-  }
-}
-
 [data-theme="dark"] { color-scheme: dark; }
 
 /* Lighter shadows in light mode */
 [data-theme="light"] .location-dropdown { box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme]) .location-dropdown { box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-}
 [data-theme="light"] .header-nav.open .header-nav-links { box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme]) .header-nav.open .header-nav-links { box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
-}
 
 /* ===== FOOTPRINT PAGE ===== */
 .pollution-map-wrap {
