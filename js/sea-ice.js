@@ -77,7 +77,7 @@ function renderPoleChart(pole, data, canvasId, title) {
           },
         },
         y: {
-          grid: { color: 'rgba(30,36,51,0.7)' },
+          grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--border').trim() },
           ticks: { callback: v => v.toFixed(1) + ' M km²' },
           grace: '8%',
           title: {
@@ -102,11 +102,13 @@ function renderPoleChart(pole, data, canvasId, title) {
               return `Extent: ${ctx.parsed.y.toFixed(2)} M km²  (${sign}${anom.toFixed(2)} vs baseline)`;
             },
           },
-          backgroundColor: 'rgba(14,18,28,0.95)',
+          backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg-panel').trim(),
+          titleColor: getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim(),
+          bodyColor: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim(),
           titleFont: { family: "'DM Mono', monospace", size: 11 },
           bodyFont: { family: "'DM Mono', monospace", size: 11 },
           padding: 12,
-          borderColor: 'rgba(30,36,51,0.9)',
+          borderColor: getComputedStyle(document.documentElement).getPropertyValue('--border-accent').trim(),
           borderWidth: 1,
         },
       },
@@ -131,12 +133,12 @@ function renderPoleStats(data, rowId, lastLabel, anomalyLabel) {
     </div>
     <div class="climate-stat-card">
       <div class="climate-stat-label">${anomalyLabel}</div>
-      <div class="climate-stat-value" style="color:${lastAnomaly < 0 ? '#fb923c' : '#38bdf8'}">${sign(lastAnomaly)}${lastAnomaly?.toFixed(2)}<span class="climate-stat-unit"> M km²</span></div>
+      <div class="climate-stat-value" style="color:${lastAnomaly < 0 ? 'var(--temp-high)' : 'var(--temp-low)'}">${sign(lastAnomaly)}${lastAnomaly?.toFixed(2)}<span class="climate-stat-unit"> M km²</span></div>
       <div class="climate-stat-note">vs 1981–2010 baseline</div>
     </div>
     <div class="climate-stat-card">
       <div class="climate-stat-label">Record Low</div>
-      <div class="climate-stat-value" style="color:#ef4444">${recordLowExtent?.toFixed(2)}<span class="climate-stat-unit"> M km²</span></div>
+      <div class="climate-stat-value" style="color:var(--anomaly-warm)">${recordLowExtent?.toFixed(2)}<span class="climate-stat-unit"> M km²</span></div>
       <div class="climate-stat-note">${recordLowYear}</div>
     </div>
     <div class="climate-stat-card">

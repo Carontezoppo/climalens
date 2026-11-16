@@ -118,27 +118,27 @@ function renderClimateData(data) {
   document.getElementById('climateStatsRow').innerHTML = `
     <div class="climate-stat-card">
       <div class="climate-stat-label">Warming Rate</div>
-      <div class="climate-stat-value" style="color:${decadeRate >= 0 ? '#fb923c' : '#38bdf8'}">${s(decadeRate)}${decadeRate}<span class="climate-stat-unit"> °C/decade</span></div>
-      <div class="climate-stat-note">Linear trend 1970–${lastYear}</div>
+      <div class="climate-stat-value" style="color:${decadeRate >= 0 ? 'var(--temp-high)' : 'var(--temp-low)'}">${s(decadeRate)}${decadeRate}<span class="climate-stat-unit"> °C/decade</span></div>
+      <div class="climate-stat-note">Linear trend ${years[0]}–${lastYear}</div>
     </div>
     <div class="climate-stat-card">
       <div class="climate-stat-label">Total Change</div>
-      <div class="climate-stat-value" style="color:${totalChange >= 0 ? '#fb923c' : '#38bdf8'}">${s(totalChange)}${totalChange}<span class="climate-stat-unit"> °C</span></div>
-      <div class="climate-stat-note">Trend 1970 → ${lastYear}</div>
+      <div class="climate-stat-value" style="color:${totalChange >= 0 ? 'var(--temp-high)' : 'var(--temp-low)'}">${s(totalChange)}${totalChange}<span class="climate-stat-unit"> °C</span></div>
+      <div class="climate-stat-note">Trend ${years[0]} → ${lastYear}</div>
     </div>
     <div class="climate-stat-card">
       <div class="climate-stat-label">Warmest Year</div>
-      <div class="climate-stat-value" style="color:#ef4444">${warmestYr}<span class="climate-stat-unit"> (${s(warmestAnom)}${warmestAnom}°)</span></div>
+      <div class="climate-stat-value" style="color:var(--anomaly-warm)">${warmestYr}<span class="climate-stat-unit"> (${s(warmestAnom)}${warmestAnom}°)</span></div>
       <div class="climate-stat-note">vs 1981–2010 baseline</div>
     </div>
     <div class="climate-stat-card">
       <div class="climate-stat-label">Coolest Year</div>
-      <div class="climate-stat-value" style="color:#38bdf8">${coldestYr}<span class="climate-stat-unit"> (${coldestAnom}°)</span></div>
+      <div class="climate-stat-value" style="color:var(--temp-low)">${coldestYr}<span class="climate-stat-unit"> (${coldestAnom}°)</span></div>
       <div class="climate-stat-note">vs 1981–2010 baseline</div>
     </div>
     <div class="climate-stat-card">
       <div class="climate-stat-label">${lastYear} Anomaly</div>
-      <div class="climate-stat-value" style="color:${lastAnom >= 0 ? '#fb923c' : '#38bdf8'}">${s(lastAnom)}${lastAnom}<span class="climate-stat-unit"> °C</span></div>
+      <div class="climate-stat-value" style="color:${lastAnom >= 0 ? 'var(--temp-high)' : 'var(--temp-low)'}">${s(lastAnom)}${lastAnom}<span class="climate-stat-unit"> °C</span></div>
       <div class="climate-stat-note">vs 1981–2010 baseline</div>
     </div>`;
 

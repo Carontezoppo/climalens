@@ -18,7 +18,7 @@ Current conditions, up to 9-day forecast, hourly breakdown, and a live wind/pres
 Best for: what's the weather now, what's coming this week, is the air quality bad today.
 
 ### Historical Climate (/history.html)
-ERA5 climate trend chart from 1970 to present for the selected location — temperature, precipitation, and related variables. Monthly KPI cards with a user-selectable date range.
+NASA POWER (MERRA-2) climate trend chart from 1981 to present for the selected location — temperature, precipitation, and related variables. Monthly KPI cards with a user-selectable date range.
 Best for: has this city been getting hotter, how unusual was last summer, what's changed over decades.
 
 ### Sea Data (/sea.html)

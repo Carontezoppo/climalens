@@ -120,7 +120,7 @@ function showMonthlyDrill(key) {
       type:'line',
       data:{ labels:MONTHS_FULL, datasets:[{
         data:mData, borderColor:color, backgroundColor:ca+'0.08)', fill:true, tension:0.4,
-        pointRadius:6, pointBackgroundColor:color, pointBorderColor:'#111520', pointBorderWidth:2,
+        pointRadius:6, pointBackgroundColor:color, pointBorderColor:getComputedStyle(document.documentElement).getPropertyValue('--bg-panel').trim(), pointBorderWidth:2,
       }]},
       options:{
         responsive:true, maintainAspectRatio:false,
@@ -215,7 +215,7 @@ function showDailyDrill(key, mi) {
       type:'line',
       data:{ labels, datasets:[{
         data:vals, borderColor:color, backgroundColor:ca+'0.08)', fill:true, tension:0.35,
-        pointRadius:2.5, pointBackgroundColor:color, pointBorderColor:'#111520', pointBorderWidth:1, borderWidth:2,
+        pointRadius:2.5, pointBackgroundColor:color, pointBorderColor:getComputedStyle(document.documentElement).getPropertyValue('--bg-panel').trim(), pointBorderWidth:1, borderWidth:2,
       }]},
       options:{
         responsive:true, maintainAspectRatio:false,
@@ -318,7 +318,7 @@ function showForecastDrill(dayIdx) {
       responsive: true, maintainAspectRatio: false,
       interaction: { mode:'index', intersect:false },
       scales: {
-        yTemp:   { type:'linear', position:'left',  ticks:{ callback: v => v+'°', color:'#fb923c' }, grid:{ color:'rgba(30,36,51,0.7)' }, grace:'10%' },
+        yTemp:   { type:'linear', position:'left',  ticks:{ callback: v => v+'°', color:'#fb923c' }, grid:{ color:getComputedStyle(document.documentElement).getPropertyValue('--border').trim() }, grace:'10%' },
         yPrecip: { type:'linear', position:'right', ticks:{ callback: v => v+' mm', color:'#4ea8de' }, grid:{ drawOnChartArea:false }, beginAtZero:true, min:0 },
       },
       plugins: { tooltip:{ callbacks:{ label: ctx => ctx.dataset.label === 'Temperature' ? `${ctx.parsed.y}°C` : `${ctx.parsed.y} mm` } } }
