@@ -299,7 +299,7 @@ async function fetchGMSLData() {
     if (data.error) throw new Error(data.error);
     renderGMSL(data);
   } catch {
-    if (statusEl) statusEl.textContent = 'Data temporarily unavailable · NASA JPL/PO.DAAC';
+    if (statusEl) statusEl.textContent = 'Data temporarily unavailable · University of Colorado';
   }
 }
 
@@ -311,7 +311,7 @@ function renderGMSL({ currentRate, totalRise, latestYear, sparkline }) {
 
   if (rateEl)   rateEl.textContent  = `+${currentRate} mm/yr`;
   if (totalEl)  totalEl.textContent = `+${totalRise} mm since 1993`;
-  if (statusEl) statusEl.textContent = `NASA JPL/PO.DAAC merged altimetry · 1993–${latestYear}`;
+  if (statusEl) statusEl.textContent = `University of Colorado Sea Level Research Group · merged altimetry · 1993–${latestYear}`;
   if (endLblEl) endLblEl.textContent = String(latestYear);
 
   wlSparklineData = sparkline;
@@ -345,12 +345,12 @@ function renderSparkline(points) {
   svg.innerHTML = `
     <defs>
       <linearGradient id="wlSparkGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="#38bdf8" stop-opacity="0.3"/>
-        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+        <stop offset="0%"   style="stop-color:var(--sea)" stop-opacity="0.3"/>
+        <stop offset="100%" style="stop-color:var(--sea)" stop-opacity="0"/>
       </linearGradient>
     </defs>
     <path d="${fillD}" fill="url(#wlSparkGrad)"/>
-    <path d="${lineD}" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${lineD}" fill="none" style="stroke:var(--sea)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
   `;
 }
 

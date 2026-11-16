@@ -24,6 +24,7 @@
     --humidity-dim: rgba(244,114,182,0.15);
     --temp-high: #fb923c;
     --temp-low: #38bdf8;
+    --sea: #38bdf8;
     --accent: #6366f1;
     --accent-text: #a5b4fc;
     --positive: #34d399;
@@ -1537,7 +1538,7 @@
 }
 .wl-metric-value {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 36px; color: #38bdf8; line-height: 1; margin-bottom: 6px; font-weight: 700;
+  font-size: 36px; color: var(--sea); line-height: 1; margin-bottom: 6px; font-weight: 700;
 }
 .wl-metric-sub {
   font-family: 'DM Mono', monospace;
@@ -1696,7 +1697,7 @@
   font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500;
 }
 .wl-rate-high   { color: #fb923c; }
-.wl-rate-global { color: #38bdf8; }
+.wl-rate-global { color: var(--sea); }
 .wl-cause-badge {
   display: inline-block;
   font-family: 'DM Mono', monospace;
@@ -2083,6 +2084,7 @@
   --humidity-dim:   rgba(154,28,104,0.12);
   --temp-high:      #9c3b08;
   --temp-low:       #0a5e8e;
+  --sea:            #0a5e8e;
   --accent:         #3d43f2;
   --accent-text:    #3338ae;
   --positive:       #087249;
