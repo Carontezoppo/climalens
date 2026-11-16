@@ -6,19 +6,19 @@ function seaIceColor(anomaly) {
   // Negative anomaly (less ice than baseline) → warm orange/red
   // Positive anomaly (more ice than baseline) → cool blue
   const t = Math.max(-1, Math.min(1, anomaly / 2));
-  if (t <= 0) {
-    // below baseline: blue → white
-    const f = -t;
-    const r = Math.round(56 + 199 * (1 - f));
-    const g = Math.round(189 + 66 * (1 - f));
+  if (t >= 0) {
+    // above baseline: white → blue
+    const r = Math.round(56 + 199 * (1 - t));
+    const g = Math.round(189 + 66 * (1 - t));
     const b = 248;
-    return `rgba(${r},${g},${b},${(0.5 + f * 0.45).toFixed(2)})`;
-  } else {
-    // above baseline: white → orange
-    const r = 255;
-    const g = Math.round(255 - 150 * t);
-    const b = Math.round(255 - 200 * t);
     return `rgba(${r},${g},${b},${(0.5 + t * 0.45).toFixed(2)})`;
+  } else {
+    // below baseline: white → orange
+    const f = -t;
+    const r = 255;
+    const g = Math.round(255 - 150 * f);
+    const b = Math.round(255 - 200 * f);
+    return `rgba(${r},${g},${b},${(0.5 + f * 0.45).toFixed(2)})`;
   }
 }
 
