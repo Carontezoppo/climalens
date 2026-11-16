@@ -56,7 +56,7 @@ function showMonthlyDrill(key) {
   const def = METRIC_DEFS[key];
   const mData = DATA[def.monthKey];
   const stats = def.statsFn(mData);
-  const color = getCSSColor(def.color);
+  const color = getCSSColor(def.chartColor || def.color);
   const rgb = color.match(/\d+/g);
   const ca = rgb ? 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',' : 'rgba(100,100,100,';
 
@@ -137,7 +137,7 @@ function showMonthlyDrill(key) {
 function showDailyDrill(key, mi) {
   const def = METRIC_DEFS[key];
   const daily = generateDailyData(mi);
-  const color = getCSSColor(def.color);
+  const color = getCSSColor(def.chartColor || def.color);
   const rgb = color.match(/\d+/g);
   const ca = rgb ? 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',' : 'rgba(100,100,100,';
   const mn = MONTHS_FULL[mi], yr = MONTH_YEARS[mi];
@@ -307,19 +307,23 @@ function showForecastDrill(dayIdx) {
 
   if (drillChart) drillChart.destroy();
   const ctx = document.getElementById('drillCanvas').getContext('2d');
+  const _css = getComputedStyle(document.documentElement);
+  const hi = _css.getPropertyValue('--temp-high-chart').trim(), rain = _css.getPropertyValue('--rain-chart').trim();
+  const hiText = _css.getPropertyValue('--temp-high').trim(), rainText = _css.getPropertyValue('--rain').trim();
+  const _rgba = (h, a) => { const n = parseInt(h.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
   drillChart = new Chart(ctx, {
     type: 'line',
     data: { labels: hLabels, datasets: [
-      { label:'Temperature', data: hTemp, borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,0.08)', fill:true, tension:0.4, pointRadius:2, borderWidth:2, yAxisID:'yTemp' },
-      { label:'Precipitation', data: hPrecip, borderColor:'#4ea8de', backgroundColor:'rgba(78,168,222,0.25)', fill:true, tension:0.1, pointRadius:0, borderWidth:1.5, type:'bar', yAxisID:'yPrecip',
+      { label:'Temperature', data: hTemp, borderColor:hi, backgroundColor:_rgba(hi,0.08), fill:true, tension:0.4, pointRadius:2, borderWidth:2, yAxisID:'yTemp' },
+      { label:'Precipitation', data: hPrecip, borderColor:rain, backgroundColor:_rgba(rain,0.25), fill:true, tension:0.1, pointRadius:0, borderWidth:1.5, type:'bar', yAxisID:'yPrecip',
         borderRadius:{topLeft:3,topRight:3,bottomLeft:0,bottomRight:0}, barPercentage:0.8 },
     ]},
     options: {
       responsive: true, maintainAspectRatio: false,
       interaction: { mode:'index', intersect:false },
       scales: {
-        yTemp:   { type:'linear', position:'left',  ticks:{ callback: v => v+'°', color:'#fb923c' }, grid:{ color:getComputedStyle(document.documentElement).getPropertyValue('--border').trim() }, grace:'10%' },
-        yPrecip: { type:'linear', position:'right', ticks:{ callback: v => v+' mm', color:'#4ea8de' }, grid:{ drawOnChartArea:false }, beginAtZero:true, min:0 },
+        yTemp:   { type:'linear', position:'left',  ticks:{ callback: v => v+'°', color:hiText }, grid:{ color:getComputedStyle(document.documentElement).getPropertyValue('--border').trim() }, grace:'10%' },
+        yPrecip: { type:'linear', position:'right', ticks:{ callback: v => v+' mm', color:rainText }, grid:{ drawOnChartArea:false }, beginAtZero:true, min:0 },
       },
       plugins: { tooltip:{ callbacks:{ label: ctx => ctx.dataset.label === 'Temperature' ? `${ctx.parsed.y}°C` : `${ctx.parsed.y} mm` } } }
     }

@@ -116,7 +116,7 @@ function generateDailyData(monthIdx) {
 // ============================================================
 const METRIC_DEFS = {
   rain: {
-    label: 'Total Rainfall', icon: '\u{1F327}', color: 'var(--rain)', bgDim: 'var(--rain-dim)',
+    label: 'Total Rainfall', icon: '\u{1F327}', color: 'var(--rain)', chartColor: 'var(--rain-chart)', bgDim: 'var(--rain-dim)',
     unit: 'mm', monthKey: 'rain', dailyKey: 'rain', chartType: 'bar', aggLabel: 'Total',
     dailyCols: [
       { key: 'rain', label: 'Rain (mm)', color: 'var(--rain)' },
@@ -130,7 +130,7 @@ const METRIC_DEFS = {
     ],
   },
   sun: {
-    label: 'Sunshine Hours', icon: '\u2600', color: 'var(--sun)', bgDim: 'var(--sun-dim)',
+    label: 'Sunshine Hours', icon: '\u2600', color: 'var(--sun)', chartColor: 'var(--sun-chart)', bgDim: 'var(--sun-dim)',
     unit: 'hrs', monthKey: 'sunHours', dailyKey: 'sun', chartType: 'bar', aggLabel: 'Total',
     dailyCols: [{ key: 'sun', label: 'Sun (hrs)', color: 'var(--sun)' }],
     statsFn: m => [
@@ -141,7 +141,7 @@ const METRIC_DEFS = {
     ],
   },
   wind: {
-    label: 'Avg Wind Speed', icon: '\u{1F4A8}', color: 'var(--wind)', bgDim: 'var(--wind-dim)',
+    label: 'Avg Wind Speed', icon: '\u{1F4A8}', color: 'var(--wind)', chartColor: 'var(--wind-chart)', bgDim: 'var(--wind-dim)',
     unit: 'km/h', monthKey: 'windAvg', dailyKey: 'wind', chartType: 'line', aggLabel: 'Average',
     dailyCols: [
       { key: 'wind', label: 'Avg (km/h)', color: 'var(--wind)' },

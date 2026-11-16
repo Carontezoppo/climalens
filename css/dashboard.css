@@ -16,10 +16,18 @@
     --sun-dim: rgba(245,166,35,0.15);
     --wind: #7ee8a8;
     --wind-dim: rgba(126,232,168,0.15);
+    /* -chart: lines, bars, legend swatches, accent stripes. Base vars are for text. */
+    --rain-chart: #4ea8de;
+    --wind-chart: #7ee8a8;
+    --sun-chart: #f5a623;
+    --temp-high-chart: #fb923c;
+    --temp-low-chart: #38bdf8;
     --snow: #b8c4e0;
     --snow-dim: rgba(184,196,224,0.15);
-    --pressure: #c084fc;
-    --pressure-dim: rgba(192,132,252,0.15);
+    --pressure: #818cf8;
+    --pressure-dim: rgba(129,140,248,0.15);
+    --uv: #a78bfa;
+    --frost: #38bdf8;
     --humidity: #f472b6;
     --humidity-dim: rgba(244,114,182,0.15);
     --temp-high: #fb923c;
@@ -460,9 +468,9 @@
   }
   .kpi-card:hover .tap-hint { opacity: 1; }
 
-  .kpi-card.rain::before { background: var(--rain); }
-  .kpi-card.sun::before { background: var(--sun); }
-  .kpi-card.wind::before { background: var(--wind); }
+  .kpi-card.rain::before { background: var(--rain-chart); }
+  .kpi-card.sun::before { background: var(--sun-chart); }
+  .kpi-card.wind::before { background: var(--wind-chart); }
   .kpi-card.snow::before { background: var(--snow); }
   .kpi-card.pressure::before { background: var(--pressure); }
   .kpi-card.humidity::before { background: var(--humidity); }
@@ -2086,10 +2094,19 @@
   --sun-dim:        rgba(135,80,0,0.12);
   --wind:           #167740;
   --wind-dim:       rgba(22,119,64,0.12);
+  /* -chart: lines, bars, legend swatches, accent stripes (3:1 on white).
+     Base vars stay text-safe (4.5:1) because they colour small text. */
+  --rain-chart:      #0191ff;
+  --wind-chart:      #04a454;
+  --sun-chart:       #c27803;
+  --temp-high-chart: #e2580c;
+  --temp-low-chart:  #0284c7;
   --snow:           #3a4d6e;
   --snow-dim:       rgba(58,77,110,0.12);
-  --pressure:       #5d30a0;
-  --pressure-dim:   rgba(93,48,160,0.12);
+  --pressure:       #4338ca;
+  --pressure-dim:   rgba(67,56,202,0.12);
+  --uv:             #7c3aed;
+  --frost:          #049eb5;
   --humidity:       #9a1c68;
   --humidity-dim:   rgba(154,28,104,0.12);
   --temp-high:      #9c3b08;

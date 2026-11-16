@@ -73,6 +73,8 @@ function renderDashboard(normals = null) {
 
   // UPDATE CHART HEADERS (idempotent — fully replaced each render)
   const normNote = normals ? ' · dashed: 2000–2024 avg' : '';
+  // Theme colour as rgba, for chart datasets (canvas can't read CSS variables)
+  const _rgba = (v, a) => { const n = parseInt(_cv(v).slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
   const normLegendItems = (items) => normals ? items.map(({ color, label }) =>
     `<div class="legend-item"><div class="legend-dash" style="border-top-color:${color}"></div>${label}</div>`
   ).join('') : '';
@@ -83,34 +85,34 @@ function renderDashboard(normals = null) {
       <div class="chart-subtitle">Monthly high &amp; low averages (°C)${normNote}</div>
     </div>
     <div class="chart-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:var(--temp-high)"></div>Avg High</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--temp-low)"></div>Avg Low</div>
-      ${normLegendItems([{color:'rgba(251,146,60,0.6)',label:'Norm High'},{color:'rgba(56,189,248,0.6)',label:'Norm Low'}])}
+      <div class="legend-item"><div class="legend-dot" style="background:var(--temp-high-chart)"></div>Avg High</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--temp-low-chart)"></div>Avg Low</div>
+      ${normLegendItems([{color:_rgba('--temp-high-chart',0.6),label:'Norm High'},{color:_rgba('--temp-low-chart',0.6),label:'Norm Low'}])}
     </div>`;
 
   document.getElementById('rainChart').closest('.chart-card').querySelector('.chart-header').innerHTML = `
     <div><div class="chart-title">Precipitation</div><div class="chart-subtitle">Rainfall in mm per month${normNote}</div></div>
-    ${normals ? '<div class="chart-legend"><div class="legend-item"><div class="legend-dash" style="border-top-color:rgba(78,168,222,0.6)"></div>2000–2024 avg</div></div>' : ''}`;
+    ${normals ? '<div class="chart-legend"><div class="legend-item"><div class="legend-dash" style="border-top-color:'+_rgba('--rain-chart',0.6)+'"></div>2000–2024 avg</div></div>' : ''}`;
 
   document.getElementById('sunChart').closest('.chart-card').querySelector('.chart-header').innerHTML = `
     <div><div class="chart-title">Sunshine Hours</div><div class="chart-subtitle">Total hours of sunlight per month${normNote}</div></div>
-    ${normals ? '<div class="chart-legend"><div class="legend-item"><div class="legend-dash" style="border-top-color:rgba(245,166,35,0.6)"></div>2000–2024 avg</div></div>' : ''}`;
+    ${normals ? '<div class="chart-legend"><div class="legend-item"><div class="legend-dash" style="border-top-color:'+_rgba('--sun-chart',0.6)+'"></div>2000–2024 avg</div></div>' : ''}`;
 
   document.getElementById('windChart').closest('.chart-card').querySelector('.chart-header').innerHTML = `
     <div><div class="chart-title">Wind Speed</div><div class="chart-subtitle">Average daily maximum (km/h)${normNote}</div></div>
     <div class="chart-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:var(--wind)"></div>Avg</div>
-      ${normLegendItems([{color:'rgba(126,232,168,0.55)',label:'Norm Avg'}])}
+      <div class="legend-item"><div class="legend-dot" style="background:var(--wind-chart)"></div>Avg</div>
+      ${normLegendItems([{color:_rgba('--wind-chart',0.55),label:'Norm Avg'}])}
     </div>`;
 
   // MAIN CHARTS
   var _cardBg = _cv('--bg-card') || '#141821';
   const tempDs = [
-    { label:'Avg High', data:DATA.avgHigh, borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#fb923c', pointBorderColor:_cardBg, pointBorderWidth:2 },
-    { label:'Avg Low',  data:DATA.avgLow,  borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,0.08)',  fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#38bdf8', pointBorderColor:_cardBg, pointBorderWidth:2 },
+    { label:'Avg High', data:DATA.avgHigh, borderColor:_cv('--temp-high-chart'), backgroundColor:_rgba('--temp-high-chart',0.08), fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:_cv('--temp-high-chart'), pointBorderColor:_cardBg, pointBorderWidth:2 },
+    { label:'Avg Low',  data:DATA.avgLow,  borderColor:_cv('--temp-low-chart'), backgroundColor:_rgba('--temp-low-chart',0.08),  fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:_cv('--temp-low-chart'), pointBorderColor:_cardBg, pointBorderWidth:2 },
   ];
-  if (normHigh) tempDs.push({ label:'Norm High', data:normHigh, borderColor:'rgba(251,146,60,0.45)', borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
-  if (normLow)  tempDs.push({ label:'Norm Low',  data:normLow,  borderColor:'rgba(56,189,248,0.45)',  borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
+  if (normHigh) tempDs.push({ label:'Norm High', data:normHigh, borderColor:_rgba('--temp-high-chart',0.45), borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
+  if (normLow)  tempDs.push({ label:'Norm Low',  data:normLow,  borderColor:_rgba('--temp-low-chart',0.45),  borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
   chartInstances.temp = new Chart(document.getElementById('tempChart'), {
     type:'line',
     data:{ labels:MONTHS, datasets:tempDs },
@@ -118,9 +120,9 @@ function renderDashboard(normals = null) {
   });
 
   const rainDs = [
-    { data:DATA.rain, backgroundColor:DATA.rain.map(v=>v>75?'#4ea8de':'rgba(78,168,222,0.5)'), borderRadius:{topLeft:6,topRight:6,bottomLeft:0,bottomRight:0}, barPercentage:0.55 },
+    { data:DATA.rain, backgroundColor:DATA.rain.map(v=>v>75?_cv('--rain-chart'):_rgba('--rain-chart',0.5)), borderRadius:{topLeft:6,topRight:6,bottomLeft:0,bottomRight:0}, barPercentage:0.55 },
   ];
-  if (normRain) rainDs.push({ type:'line', label:'2000–2024 avg', data:normRain, borderColor:'rgba(78,168,222,0.55)', borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
+  if (normRain) rainDs.push({ type:'line', label:'2000–2024 avg', data:normRain, borderColor:_rgba('--rain-chart',0.55), borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
   chartInstances.rain = new Chart(document.getElementById('rainChart'), {
     type:'bar',
     data:{ labels:MONTHS, datasets:rainDs },
@@ -128,9 +130,9 @@ function renderDashboard(normals = null) {
   });
 
   const sunDs = [
-    { data:DATA.sunHours, backgroundColor:DATA.sunHours.map(v=>v>90?'#f5a623':'rgba(245,166,35,0.45)'), borderRadius:{topLeft:6,topRight:6,bottomLeft:0,bottomRight:0}, barPercentage:0.55 },
+    { data:DATA.sunHours, backgroundColor:DATA.sunHours.map(v=>v>90?_cv('--sun-chart'):_rgba('--sun-chart',0.45)), borderRadius:{topLeft:6,topRight:6,bottomLeft:0,bottomRight:0}, barPercentage:0.55 },
   ];
-  if (normSun) sunDs.push({ type:'line', label:'2000–2024 avg', data:normSun, borderColor:'rgba(245,166,35,0.55)', borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
+  if (normSun) sunDs.push({ type:'line', label:'2000–2024 avg', data:normSun, borderColor:_rgba('--sun-chart',0.55), borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
   chartInstances.sun = new Chart(document.getElementById('sunChart'), {
     type:'bar',
     data:{ labels:MONTHS, datasets:sunDs },
@@ -138,9 +140,9 @@ function renderDashboard(normals = null) {
   });
 
   const windDs = [
-    { label:'Avg Speed', data:DATA.windAvg, borderColor:'#7ee8a8', backgroundColor:'rgba(126,232,168,0.1)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#7ee8a8', pointBorderColor:_cardBg, pointBorderWidth:2 },
+    { label:'Avg Speed', data:DATA.windAvg, borderColor:_cv('--wind-chart'), backgroundColor:_rgba('--wind-chart',0.1), fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:_cv('--wind-chart'), pointBorderColor:_cardBg, pointBorderWidth:2 },
   ];
-  if (normWind) windDs.push({ label:'Norm Avg', data:normWind, borderColor:'rgba(126,232,168,0.45)', borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
+  if (normWind) windDs.push({ label:'Norm Avg', data:normWind, borderColor:_rgba('--wind-chart',0.45), borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
   chartInstances.wind = new Chart(document.getElementById('windChart'), {
     type:'line',
     data:{ labels:MONTHS, datasets:windDs },
@@ -148,9 +150,9 @@ function renderDashboard(normals = null) {
   });
 
   const frostDs = [
-    { data:DATA.frostDays, backgroundColor:DATA.frostDays.map(v=>v>0?'rgba(56,189,248,0.7)':'rgba(56,189,248,0.2)'), borderRadius:{topLeft:6,topRight:6,bottomLeft:0,bottomRight:0}, barPercentage:0.55 },
+    { data:DATA.frostDays, backgroundColor:DATA.frostDays.map(v=>v>0?_rgba('--frost',0.75):_rgba('--frost',0.2)), borderRadius:{topLeft:6,topRight:6,bottomLeft:0,bottomRight:0}, barPercentage:0.55 },
   ];
-  if (normFrost) frostDs.push({ type:'line', label:'2000–2024 avg', data:normFrost, borderColor:'rgba(56,189,248,0.5)', borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
+  if (normFrost) frostDs.push({ type:'line', label:'2000–2024 avg', data:normFrost, borderColor:_rgba('--frost',0.5), borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
   chartInstances.frost = new Chart(document.getElementById('frostChart'), {
     type:'bar',
     data:{ labels:MONTHS, datasets:frostDs },
@@ -158,9 +160,9 @@ function renderDashboard(normals = null) {
   });
 
   const uvDs = [
-    { data:DATA.uvIndex, backgroundColor:DATA.uvIndex.map(v=>v>=3?'rgba(251,191,36,0.75)':'rgba(251,191,36,0.3)'), borderRadius:{topLeft:6,topRight:6,bottomLeft:0,bottomRight:0}, barPercentage:0.55 },
+    { data:DATA.uvIndex, backgroundColor:_rgba('--uv',0.75), borderRadius:{topLeft:6,topRight:6,bottomLeft:0,bottomRight:0}, barPercentage:0.55 },
   ];
-  if (normUv) uvDs.push({ type:'line', label:'2000–2024 avg', data:normUv, borderColor:'rgba(251,191,36,0.55)', borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
+  if (normUv) uvDs.push({ type:'line', label:'2000–2024 avg', data:normUv, borderColor:_rgba('--uv',0.55), borderDash:[5,4], pointRadius:0, fill:false, tension:0, borderWidth:1.5 });
   chartInstances.uv = new Chart(document.getElementById('uvChart'), {
     type:'bar',
     data:{ labels:MONTHS, datasets:uvDs },
@@ -169,7 +171,7 @@ function renderDashboard(normals = null) {
 
   chartInstances.pressure = new Chart(document.getElementById('pressureChart'), {
     type:'line',
-    data:{ labels:MONTHS, datasets:[{ data:DATA.pressure, borderColor:'#c084fc', backgroundColor:'rgba(192,132,252,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#c084fc', pointBorderColor:_cardBg, pointBorderWidth:2 }] },
+    data:{ labels:MONTHS, datasets:[{ data:DATA.pressure, borderColor:_cv('--pressure'), backgroundColor:_rgba('--pressure',0.08), fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:_cv('--pressure'), pointBorderColor:_cardBg, pointBorderWidth:2 }] },
     options:{ responsive:true, maintainAspectRatio:false, scales:{y:{grace:'5%',ticks:{callback:v=>v+' hPa'}}}, plugins:{tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y} hPa`}}} }
   });
 
@@ -185,7 +187,7 @@ function renderDashboard(normals = null) {
     tbody += '<tr><td>'+MONTHS_FULL[i]+'</td>';
     tbody += '<td style="color:var(--temp-high)">'+DATA.avgHigh[i]+'</td>';
     tbody += '<td style="color:var(--temp-low)">'+DATA.avgLow[i]+'</td>';
-    tbody += '<td><span class="cell-bar" style="width:'+bw+'px;background:var(--rain)"></span>'+DATA.rain[i]+'</td>';
+    tbody += '<td><span class="cell-bar" style="width:'+bw+'px;background:var(--rain-chart)"></span>'+DATA.rain[i]+'</td>';
     tbody += '<td>'+DATA.rainDays[i]+'</td>';
     tbody += '<td style="color:var(--sun)">'+DATA.sunHours[i]+'</td>';
     tbody += '<td>'+DATA.windAvg[i]+'</td>';

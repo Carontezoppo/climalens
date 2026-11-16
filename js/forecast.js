@@ -85,9 +85,9 @@ function renderForecast(json, normals) {
           <div class="chart-subtitle">High &amp; low over the next ${daily.time.length} days (°C)${normals ? ' · dashed: 2000–2024 monthly avg' : ''}</div>
         </div>
         <div class="chart-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--temp-high)"></div>High</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--temp-low)"></div>Low</div>
-          ${normals ? `<div class="legend-item"><div class="legend-dash" style="border-top-color:rgba(251,146,60,0.5)"></div>Avg High</div><div class="legend-item"><div class="legend-dash" style="border-top-color:rgba(56,189,248,0.5)"></div>Avg Low</div>` : ''}
+          <div class="legend-item"><div class="legend-dot" style="background:var(--temp-high-chart)"></div>High</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--temp-low-chart)"></div>Low</div>
+          ${normals ? `<div class="legend-item"><div class="legend-dash" style="border-top-color:color-mix(in srgb, var(--temp-high-chart) 50%, transparent)"></div>Avg High</div><div class="legend-item"><div class="legend-dash" style="border-top-color:color-mix(in srgb, var(--temp-low-chart) 50%, transparent)"></div>Avg Low</div>` : ''}
         </div>
       </div>
       <div class="forecast-chart-container"><canvas id="forecastChart"></canvas></div>
@@ -110,16 +110,19 @@ function renderForecast(json, normals) {
     const d = new Date(date + 'T12:00:00');
     return date === today ? 'Today' : dayNames[d.getDay()];
   });
-  const _cardBg = getComputedStyle(document.documentElement).getPropertyValue('--bg-card').trim() || '#0c0f14';
+  const _css = getComputedStyle(document.documentElement);
+  const _cardBg = _css.getPropertyValue('--bg-card').trim() || '#0c0f14';
+  const hi = _css.getPropertyValue('--temp-high-chart').trim(), lo = _css.getPropertyValue('--temp-low-chart').trim();
+  const _rgba = (h, a) => { const n = parseInt(h.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
   const datasets = [
-    { label:'High', data: daily.temperature_2m_max.map(v => Math.round(v)), borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,0.08)', fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#fb923c', pointBorderColor:_cardBg, pointBorderWidth:2 },
-    { label:'Low',  data: daily.temperature_2m_min.map(v => Math.round(v)), borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,0.08)',  fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:'#38bdf8', pointBorderColor:_cardBg, pointBorderWidth:2 },
+    { label:'High', data: daily.temperature_2m_max.map(v => Math.round(v)), borderColor:hi, backgroundColor:_rgba(hi,0.08), fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:hi, pointBorderColor:_cardBg, pointBorderWidth:2 },
+    { label:'Low',  data: daily.temperature_2m_min.map(v => Math.round(v)), borderColor:lo, backgroundColor:_rgba(lo,0.08),  fill:true, tension:0.4, pointRadius:5, pointBackgroundColor:lo, pointBorderColor:_cardBg, pointBorderWidth:2 },
   ];
   if (normals) {
     const normHigh = daily.time.map(d => normals.high[new Date(d + 'T12:00:00').getMonth()]);
     const normLow  = daily.time.map(d => normals.low[new Date(d + 'T12:00:00').getMonth()]);
-    datasets.push({ label:'Avg High', data: normHigh, borderColor:'rgba(251,146,60,0.45)', borderDash:[5,4], pointRadius:0, fill:false, tension:0 });
-    datasets.push({ label:'Avg Low',  data: normLow,  borderColor:'rgba(56,189,248,0.45)',  borderDash:[5,4], pointRadius:0, fill:false, tension:0 });
+    datasets.push({ label:'Avg High', data: normHigh, borderColor:_rgba(hi,0.45), borderDash:[5,4], pointRadius:0, fill:false, tension:0 });
+    datasets.push({ label:'Avg Low',  data: normLow,  borderColor:_rgba(lo,0.45),  borderDash:[5,4], pointRadius:0, fill:false, tension:0 });
   }
   forecastChartInstance = new Chart(document.getElementById('forecastChart'), {
     type: 'line',
@@ -283,9 +286,9 @@ function renderSunMoonBar(dateStr, isToday) {
       const Q0x = 10  + t * 140, Q0y = 62 - t * 104;
       const Q1x = 150 + t * 140, Q1y = -42 + t * 104;
       const Bx  = Q0x + t * (Q1x - Q0x), By = Q0y + t * (Q1y - Q0y);
-      arcFill = `<path d="M 10 62 Q ${Q0x.toFixed(1)} ${Q0y.toFixed(1)} ${Bx.toFixed(1)} ${By.toFixed(1)}" style="fill:none;stroke:var(--sun);stroke-width:2.5;stroke-linecap:round"/>`;
+      arcFill = `<path d="M 10 62 Q ${Q0x.toFixed(1)} ${Q0y.toFixed(1)} ${Bx.toFixed(1)} ${By.toFixed(1)}" style="fill:none;stroke:var(--sun-chart);stroke-width:2.5;stroke-linecap:round"/>`;
       // full_sun centered at (Bx, By); flat-edge of half_sun at y=35.75/48 of its height
-      sunDot  = `<image href="weather_icon/full_sun.svg" x="${(Bx - 11).toFixed(1)}" y="${(By - 11).toFixed(1)}" width="22" height="22" style="filter:drop-shadow(0 0 5px var(--sun))"/>`;
+      sunDot  = `<image href="weather_icon/full_sun.svg" x="${(Bx - 11).toFixed(1)}" y="${(By - 11).toFixed(1)}" width="22" height="22" style="filter:drop-shadow(0 0 5px var(--sun-chart))"/>`;
     }
   }
 
