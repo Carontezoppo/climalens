@@ -7,6 +7,7 @@ const LOCATION_GROUPS = [
     { name: 'Birmingham, UK',         lat: 52.48,  lon:  -1.90, tz: 'Europe/London'      },
     { name: 'Almeria, Spain',         lat: 36.84,  lon:  -2.46, tz: 'Europe/Madrid'      },
     { name: 'Amsterdam, Netherlands', lat: 52.37,  lon:   4.90, tz: 'Europe/Amsterdam'   },
+    { name: 'Arabba, Italy',          lat: 46.42,  lon:  12.00, tz: 'Europe/Rome'        },
     { name: 'Athens, Greece',         lat: 37.98,  lon:  23.72, tz: 'Europe/Athens'      },
     { name: 'Barcelona, Spain',       lat: 41.38,  lon:   2.16, tz: 'Europe/Madrid'      },
     { name: 'Berlin, Germany',        lat: 52.52,  lon:  13.40, tz: 'Europe/Berlin'      },
