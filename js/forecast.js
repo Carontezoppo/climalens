@@ -13,10 +13,13 @@ async function fetchForecast() {
   return json;
 }
 
-function weatherIcon(sym, localHour = -1) {
-  const nightSym  = !!sym && (sym.includes('night') || sym.includes('polartwilight'));
-  const nightHour = localHour >= 0 && (localHour < 6 || localHour >= 21);
-  const night     = nightSym || nightHour;
+// MET Norway only marks day/night on symbols that have both variants
+// (partlycloudy_night, clearsky_day…). Suffix-less symbols (cloudy, rain, fog…)
+// carry no day/night information, so for those `utcTime` (an hourly
+// "YYYY-MM-DDTHH:MM" UTC timestamp) is checked against the actual sunset.
+function weatherIcon(sym, utcTime) {
+  const suffixed = !!sym && /_(day|night|polartwilight)$/.test(sym);
+  const night    = suffixed ? !sym.endsWith('_day') : !!utcTime && isSunDown(utcTime);
   const n         = night ? '_night' : '';
 
   if (!sym)                                            return { icon: `weather_icon/Overcast${n}.svg`,        label: 'Cloudy' };
@@ -173,7 +176,7 @@ function renderHourlyStrip(dayIdx) {
     const hour    = +hourly.time[i].slice(11, 13);
     const timeStr = new Date(hourly.time[i] + ':00Z').toLocaleTimeString('en-GB', { timeZone: currentLocation.tz, hour: '2-digit', minute: '2-digit', hour12: false });
     const isNow   = isToday && hour === currentHour;
-    const { icon, label } = weatherIcon(hourly.symbol_code[i], +timeStr.slice(0, 2));
+    const { icon, label } = weatherIcon(hourly.symbol_code[i], hourly.time[i]);
     const temp    = Math.round(hourly.temperature_2m[i]);
     const precip  = hourly.precipitation[i];
     const wind    = Math.round(hourly.wind_speed_10m[i]);
@@ -220,6 +223,18 @@ function getMoonPhaseIndex(dateStr) {
   // Reference new moon: 6 Jan 2000 18:14 UTC = JD 2451550.26
   const daysSince = ((JD - 2451550.26) % 29.53059 + 29.53059) % 29.53059;
   return Math.round(daysSince / 29.53059 * 8) % 8;
+}
+
+function isSunDown(utcTime) {
+  const sun = getSunTimes(currentLocation.lat, currentLocation.lon, utcTime.slice(0, 10));
+  if (!sun) { // polar day or night: fall back to local clock hours
+    const h = +new Date(utcTime + ':00Z').toLocaleTimeString('en-GB', { timeZone: currentLocation.tz, hour: '2-digit', hour12: false });
+    return h < 6 || h >= 21;
+  }
+  // Sun times are minutes from that date's UTC midnight and can fall outside
+  // 0–1440 far from Greenwich, so also test the adjacent days' windows.
+  const t = +utcTime.slice(11, 13) * 60 + +utcTime.slice(14, 16);
+  return ![-1440, 0, 1440].some(k => t >= sun.sunriseMin + k && t < sun.sunsetMin + k);
 }
 
 function getSunTimes(lat, lon, dateStr) {

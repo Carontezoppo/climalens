@@ -290,7 +290,7 @@ function showForecastDrill(dayIdx) {
   h += '<div class="panel-hint">Hour-by-hour breakdown</div>';
   h += '<table class="daily-table"><thead><tr><th>Time</th><th>Conditions</th><th>Temp °C</th><th>Rain (mm)</th><th>Wind (km/h)</th><th>Humidity (%)</th></tr></thead><tbody>';
   hIdx.forEach((_, j) => {
-    const { icon: hIcon, label: hLabel } = weatherIcon(hCode[j], +hLabels[j].slice(0, 2));
+    const { icon: hIcon, label: hLabel } = weatherIcon(hCode[j], hourly.time[hIdx[j]]);
     h += `<tr>
       <td>${hLabels[j]}</td>
       <td style="text-align:center"><img src="${hIcon}" alt="${hLabel}" title="${hLabel}" style="width:18px;height:18px;vertical-align:middle;"></td>
