@@ -33,6 +33,16 @@
     --temp-high: #fb923c;
     --temp-low: #38bdf8;
     --sea: #38bdf8;
+    /* Sea-level cause badges (9px text: 4.5:1 on their own tinted pill) */
+    --cause-subsidence: #fb923c;
+    --cause-eustatic: #38bdf8;
+    --cause-mixed: #c084fc;
+    --cause-isostatic: #f5a623;
+    --cause-oceanographic: #60a5fa;
+    --cause-coastal-erosion: #f87171;
+    --cause-artificial-land: #f157ff;
+    --cause-urban-loading: #a7a7a7;
+    --cause-topographic: #80ba6b;
     --accent: #6366f1;
     --accent-text: #a5b4fc;
     --positive: #34d399;
@@ -732,7 +742,7 @@
     flex: 0 0 calc((100% - 80px) / 8.333); min-width: 100px;
     background: var(--bg-card);
     border: 0px solid var(--border);
-    border-radius: 12px;
+    border-radius: 24px;
     padding: 14px 10px;
     text-align: center;
     transition: background 0.2s, border-color 0.2s, transform 0.15s;
@@ -774,8 +784,8 @@
   .hourly-scroll::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 2px; }
   .hourly-card {
     flex: 0 0 calc((100% - 96px) / 12.333); min-width: 84px;
-    background: var(--bg-panel); border: 0px solid var(--border);
-    border-radius: 10px; padding: 10px 6px; text-align: center;
+    background: transparent; border: 0px solid var(--border);
+    border-radius: 20px; padding: 10px 6px; text-align: center;
     cursor: pointer; transition: background 0.15s, border-color 0.15s;
   }
   .hourly-card:hover { background: var(--bg-card-hover); border-color: var(--border-accent); }
@@ -1714,50 +1724,26 @@
 .wl-rate-value {
   font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500;
 }
-.wl-rate-high   { color: #fb923c; }
+.wl-rate-high   { color: var(--cause-subsidence); }  /* local rate above global = subsidence-driven */
 .wl-rate-global { color: var(--sea); }
 .wl-cause-badge {
   display: inline-block;
   font-family: 'DM Mono', monospace;
   font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
   padding: 3px 8px; border-radius: 20px; margin-bottom: 12px;
+  /* Tint and border derive from the text colour, so each badge only sets color */
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
 }
-.wl-cause-subsidence {
-  background: rgba(251,146,60,0.12); color: #fb923c;
-  border: 1px solid rgba(251,146,60,0.3);
-}
-.wl-cause-eustatic {
-  background: rgba(56,189,248,0.12); color: #38bdf8;
-  border: 1px solid rgba(56,189,248,0.3);
-}
-.wl-cause-mixed {
-  background: rgba(192,132,252,0.12); color: #c084fc;
-  border: 1px solid rgba(192,132,252,0.3);
-}
-.wl-cause-isostatic {
-  background: rgba(245,166,35,0.12); color: var(--sun);
-  border: 1px solid rgba(245,166,35,0.3);
-}
-.wl-cause-oceanographic {
-  background: rgba(245,166,35,0.12); color: #009dff;
-  border: 1px solid rgba(245,166,35,0.3);
-}
-.wl-cause-coastal-erosion {
-  background: rgba(245,166,35,0.12); color: #e1894e;
-  border: 1px solid rgba(245,166,35,0.3);
-}
-.wl-cause-artificial-land {
-  background: rgba(245,166,35,0.12); color: #f157ff;
-  border: 1px solid rgba(245,166,35,0.3);
-}
-.wl-cause-urban-loading {
-  background: rgba(245,166,35,0.12); color: #a7a7a7;
-  border: 1px solid rgba(245,166,35,0.3);
-}
-.wl-cause-topographic {
-  background: rgba(245,166,35,0.12); color: #80ba6b;
-  border: 1px solid rgba(245,166,35,0.3);
-}
+.wl-cause-subsidence { color: var(--cause-subsidence); }
+.wl-cause-eustatic { color: var(--cause-eustatic); }
+.wl-cause-mixed { color: var(--cause-mixed); }
+.wl-cause-isostatic { color: var(--cause-isostatic); }
+.wl-cause-oceanographic { color: var(--cause-oceanographic); }
+.wl-cause-coastal-erosion { color: var(--cause-coastal-erosion); }
+.wl-cause-artificial-land { color: var(--cause-artificial-land); }
+.wl-cause-urban-loading { color: var(--cause-urban-loading); }
+.wl-cause-topographic { color: var(--cause-topographic); }
 .wl-city-detail {
   font-size: 12px; color: var(--text-secondary); line-height: 1.65;
 }
@@ -2112,6 +2098,15 @@
   --temp-high:      #9c3b08;
   --temp-low:       #0a5e8e;
   --sea:            #0a5e8e;
+  --cause-subsidence:       #9c3b08;
+  --cause-eustatic:         #0a5e8e;
+  --cause-mixed:            #7c1abf;
+  --cause-isostatic:        #875000;
+  --cause-oceanographic:    #1d4ed8;
+  --cause-coastal-erosion:  #b91c1c;
+  --cause-artificial-land:  #a21caf;
+  --cause-urban-loading:    #4b5563;
+  --cause-topographic:      #3f6f2a;
   --accent:         #3d43f2;
   --accent-text:    #3338ae;
   --positive:       #087249;
