@@ -57,7 +57,6 @@
     --status-poor:     #f97316;
     --status-verypoor: #ef4444;
     --status-extreme:  #a855f7;
-    --forecast-day-selected: #6366f121;
     --discover-bg: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.08) 85%);
     --discover-bg-hover: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.15) 85%);
     --discovery-text-shadow: 0 1px 4px rgba(0,0,0,0.6);
@@ -740,16 +739,18 @@
   .forecast-strip::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 2px; }
   .forecast-day {
     flex: 0 0 calc((100% - 80px) / 8.333); min-width: 100px;
-    background: var(--bg-card);
+    /* Unselected days recede toward the page; the selected day matches the
+       hourly container below (--bg-card), which shows that day's hours. */
+    background: color-mix(in srgb, var(--bg-card) 35%, var(--bg-primary));
     border: 0px solid var(--border);
     border-radius: 24px;
     padding: 14px 10px;
     text-align: center;
     transition: background 0.2s, border-color 0.2s, transform 0.15s;
   }
-  .forecast-day:hover { background: var(--bg-card-hover); border-color: var(--border-accent); transform: translateY(-2px); }
-  .forecast-day.today { border-color: var(--accent); background: rgba(99,102,241,0.07); }
-  .forecast-day.selected { border-color: var(--accent); background: var(--forecast-day-selected); box-shadow: inset 0 0 0 1px var(--accent); }
+  .forecast-day:hover { background: color-mix(in srgb, var(--bg-card) 70%, var(--bg-primary)); border-color: var(--border-accent); transform: translateY(-2px); }
+  .forecast-day.today { border-color: var(--accent); }
+  .forecast-day.selected { border-color: var(--accent); background: var(--bg-card); box-shadow: inset 0 0 0 1px var(--accent); }
   .forecast-day-name { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
   .forecast-day.today .forecast-day-name { color: var(--accent-text); }
   .forecast-icon { margin-bottom: 10px; line-height: 1; }
@@ -2121,7 +2122,6 @@
   --status-poor:     #c24a08;
   --status-verypoor: #c01818;
   --status-extreme:  #7c1abf;
-  --forecast-day-selected: #c7c8ff21;
   --discover-bg: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.08) 85%);
   --discover-bg-hover: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.15) 85%);
   --discovery-text-shadow: 0 1px 4px rgba(0,0,0,0.6);
