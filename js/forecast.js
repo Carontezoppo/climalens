@@ -197,7 +197,12 @@ function renderHourlyStrip(dayIdx) {
 
   if (isToday) {
     const nowCard = scrollEl.querySelector('.hourly-card.now');
-    if (nowCard) setTimeout(() => nowCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }), 50);
+    // Centre the Now card by scrolling the strip itself: scrollIntoView would
+    // also scroll the page down to the strip, which sits below the fold on phones
+    if (nowCard) setTimeout(() => {
+      const offset = nowCard.getBoundingClientRect().left - scrollEl.getBoundingClientRect().left;
+      scrollEl.scrollTo({ left: scrollEl.scrollLeft + offset - (scrollEl.clientWidth - nowCard.offsetWidth) / 2, behavior: 'smooth' });
+    }, 50);
   } else {
     scrollEl.scrollLeft = 0;
   }
