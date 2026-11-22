@@ -805,12 +805,12 @@
 
   /* Sun / Moon bar */
   .sun-moon-bar {
-    display: flex; gap: 10px; margin-bottom: 14px; margin-top: 16px;
+    display: flex; gap: 10px; margin-bottom: 14px; margin-top: 32px;
   }
   .moon-panel {
-    flex: 1 1 0;
+    flex: 1 1 0; min-width: 0;        /* allow shrinking below the icons' natural width */
     background: var(--bg-primary); border: 0px solid var(--border);
-    border-radius: 10px; padding: 12px 14px;
+    border-radius: 10px; padding: 12px 24px;
     display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
   }
   .moon-panel-label {
@@ -820,15 +820,23 @@
   }
   .moon-panel-label strong { color: var(--text-secondary); font-weight: 600; text-transform: none; }
   .moon-icons-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
-  .moon-phase-icon { width: 32px; height: auto; opacity: 0.4; flex-shrink: 0; display: block; }
-  .moon-phase-icon.active { width: 48px; height: auto; opacity: 1; }
+  /* Icons shrink proportionally when the row runs out of space (narrow phones) */
+  .moon-phase-icon { flex: 0 1 32px; width: 32px; min-width: 0; height: auto; opacity: 0.4; display: block; }
+  .moon-phase-icon.active { flex-basis: 48px; width: 48px; opacity: 1; }
   .sun-panel {
     flex: 1; min-width: 0;
     background: var(--bg-panel); border: 0px solid var(--border);
     border-radius: 10px; padding: 6px 14px;
     display: flex; align-items: center;
   }
-  .sun-arc-svg { width: 100%; height: 80px; overflow: visible; }
+  .sun-arc-svg { width: 100%; height: 100px; overflow: visible; }
+  /* Large screens: the arc (300×80 viewBox, sized by its 100px height) only
+     needs ~375px, so give the moon row 2/3 and the sun arc 1/3. Narrower
+     screens keep equal halves so the arc and its labels don't shrink. */
+  @media (min-width: 1101px) {
+    .moon-panel { flex: 2 1 0; }
+    .sun-panel  { flex: 1 1 0; }
+  }
   .sun-arc-label { font-family: 'DM Mono', monospace; font-size: 9px; fill: var(--text-muted); letter-spacing: 0.3px; }
 
   .forecast-chart-card {
@@ -843,12 +851,13 @@
   @media (max-width: 768px) {
     /* touch screens: disable lift so overflow-y clipping never triggers */
     .forecast-day:hover { transform: none; }
+    /* stack before the moon row starts squeezing the sun arc */
+    .sun-moon-bar { flex-direction: column; }
   }
   @media (max-width: 560px) {
     .forecast-day { padding: 10px 6px; }
     .forecast-icon img { width: 64px; height: 48px; }
     .forecast-high { font-size: 15px; }
-    .sun-moon-bar { flex-direction: column; }
   }
 
   /* ========= DRILL-DOWN PANEL ========= */
