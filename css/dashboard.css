@@ -33,6 +33,8 @@
     --temp-high: #fb923c;
     --temp-low: #38bdf8;
     --sea: #38bdf8;
+    --night-sky: #180E48;             /* moon-phase row; same in both themes */
+    --moon-glow: rgba(230,221,221,0.55); /* moonlight, matches the icons' #E6DDDD disc */
     /* Sea-level cause badges (9px text: 4.5:1 on their own tinted pill) */
     --cause-subsidence: #fb923c;
     --cause-eustatic: #38bdf8;
@@ -819,10 +821,13 @@
     white-space: nowrap;
   }
   .moon-panel-label strong { color: var(--text-secondary); font-weight: 600; text-transform: none; }
-  .moon-icons-row { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+  .moon-icons-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 4px;
+    background-color: var(--night-sky); padding: 6px 16px; border-radius: 32px;
+  }
   /* Icons shrink proportionally when the row runs out of space (narrow phones) */
-  .moon-phase-icon { flex: 0 1 32px; width: 32px; min-width: 0; height: auto; opacity: 0.4; display: block; }
-  .moon-phase-icon.active { flex-basis: 48px; width: 48px; opacity: 1; }
+  .moon-phase-icon { flex: 0 1 32px; width: 32px; min-width: 0; height: auto; opacity: 0.5; display: block; }
+  .moon-phase-icon.active { flex-basis: 48px; width: 48px; opacity: 1; filter: drop-shadow(0 0 8px var(--moon-glow)); }
   .sun-panel {
     flex: 1; min-width: 0;
     background: var(--bg-panel); border: 0px solid var(--border);
@@ -858,6 +863,9 @@
     .forecast-day { padding: 10px 6px; }
     .forecast-icon img { width: 64px; height: 48px; }
     .forecast-high { font-size: 15px; }
+    /* tighter padding so the moon icons keep ~24px on small phones */
+    .moon-panel { padding: 12px 14px; }
+    .moon-icons-row { padding: 6px 10px; }
   }
 
   /* ========= DRILL-DOWN PANEL ========= */
