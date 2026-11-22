@@ -740,7 +740,7 @@
   .forecast-strip::-webkit-scrollbar-track { background: transparent; }
   .forecast-strip::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 2px; }
   .forecast-day {
-    flex: 0 0 calc((100% - 80px) / 8.333); min-width: 100px;
+    flex: 0 0 calc((100% - 80px) / 8.333); min-width: 120px;
     /* Unselected days recede toward the page; the selected day matches the
        hourly container below (--bg-card), which shows that day's hours. */
     background: color-mix(in srgb, var(--bg-card) 35%, var(--bg-primary));
@@ -766,7 +766,7 @@
   /* ── Hourly strip ── */
   .hourly-strip-wrap {
     background: var(--bg-card); border: 0px solid var(--border);
-    border-radius: 12px; padding: 16px 8px; margin-bottom: 32px; overflow: hidden;
+    border-radius: 12px; padding: 20px 24px; margin-bottom: 32px; overflow: hidden;
   }
   .hourly-strip-header {
     display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
@@ -807,12 +807,11 @@
 
   /* Sun / Moon bar */
   .sun-moon-bar {
-    display: flex; gap: 10px; margin-bottom: 14px; margin-top: 32px;
+    display: flex; gap: 24px; margin-bottom: 14px; margin-top: 32px;
   }
   .moon-panel {
     flex: 1 1 0; min-width: 0;        /* allow shrinking below the icons' natural width */
-    background: var(--bg-primary); border: 0px solid var(--border);
-    border-radius: 10px; padding: 12px 24px;
+    padding: 12px 0;
     display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
   }
   .moon-panel-label {
@@ -823,15 +822,14 @@
   .moon-panel-label strong { color: var(--text-secondary); font-weight: 600; text-transform: none; }
   .moon-icons-row {
     display: flex; align-items: center; justify-content: space-between; gap: 4px;
-    background-color: var(--night-sky); padding: 6px 16px; border-radius: 32px;
+    background-color: var(--night-sky); padding: 9px 16px; border-radius: 32px;
   }
   /* Icons shrink proportionally when the row runs out of space (narrow phones) */
-  .moon-phase-icon { flex: 0 1 32px; width: 32px; min-width: 0; height: auto; opacity: 0.5; display: block; }
+  .moon-phase-icon { flex: 0 1 26px; width: 26px; min-width: 0; height: auto; opacity: 0.5; display: block; }
   .moon-phase-icon.active { flex-basis: 48px; width: 48px; opacity: 1; filter: drop-shadow(0 0 8px var(--moon-glow)); }
   .sun-panel {
     flex: 1; min-width: 0;
-    background: var(--bg-panel); border: 0px solid var(--border);
-    border-radius: 10px; padding: 6px 14px;
+    padding: 6px 0;
     display: flex; align-items: center;
   }
   .sun-arc-svg { width: 100%; height: 100px; overflow: visible; }
@@ -848,7 +846,7 @@
     background: var(--bg-card);
     border: 0px solid var(--border);
     border-radius: 12px;
-    padding: 20px 16px;
+    padding: 20px 24px;
     min-width: 0;
     overflow: hidden;
   }
@@ -858,13 +856,13 @@
     .forecast-day:hover { transform: none; }
     /* stack before the moon row starts squeezing the sun arc */
     .sun-moon-bar { flex-direction: column; }
+    .hourly-strip-wrap, .forecast-chart-card { padding: 16px 8px; }
   }
   @media (max-width: 560px) {
     .forecast-day { padding: 10px 6px; }
     .forecast-icon img { width: 64px; height: 48px; }
     .forecast-high { font-size: 15px; }
-    /* tighter padding so the moon icons keep ~24px on small phones */
-    .moon-panel { padding: 12px 14px; }
+    /* tighter pill padding so the moon icons keep ~24px on small phones */
     .moon-icons-row { padding: 6px 10px; }
   }
 
