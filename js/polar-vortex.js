@@ -28,6 +28,12 @@ async function fetchVortexData(hemi) {
   return data;
 }
 
+// Depends only on the hemisphere, so it's shown before the data arrives
+const VORTEX_DESC = {
+  n: 'The polar vortex is a ring of strong westerly winds circling the North Pole about 30 km up, in the stratosphere. While it is strong, it keeps frigid air locked over the Arctic. When it weakens or collapses — a <strong>sudden stratospheric warming</strong>, marked by the winds reversing to easterly — the effect works its way down over the following weeks, often pushing the jet stream south and bringing prolonged cold spells to North America, Europe and Asia.',
+  s: 'The Antarctic polar vortex is a ring of strong westerly winds circling the South Pole about 30 km up, in the stratosphere. It is stronger and more stable than its Arctic counterpart, so collapses are rare: a full reversal has happened only once on record, in 2002, with a near miss in 2019. When it does weaken sharply (a <strong>sudden stratospheric warming</strong>), the Southern Annular Mode turns negative in the following weeks, typically bringing hotter, drier conditions to eastern Australia and shifting storm tracks over southern South America and New Zealand.',
+};
+
 // Row: [date, value, min, p10, p30, mean, p70, p90, max, lead]
 function vortexStatus(row, hemi) {
   const [date, v, min, p10, p30, , p70, p90, max] = row;
@@ -184,13 +190,11 @@ function renderVortexData(data) {
   const canvas = document.getElementById('vortexChart');
   canvas.setAttribute('aria-label',
     `Polar vortex wind at ${lat}, 10 hPa, this season compared with the ${climYears} record. Latest ${fmt(latest[1])} m/s on ${vortexDay(latest[0])}: ${status.label}.`);
-  document.getElementById('vortexDesc').innerHTML = hemi === 'n'
-    ? 'The polar vortex is a ring of strong westerly winds circling the North Pole about 30 km up, in the stratosphere. While it is strong, it keeps frigid air locked over the Arctic. When it weakens or collapses — a <strong>sudden stratospheric warming</strong>, marked by the winds reversing to easterly — the effect works its way down over the following weeks, often pushing the jet stream south and bringing prolonged cold spells to North America, Europe and Asia.'
-    : 'The Antarctic polar vortex is a ring of strong westerly winds circling the South Pole about 30 km up, in the stratosphere. It is stronger and more stable than its Arctic counterpart, so collapses are rare: a full reversal has happened only once on record, in 2002, with a near miss in 2019. When it does weaken sharply (a <strong>sudden stratospheric warming</strong>), the Southern Annular Mode turns negative in the following weeks, typically bringing hotter, drier conditions to eastern Australia and shifting storm tracks over southern South America and New Zealand.';
   document.getElementById('vortexChartTitle').textContent = `Polar Vortex Strength · ${lat}, 10 hPa`;
   document.getElementById('vortexNote').textContent =
     `NASA GSFC · MERRA-2 reanalysis; values from Aug 2026 onward are GEOS FP operational analyses and may be revised slightly · Climatology ${climYears}`;
 
+  document.getElementById('vortexChartLoading').hidden = true;
   document.getElementById('vortexPrompt').style.display  = 'none';
   document.getElementById('vortexContent').style.display = '';
 }
@@ -201,8 +205,26 @@ async function loadVortexData() {
   if (block) block.style.display = tropical ? 'none' : '';
   if (tropical) return;
 
+  const hemi = currentLocation.lat >= 0 ? 'n' : 's';
+  document.getElementById('vortexDesc').innerHTML = VORTEX_DESC[hemi];
+  // First load of this hemisphere: show the stats row, chart card and note at
+  // their final size, so the block doesn't grow (and push later sections
+  // down, breaking #section- links) when the data arrives
+  if (!vortexCache[hemi]) {
+    const lat = hemi === 'n' ? '60°N' : '60°S';
+    const card = (label, note) => `<div class="climate-stat-card"><div class="climate-stat-label">${label}</div><div class="climate-stat-value">—</div><div class="climate-stat-note">${note}</div></div>`;
+    document.getElementById('vortexStatsRow').innerHTML =
+      card(`Wind at ${lat}`, 'Zonal-mean wind at 10 hPa (~30 km up)') +
+      card('Status', '&nbsp;') + card('vs Normal', '&nbsp;') + card('Outlook', 'GEOS FP forecast');
+    document.getElementById('vortexChartTitle').textContent = `Polar Vortex Strength · ${lat}, 10 hPa`;
+    document.getElementById('vortexNote').textContent = 'NASA GSFC · MERRA-2 reanalysis; values from Aug 2026 onward are GEOS FP operational analyses and may be revised slightly · Climatology 1979–present';
+    document.getElementById('vortexChartLoading').hidden = false;
+    document.getElementById('vortexPrompt').style.display  = 'none';
+    document.getElementById('vortexContent').style.display = '';
+  }
+
   try {
-    const [data, records] = await Promise.all([fetchVortexData(currentLocation.lat >= 0 ? 'n' : 's'), vortexRecordsPromise]);
+    const [data, records] = await Promise.all([fetchVortexData(hemi), vortexRecordsPromise]);
     vortexRecords = records;
     renderVortexData(data);
   } catch (err) {
