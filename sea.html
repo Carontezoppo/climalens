@@ -45,6 +45,8 @@
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to content</a>
+<nav class="side-nav" id="sideNav" aria-label="Site"></nav>
+<script src="js/nav.js"></script>
 
 <div class="dashboard">
   <header class="header">
@@ -52,37 +54,13 @@
       <h1 class="header-title"><a href="index.html" style="color:inherit;text-decoration:none;">Clima<span>Lens</span></a></h1>
       <p class="header-subtitle">Local weather in global context</p>
     </div>
-    <nav class="header-nav" id="pageTabsNav">
-      <div class="header-nav-links">
-        <a class="page-tab" href="index.html">Weather</a>
-        <a class="page-tab" href="history.html">History</a>
-        <a class="page-tab active" href="sea.html" aria-current="page">Sea</a>
-        <a class="page-tab" href="forest.html">Land Cover</a>
-        <a class="page-tab" href="footprint.html">Footprint</a>
-        <a class="page-tab" href="about.html">About</a>
-      </div>
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-        <span class="theme-icon-sun" aria-hidden="true">☀</span>
-        <span class="theme-icon-moon" aria-hidden="true">◑</span>
-      </button>
-      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
-        <span id="navHamburgerIcon">☰</span><span>Menu</span>
-      </button>
-    </nav>
+    <button class="nav-hamburger" id="navHamburger" type="button" aria-controls="sideNav" aria-expanded="false">
+      <span aria-hidden="true">☰</span><span>Menu</span>
+    </button>
   </header>
 
   <main id="main-content">
 
-  <div class="controls-bar">
-    <nav class="section-nav">
-      <a class="section-nav-btn" href="#section-water-level"><span class="section-nav-arrows">↓</span> Level</a>
-      <a class="section-nav-btn" href="#section-sst"><span class="section-nav-arrows">↓</span> Temperature</a>
-      <a class="section-nav-btn" href="#section-enso"><span class="section-nav-arrows">↓</span> El Niño</a>
-      <a class="section-nav-btn" href="#section-polar-ice"><span class="section-nav-arrows">↓</span> Ice</a>
-      <a class="section-nav-btn" href="#section-currents-live"><span class="section-nav-arrows">↓</span> Currents</a>
-      <a class="section-nav-btn" href="#section-paleo"><span class="section-nav-arrows">↓</span> Paleo</a>
-    </nav>
-  </div>
 
   <div class="page-cta" style="margin-bottom: 32px;">
   <p class="page-cta-text">This page loads <strong>significant amounts of data</strong> to display its animations and maps. Please <strong>allow a few moments</strong>, especially on slower connections.</p>

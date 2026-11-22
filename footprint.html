@@ -41,6 +41,8 @@
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to content</a>
+<nav class="side-nav" id="sideNav" aria-label="Site"></nav>
+<script src="js/nav.js"></script>
 
 <div class="dashboard">
   <header class="header">
@@ -48,23 +50,9 @@
       <h1 class="header-title"><a href="index.html" style="color:inherit;text-decoration:none;">Clima<span>Lens</span></a></h1>
       <p class="header-subtitle">Local weather in global context</p>
     </div>
-    <nav class="header-nav" id="pageTabsNav">
-      <div class="header-nav-links">
-        <a class="page-tab" href="index.html">Weather</a>
-        <a class="page-tab" href="history.html">History</a>
-        <a class="page-tab" href="sea.html">Sea</a>
-        <a class="page-tab" href="forest.html">Land Cover</a>
-        <a class="page-tab active" href="footprint.html" aria-current="page">Footprint</a>
-        <a class="page-tab" href="about.html">About</a>
-      </div>
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-        <span class="theme-icon-sun" aria-hidden="true">☀</span>
-        <span class="theme-icon-moon" aria-hidden="true">◑</span>
-      </button>
-      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
-        <span id="navHamburgerIcon">☰</span><span>Menu</span>
-      </button>
-    </nav>
+    <button class="nav-hamburger" id="navHamburger" type="button" aria-controls="sideNav" aria-expanded="false">
+      <span aria-hidden="true">☰</span><span>Menu</span>
+    </button>
   </header>
 
   <main id="main-content">
@@ -140,19 +128,5 @@
 <script src="js/pollution-map.js"></script>
 <script src="/js/cookies.js"></script>
 <script src="js/theme.js"></script>
-<script>
-  const navHamburger = document.getElementById('navHamburger');
-  const pageTabsNav  = document.getElementById('pageTabsNav');
-  if (navHamburger && pageTabsNav) {
-    const navOverlay = document.createElement('div');
-    navOverlay.className = 'nav-overlay';
-    document.body.appendChild(navOverlay);
-    const openMenu  = () => { pageTabsNav.classList.add('open'); navOverlay.classList.add('open'); document.getElementById('navHamburgerIcon').textContent = '✕'; navHamburger.setAttribute('aria-expanded', 'true'); };
-    const closeMenu = () => { pageTabsNav.classList.remove('open'); navOverlay.classList.remove('open'); document.getElementById('navHamburgerIcon').textContent = '☰'; navHamburger.setAttribute('aria-expanded', 'false'); };
-    navHamburger.addEventListener('click', () => pageTabsNav.classList.contains('open') ? closeMenu() : openMenu());
-    navOverlay.addEventListener('click', closeMenu);
-    window.addEventListener('resize', () => { if (window.innerWidth > 1100) closeMenu(); });
-  }
-</script>
 </body>
 </html>

@@ -156,7 +156,7 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    margin-bottom: 72px;
+    margin-bottom: 48px;
     padding-bottom: 0;
   }
   .header-label {
@@ -307,47 +307,171 @@
     background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
-    z-index: 100;
+    z-index: 950;
   }
   .nav-overlay.open { display: block; }
 
-  /* HEADER NAV */
-  .header-nav {
-    display: flex;
-    align-items: center;
+  /* ===== SIDE NAV =====
+     Rendered by js/nav.js, which sets <html data-nav="expanded|collapsed|drawer">
+     from the viewport width (≥1440 / 1281–1439 / ≤1280). */
+  :root { --sn-expanded: 240px; --sn-collapsed: 80px; }
+  html[data-nav="expanded"]  body { padding-left: var(--sn-expanded); }
+  html[data-nav="collapsed"] body { padding-left: var(--sn-collapsed); }
+
+  /* Leaflet's panes and controls use z-index 400–1000 without a stacking
+     context of their own; contain them so they can't sit above the nav
+     flyouts or the drill-down panel */
+  .leaflet-container { isolation: isolate; }
+
+  /* Native anchor jumps (page.html#section-…) leave the same 16px as the
+     nav's eased scroll */
+  [id^="section-"] { scroll-margin-top: 16px; }
+
+  .side-nav {
+    position: fixed; top: 0; bottom: 0; left: 0; z-index: 900;
+    width: var(--sn-expanded);
+    display: flex; flex-direction: column;
+    background: var(--bg-panel); border-right: 1px solid var(--border);
+    padding: 24px 0 16px;
+    overflow-y: auto; overscroll-behavior: contain;
   }
-  .header-nav-links {
-    display: flex;
-    align-items: center;
+  .side-nav a:focus-visible, .side-nav button:focus-visible { outline-offset: -2px; }
+  .sn-top { display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 23px; margin-bottom: 24px; }
+  .sn-logo { display: block; border-radius: 8px; }
+  .sn-logo img { display: block; width: 32px; height: 32px; }
+  .sn-pages, .sn-sections { list-style: none; margin: 0; padding: 0; }
+  .sn-pages { flex: 1; }
+  .sn-item { position: relative; }
+  .sn-row { display: flex; align-items: center; }
+  .sn-item.current > .sn-row {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    box-shadow: inset 3px 0 0 var(--accent);
   }
-  .page-tab {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 10px 20px;
-    text-decoration: none;
-    color: var(--text-muted);
-    border-bottom: 2px solid transparent;
-    white-space: nowrap;
+  .sn-page {
+    flex: 1; min-width: 0; min-height: 44px;
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 8px 10px 23px;
+    font-size: 14px; font-weight: 500; color: var(--text-secondary); text-decoration: none;
+    transition: color 0.15s;
+  }
+  .sn-page:hover { color: var(--text-primary); }
+  .sn-item.current .sn-page { color: var(--accent-text); }
+  .sn-icon { width: 24px; height: 24px; flex-shrink: 0; fill: currentColor; }
+  .sn-short { display: none; }
+  .sn-disclose {
+    flex-shrink: 0; width: 40px; height: 40px; margin-right: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: none; border-radius: 8px;
+    color: var(--text-muted); cursor: pointer; transition: color 0.15s;
+  }
+  .sn-disclose:hover { color: var(--text-primary); }
+  .sn-chevron { width: 14px; height: 14px; fill: currentColor; transform: rotate(-90deg); transition: transform 0.15s; }
+  .sn-item.open .sn-chevron { transform: none; }
+  .sn-sections { display: none; padding: 4px 0 10px; }
+  .sn-item.open > .sn-sections { display: block; }
+  .sn-sections a {
+    display: block; padding: 7px 16px 7px 61px;
+    font-size: 13px; color: var(--text-muted); text-decoration: none;
+    transition: color 0.15s;
+  }
+  .sn-sections a:hover { color: var(--text-primary); }
+  .sn-flyout-title { display: none; }
+  .sn-bottom {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin-top: 16px; padding: 16px 16px 0 20px; border-top: 1px solid var(--border);
+  }
+  .side-nav .theme-toggle { margin-left: 0; }
+  .sn-collapse, .sn-close {
+    width: 34px; height: 34px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: 1px solid var(--border-search); border-radius: 50%;
+    color: var(--text-secondary); cursor: pointer; font-size: 14px;
     transition: color 0.15s, border-color 0.15s;
   }
-  .page-tab:hover { color: var(--text-secondary); }
-  .page-tab.active {
-    color: var(--accent-text);
-    border-bottom-color: var(--accent);
-  }
-  .page-tab:has(img) { display: flex; align-items: center; gap: 6px; }
-  .page-tab img { height: 20px; width: auto; }
+  .sn-collapse:hover, .sn-close:hover { color: var(--text-primary); border-color: var(--border-accent); }
+  .sn-collapse[hidden] { display: none; }
+  .sn-collapse-icon { width: 16px; height: 16px; fill: currentColor; transition: transform 0.15s; }
+  .sn-close { display: none; }
 
-  /* CONTROLS BAR (location + section pills) */
+  /* Collapsed rail: icon + short label; sections open as a flyout on hover,
+     focus or tap. The flyout opens after a short delay and lingers briefly on
+     leave, so sweeping the pointer across the rail doesn't flash menus. */
+  html[data-nav="collapsed"] .side-nav { width: var(--sn-collapsed); overflow: visible; }
+  html[data-nav="collapsed"] .sn-top { justify-content: center; padding: 0; }
+  html[data-nav="collapsed"] .sn-page {
+    flex-direction: column; justify-content: center; gap: 5px; padding: 10px 4px;
+  }
+  html[data-nav="collapsed"] .sn-label,
+  html[data-nav="collapsed"] .sn-disclose { display: none; }
+  html[data-nav="collapsed"] .sn-short {
+    display: block; font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  html[data-nav="collapsed"] .sn-sections {
+    display: block; position: absolute; left: 100%; top: 0; min-width: 210px;
+    padding: 6px 0;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+    visibility: hidden; opacity: 0;
+    transition: opacity 0.12s, visibility 0s linear 0.25s;
+  }
+  html[data-nav="collapsed"] .sn-item:hover > .sn-sections,
+  html[data-nav="collapsed"] .sn-item.flyout-open > .sn-sections {
+    visibility: visible; opacity: 1;
+    transition: opacity 0.12s 0.08s, visibility 0s 0.08s;
+  }
+  html[data-nav="collapsed"] .sn-item:focus-within > .sn-sections {
+    visibility: visible; opacity: 1; transition: none;
+  }
+  html[data-nav="collapsed"] .sn-item.flyout-dismissed > .sn-sections {
+    visibility: hidden; opacity: 0; transition: none;
+  }
+  html[data-nav="collapsed"] .sn-flyout-title { display: block; }
+  html[data-nav="collapsed"] .sn-flyout-title a {
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text-muted);
+    padding: 8px 16px 6px;
+  }
+  html[data-nav="collapsed"] .sn-sections a { padding: 8px 16px; color: var(--text-secondary); }
+  html[data-nav="collapsed"] .sn-sections a:hover { color: var(--text-primary); background: var(--bg-card-hover); }
+  html[data-nav="collapsed"] .sn-bottom { flex-direction: column; padding: 16px 0 0; }
+  html[data-nav="collapsed"] .sn-collapse-icon { transform: rotate(180deg); }
+
+  /* Drawer (≤1280px): the expanded nav slides in over the page */
+  html[data-nav="drawer"] .side-nav {
+    width: min(300px, 85vw); z-index: 960;
+    transform: translateX(-100%); visibility: hidden;
+    transition: transform 0.2s ease, visibility 0s linear 0.2s;
+  }
+  html[data-nav="drawer"] .side-nav.open {
+    transform: none; visibility: visible;
+    transition: transform 0.2s ease;
+    box-shadow: 0 0 40px rgba(0,0,0,0.4);
+  }
+  html[data-nav="drawer"] .sn-close { display: flex; }
+  html[data-nav="drawer"] .sn-collapse { display: none; }
+
+  .nav-hamburger { display: none; }
+  html[data-nav="drawer"] .nav-hamburger {
+    display: flex; align-items: center; gap: 6px; align-self: center;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 8px 2px 10px; border: none; background: none;
+    color: var(--text-secondary); cursor: pointer; transition: color 0.15s;
+    white-space: nowrap;
+  }
+  html[data-nav="drawer"] .nav-hamburger:hover { color: var(--text-primary); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .side-nav, .side-nav *, html[data-nav="collapsed"] .sn-sections { transition: none !important; }
+  }
+
+  /* CONTROLS BAR (location picker) */
   .controls-bar {
     display: flex;
     align-items: center;
     gap: 16px;
-    border-bottom: 1px solid var(--border);
     margin-bottom: 32px;
-    padding-bottom: 10px;
     flex-wrap: wrap;
   }
   .nav-location {
@@ -356,39 +480,7 @@
   }
   .nav-location .location-select-wrapper { margin-bottom: 0; }
   .nav-location .location-dropdown { right: 0; left: auto; min-width: 240px; }
-  .nav-hamburger { display: none; }
 
-  /* SECTION NAV (in-page jump pills, lives inside .controls-bar) */
-  .section-nav {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .section-nav-btn {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 6px 16px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: var(--bg-card);
-    color: var(--text-muted);
-    text-decoration: none;
-    white-space: nowrap;
-    transition: border-color 0.15s, color 0.15s, background 0.15s;
-  }
-  .section-nav-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent-text);
-    background: rgba(99,102,241,0.08);
-  }
-  .section-nav-arrows {
-    font-family: 'Plus Jakarta Sans', sans-serif; 
-    font-size: 13px; 
-    margin-right: 4px; 
-    margin-top: -2px;
-  }
   /* CURRENTS COLOUR MODE TOGGLE */
   .currents-mode-bar {
     display: flex;
@@ -418,11 +510,7 @@
     background: rgba(99,102,241,0.12);
   }
 
-  .section-nav-btn.active {
-    border-color: var(--accent);
-    color: var(--accent-text);
-    background: rgba(99,102,241,0.12);
-  }
+  
 
   /* INLINE SECTION CONTROLS (range picker in context) */
   .section-controls {
@@ -986,59 +1074,13 @@
     .chart-card.full-width .chart-container { height: 240px; }
   }
 
-  /* ── Page nav collapses to the menu button at ≤ 1100px ──
-     The six tabs + theme toggle need ~620px beside the ~240px title block;
-     below ~870px they'd push past the viewport. Keep in sync with the
-     resize-close threshold in each page's menu script. */
-  @media (max-width: 1100px) {
-    /* Positioned as the dropdown anchor; z-index: 201 keeps the header
-       (and its hamburger/close button) above the nav overlay (z: 100) */
-    .header { position: relative; z-index: 201; }
-
-    /* Hamburger button */
-    .nav-hamburger {
-      display: flex; align-items: center; gap: 6px;
-      font-family: 'DM Mono', monospace; font-size: 11px;
-      letter-spacing: 1.5px; text-transform: uppercase;
-      padding: 8px 2px 10px; border: none; background: none;
-      color: var(--text-secondary); cursor: pointer; transition: color 0.15s;
-      white-space: nowrap;
-    }
-    .nav-hamburger:hover { color: var(--text-primary); }
-
-    /* Collapsible tab links — absolute panel below header */
-    .header-nav-links { display: none; }
-    .header-nav.open .header-nav-links {
-      display: flex; flex-direction: column;
-      position: absolute; top: calc(100% + 8px); left: 0; right: 0;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.6);
-      padding: 8px 0 20px;
-      z-index: 200;
-    }
-    .header-nav .page-tab {
-      font-size: 15px; font-family: 'Plus Jakarta Sans', sans-serif;
-      letter-spacing: 0; font-weight: 500;
-      padding: 32px 24px; line-height: 1.4;
-      border-bottom: none; width: 100%; text-transform: none;
-    }
-    .header-nav .page-tab:hover { background: var(--bg-card-hover); }
-    .header-nav .page-tab.active {
-      color: var(--accent-text);
-      background: rgba(99,102,241,0.08);
-      border-bottom-color: transparent;
-    }
-  }
-
   /* ── Mobile: ≤ 768px ── */
   @media (max-width: 768px) {
     /* Layout */
     .dashboard { padding: 24px 14px 48px; }
 
     /* Header — row on mobile, hamburger on right */
-    .header { align-items: center; margin-bottom: 48px; }
+    .header { align-items: center; }
     .header-left { max-width: 75%; }
     .header-title { font-size: 40px; }
     .header-subtitle { font-size: 16px; }
@@ -1441,8 +1483,6 @@
   }
 
   /* Links rendered as flex so min-height actually centres content vertically */
-  .page-tab,
-  .section-nav-btn,
   .hourly-detail-btn {
     min-height: 44px;
     display: flex;
@@ -2155,7 +2195,6 @@
 
 /* Lighter shadows in light mode */
 [data-theme="light"] .location-dropdown { box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-[data-theme="light"] .header-nav.open .header-nav-links { box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
 
 /* ===== FOOTPRINT PAGE ===== */
 .pollution-map-wrap {
@@ -2208,3 +2247,7 @@
 @media (max-width: 768px) {
   .pollution-map-wrap { height: 320px; }
 }
+
+/* Side nav shadows: the dark-theme strength is too heavy on a light page */
+html[data-theme="light"][data-nav="collapsed"] .sn-sections { box-shadow: 0 12px 32px rgba(0,0,0,0.12); }
+html[data-theme="light"][data-nav="drawer"] .side-nav.open { box-shadow: 0 0 40px rgba(0,0,0,0.15); }

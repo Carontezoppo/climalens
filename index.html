@@ -51,6 +51,8 @@
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to content</a>
+<nav class="side-nav" id="sideNav" aria-label="Site"></nav>
+<script src="js/nav.js"></script>
 
 <div class="panel-overlay" id="panelOverlay"></div>
 <div class="drill-panel" id="drillPanel" role="dialog" aria-modal="true" aria-labelledby="panelBreadcrumb">
@@ -67,23 +69,9 @@
       <h1 class="header-title"><a href="index.html" style="color:inherit;text-decoration:none;">Clima<span>Lens</span></a></h1>
       <p class="header-subtitle">Local weather in global context</p>
     </div>
-    <nav class="header-nav" id="pageTabsNav">
-      <div class="header-nav-links">
-        <a class="page-tab active" href="index.html" aria-current="page">Weather</a>
-        <a class="page-tab" href="history.html">History</a>
-        <a class="page-tab" href="sea.html">Sea</a>
-        <a class="page-tab" href="forest.html">Land Cover</a>
-        <a class="page-tab" href="footprint.html">Footprint</a>
-        <a class="page-tab" href="about.html">About</a>
-      </div>
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-        <span class="theme-icon-sun" aria-hidden="true">☀</span>
-        <span class="theme-icon-moon" aria-hidden="true">◑</span>
-      </button>
-      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle navigation" aria-expanded="false">
-        <span id="navHamburgerIcon">☰</span><span>Menu</span>
-      </button>
-    </nav>
+    <button class="nav-hamburger" id="navHamburger" type="button" aria-controls="sideNav" aria-expanded="false">
+      <span aria-hidden="true">☰</span><span>Menu</span>
+    </button>
   </header>
 
   <main id="main-content">
@@ -106,13 +94,6 @@
         </div>
       </div>
     </div>
-    <nav class="section-nav">
-      
-      <a class="section-nav-btn" href="#section-forecast"><span class="section-nav-arrows">↓</span> Forecast</a>
-      <a class="section-nav-btn" href="#section-map"><span class="section-nav-arrows">↓</span> Maps</a>
-      <a class="section-nav-btn" href="#section-aq"><span class="section-nav-arrows
-        ">↓</span> Air</a>
-    </nav>
   </div>
 
   <div class="forecast-section" id="section-forecast">
