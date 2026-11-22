@@ -212,7 +212,7 @@
     const closeMenu = () => { pageTabsNav.classList.remove('open'); navOverlay.classList.remove('open'); document.getElementById('navHamburgerIcon').textContent = '☰'; navHamburger.setAttribute('aria-expanded', 'false'); };
     navHamburger.addEventListener('click', () => pageTabsNav.classList.contains('open') ? closeMenu() : openMenu());
     navOverlay.addEventListener('click', closeMenu);
-    window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 1100) closeMenu(); });
   }
 </script>
 <script src="/js/cookies.js"></script>

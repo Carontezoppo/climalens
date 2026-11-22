@@ -131,7 +131,7 @@ function init() {
     navHamburger.addEventListener('click', () =>
       pageTabsNav.classList.contains('open') ? closeMenu() : openMenu());
     navOverlay.addEventListener('click', closeMenu);
-    window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 1100) closeMenu(); });
   }
 
   // ── Section nav — smooth scroll ──────────────────────────────────────────

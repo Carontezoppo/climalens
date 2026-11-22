@@ -986,19 +986,14 @@
     .chart-card.full-width .chart-container { height: 240px; }
   }
 
-  /* ── Mobile: ≤ 768px ── */
-  @media (max-width: 768px) {
-    /* Layout */
-    .dashboard { padding: 24px 14px 48px; }
-
-    /* Header — row on mobile, hamburger on right; positioned for dropdown anchor */
-    /* z-index: 201 keeps the header (and its hamburger/close button) above the nav overlay (z: 100) */
-    .header { position: relative; align-items: center; z-index: 201; margin-bottom: 48px; }
-    .header-left { max-width: 75%; }
-    .header-title { font-size: 40px; }
-    .header-subtitle { font-size: 16px; }
-    .header-period { margin-bottom: 10px; }
-    .section-title { font-size: 18px; }
+  /* ── Page nav collapses to the menu button at ≤ 1100px ──
+     The six tabs + theme toggle need ~620px beside the ~240px title block;
+     below ~870px they'd push past the viewport. Keep in sync with the
+     resize-close threshold in each page's menu script. */
+  @media (max-width: 1100px) {
+    /* Positioned as the dropdown anchor; z-index: 201 keeps the header
+       (and its hamburger/close button) above the nav overlay (z: 100) */
+    .header { position: relative; z-index: 201; }
 
     /* Hamburger button */
     .nav-hamburger {
@@ -1035,6 +1030,20 @@
       background: rgba(99,102,241,0.08);
       border-bottom-color: transparent;
     }
+  }
+
+  /* ── Mobile: ≤ 768px ── */
+  @media (max-width: 768px) {
+    /* Layout */
+    .dashboard { padding: 24px 14px 48px; }
+
+    /* Header — row on mobile, hamburger on right */
+    .header { align-items: center; margin-bottom: 48px; }
+    .header-left { max-width: 75%; }
+    .header-title { font-size: 40px; }
+    .header-subtitle { font-size: 16px; }
+    .header-period { margin-bottom: 10px; }
+    .section-title { font-size: 18px; }
 
     /* Controls bar — stack location above pills on mobile */
     .controls-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
