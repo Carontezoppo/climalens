@@ -423,10 +423,10 @@
   html[data-nav="collapsed"] .sn-item.flyout-dismissed > .sn-sections {
     visibility: hidden; opacity: 0; transition: none;
   }
-  html[data-nav="collapsed"] .sn-flyout-title { display: block; }
+  html[data-nav="collapsed"] .sn-flyout-title { display: block; border-bottom: 1px solid var(--border); margin-bottom: 2px; }
   html[data-nav="collapsed"] .sn-flyout-title a {
     font-size: 12px; font-weight: 600; color: var(--text-muted);
-    padding: 8px 16px 6px;
+    padding: 8px 16px 10px;
   }
   html[data-nav="collapsed"] .sn-sections a { padding: 8px 16px; color: var(--text-secondary); }
   html[data-nav="collapsed"] .sn-sections a:hover { color: var(--text-primary); background: var(--bg-card-hover); }
