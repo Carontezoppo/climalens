@@ -58,31 +58,30 @@
       <h1 class="header-title"><a href="index.html" style="color:inherit;text-decoration:none;">Clima<span>Lens</span></a></h1>
       <p class="header-subtitle">Local weather in global context</p>
     </div>
+    <div class="controls-bar">
+      <div class="nav-location">
+        <div class="location-select-wrapper">
+          <button class="location-select" id="locationSelectBtn" type="button">
+            <span id="locationSelectLabel"></span>
+          </button>
+          <div class="location-dropdown" id="locationDropdown">
+            <div class="location-search-wrap">
+              <label for="locationSearch" class="sr-only">Search city</label>
+              <input class="location-search" id="locationSearch" type="text" placeholder="Search city…" autocomplete="off">
+            </div>
+            <div class="location-list" id="locationList">
+              <div class="location-no-results" id="locationNoResults">No results</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <button class="nav-hamburger" id="navHamburger" type="button" aria-controls="sideNav" aria-expanded="false">
       <span aria-hidden="true">☰</span><span>Menu</span>
     </button>
   </header>
 
   <main id="main-content">
-
-  <div class="controls-bar">
-    <div class="nav-location">
-      <div class="location-select-wrapper">
-        <button class="location-select" id="locationSelectBtn" type="button">
-          <span id="locationSelectLabel"></span>
-        </button>
-        <div class="location-dropdown" id="locationDropdown">
-          <div class="location-search-wrap">
-            <label for="locationSearch" class="sr-only">Search city</label>
-            <input class="location-search" id="locationSearch" type="text" placeholder="Search city…" autocomplete="off">
-          </div>
-          <div class="location-list" id="locationList">
-            <div class="location-no-results" id="locationNoResults">No results</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <h2 class="section-title" id="section-climate" style="margin-top:8px;">
     <span id="climateSectionTitle">Climate Trends</span>

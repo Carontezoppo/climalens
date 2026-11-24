@@ -156,7 +156,8 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    margin-bottom: 48px;
+    column-gap: 24px;
+    margin-bottom: 72px;
     padding-bottom: 0;
   }
   .header-label {
@@ -462,13 +463,10 @@
     .side-nav, .side-nav *, html[data-nav="collapsed"] .sn-sections { transition: none !important; }
   }
 
-  /* CONTROLS BAR (location picker) */
+  /* CONTROLS BAR (location picker, right side of the header) */
   .controls-bar {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
+    margin-left: auto;
+    align-self: center;
   }
   .nav-location {
     padding-bottom: 0;
@@ -1091,9 +1089,9 @@
     .header-period { margin-bottom: 10px; }
     .section-title { font-size: 18px; }
 
-    /* Controls bar — stack location above pills on mobile */
-    .controls-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .controls-bar .nav-location { width: 100%; }
+    /* Controls bar — drops to its own full-width row under the title */
+    .header { flex-wrap: wrap; row-gap: 20px; margin-bottom: 48px; }
+    .controls-bar { order: 3; width: 100%; margin-left: 0; }
     .controls-bar .nav-location .location-select { min-width: 0; width: 100%; }
 
     /* Range picker */
