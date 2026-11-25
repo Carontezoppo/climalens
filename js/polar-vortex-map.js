@@ -93,17 +93,31 @@ function vmapVelocity(x, y) {
   };
 }
 
-// Temperature: blue → grey → orange, the live currents map's cold/warm colours
-// (--temp-low-chart / --temp-high-chart, dark theme) with a neutral midpoint
-const VMAP_TEMP_STOPS = [[56, 189, 248], [176, 184, 200], [251, 146, 60]];
+// Temperature: saturation and opacity grow towards both ends, so near-average
+// air stays pale and faint while extremes stand out. Electric blue starts at
+// −78 °C, where polar stratospheric clouds (and ozone loss) become possible.
+// Keep in sync with .vortex-map-ramp-temp in css/dashboard.css.
+const VMAP_TEMP_STOPS = [
+  [-90, [60, 90, 255]],   // electric blue
+  [-78, [30, 160, 255]],  // saturated azure
+  [-65, [110, 200, 255]], // light blue
+  [-50, [215, 220, 230]], // pale neutral
+  [-35, [255, 200, 110]], // light amber
+  [-22, [255, 140, 40]],  // saturated orange
+  [-10, [255, 70, 50]],   // red-orange
+];
 
 function vmapColor(vel, alpha) {
   if (vmap.mode === 'temperature') {
-    const t = Math.min(1, Math.max(0, (vel.temp - VMAP_TEMP_MIN) / (VMAP_TEMP_MAX - VMAP_TEMP_MIN))) * 2;
-    const i = Math.min(1, Math.floor(t)), f = t - i;
-    const [a, b] = [VMAP_TEMP_STOPS[i], VMAP_TEMP_STOPS[i + 1]];
-    const c = a.map((x, k) => Math.round(x + (b[k] - x) * f));
-    return `rgba(${c[0]},${c[1]},${c[2]},${0.85 * alpha})`;
+    const T = Math.min(VMAP_TEMP_MAX, Math.max(VMAP_TEMP_MIN, vel.temp));
+    let i = 0;
+    while (i < VMAP_TEMP_STOPS.length - 2 && T > VMAP_TEMP_STOPS[i + 1][0]) i++;
+    const [t0, c0] = VMAP_TEMP_STOPS[i], [t1, c1] = VMAP_TEMP_STOPS[i + 1];
+    const f = (T - t0) / (t1 - t0);
+    const c = c0.map((x, k) => Math.round(x + (c1[k] - x) * f));
+    const pos = (T - VMAP_TEMP_MIN) / (VMAP_TEMP_MAX - VMAP_TEMP_MIN);
+    const extreme = Math.abs(pos - 0.5) * 2; // 0 at the midpoint, 1 at either end
+    return `rgba(${c[0]},${c[1]},${c[2]},${(0.5 + 0.5 * extreme) * alpha})`;
   }
   // Speed: same teal → cyan → white ramp as the live currents map in speed mode
   const t = Math.min(1, vel.speed / VMAP_MAX_SPEED);

@@ -1459,9 +1459,12 @@
   height: 12px; border-radius: 6px; border: 2px solid #0e121a;
   background: linear-gradient(to right, rgba(40,130,160,0.3), rgba(148,193,208,0.65), rgb(255,255,255)), #0e121a;
 }
-/* Same stops as VMAP_TEMP_STOPS in js/polar-vortex-map.js */
+/* Same stops and opacity as VMAP_TEMP_STOPS in js/polar-vortex-map.js (−90 … −10 °C) */
 .vortex-map-ramp-temp {
-  background: linear-gradient(to right, rgba(56,189,248,0.85), rgba(176,184,200,0.85), rgba(251,146,60,0.85)), #0e121a;
+  background: linear-gradient(to right,
+    rgba(60,90,255,1) 0%, rgba(30,160,255,0.85) 15%, rgba(110,200,255,0.69) 31.25%,
+    rgba(215,220,230,0.5) 50%,
+    rgba(255,200,110,0.69) 68.75%, rgba(255,140,40,0.85) 85%, rgba(255,70,50,1) 100%), #0e121a;
 }
 .vortex-map-key-note { margin-top: 10px; font-size: 12px; line-height: 1.5; color: var(--text-secondary); }
 .vortex-map-ticks {
