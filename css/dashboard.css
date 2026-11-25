@@ -1231,7 +1231,6 @@
     color: var(--text-muted); cursor: pointer; transition: all 0.15s;
   }
   .sst-play-btn:hover { border-color: var(--accent); color: var(--accent-text); background: rgba(99,102,241,0.08); }
-  .sst-play-btn.playing { border-color: var(--negative); color: var(--negative); background: rgba(248,113,113,0.08); }
   .polar-live-btn {
     font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px;
     text-transform: uppercase; padding: 6px 14px; border-radius: 20px;
