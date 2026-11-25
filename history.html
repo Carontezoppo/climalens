@@ -189,12 +189,25 @@
           <div class="chart-subtitle">The vortex seen from above the pole</div>
         </div>
         <p class="vortex-map-text">A strong vortex is a tight, round ring of fast winds circling the pole. Before a sudden stratospheric warming it is pushed off the pole or pinched in two, and the ring of fast winds breaks up.</p>
-        <div class="vortex-map-key">
+        <div>
+          <div class="vortex-map-key-label" id="vortexMapModeLabel">Colour by</div>
+          <div class="currents-mode-bar" id="vortexMapModeBar" role="group" aria-labelledby="vortexMapModeLabel">
+            <button class="currents-mode-btn active" type="button" data-mode="speed" aria-pressed="true">Speed</button>
+            <button class="currents-mode-btn" type="button" data-mode="temperature" aria-pressed="false">Temperature</button>
+          </div>
+        </div>
+        <div class="vortex-map-key" id="vortexMapSpeedKey">
           <div class="vortex-map-key-label">Wind speed</div>
           <div class="vortex-map-ramp" aria-hidden="true"></div>
           <div class="vortex-map-ticks" aria-hidden="true"><span>0</span><span>20</span><span>40</span><span>60</span><span>80+ m/s</span></div>
         </div>
-        <div class="vortex-map-key-row"><span class="vortex-map-swatch vortex-map-swatch-contour" aria-hidden="true"></span><span>Height of the 10 hPa surface, <span id="vortexMapContour">every 400 m</span>. The innermost, lowest ring is the vortex core.</span></div>
+        <div class="vortex-map-key" id="vortexMapTempKey" hidden>
+          <div class="vortex-map-key-label">Air temperature</div>
+          <div class="vortex-map-ramp vortex-map-ramp-temp" aria-hidden="true"></div>
+          <div class="vortex-map-ticks" aria-hidden="true"><span>−90</span><span>−70</span><span>−50</span><span>−30</span><span>−10 °C</span></div>
+          <p class="vortex-map-key-note">In midwinter the vortex core is typically −75 to −85 °C. In a sudden stratospheric warming, air over the pole can warm by 30–50 °C within days.</p>
+        </div>
+        <div class="vortex-map-key-row"><span class="vortex-map-swatch vortex-map-swatch-contour" id="vortexMapContourSwatch" aria-hidden="true"></span><span>Height of the 10 hPa surface, <span id="vortexMapContour">every 400 m</span>. The innermost, lowest ring is the vortex core.</span></div>
         <div class="vortex-map-key-row"><span class="vortex-map-swatch vortex-map-swatch-ring" aria-hidden="true"></span><span><span id="vortexMapRing">60°N</span>, where the strength chart above is measured</span></div>
         <p class="vortex-map-now" id="vortexMapNow" aria-live="polite">&nbsp;</p>
         <div class="vortex-map-foot">

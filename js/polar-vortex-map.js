@@ -1,4 +1,5 @@
-// Animated polar vortex map — 10 hPa wind particles + geopotential height contours
+// Animated polar vortex map — 10 hPa wind particles (coloured by speed or
+// temperature) + geopotential height contours
 // over the polar cap (30°–pole), seen from directly above the pole.
 // Data: /api/polar-vortex-map (Open-Meteo ECMWF). Hemisphere follows the selected
 // city, like the strength chart; loadVortexData() in polar-vortex.js calls loadVortexMap().
@@ -12,11 +13,15 @@ const VMAP_COLORS = {
   edge:    'rgba(255,255,255,0.14)',
   ring60:  'rgba(255,255,255,0.7)',
   contour: 'rgba(129,140,248,0.80)', // --pressure (dark theme)
+  contourTemp: 'rgba(255,255,255,0.55)', // indigo would blur into the cold end of the temperature ramp
   label:   'rgba(232,234,240,0.75)',
 };
 const VMAP_EDGE_LAT   = 30;
 const VMAP_EDGE       = Math.cos(VMAP_EDGE_LAT * Math.PI / 180); // disc radius in globe radii
-const VMAP_MAX_SPEED  = 80;      // m/s at the top of the colour ramp
+const VMAP_MAX_SPEED  = 80;      // m/s at the top of the speed ramp
+// Fixed, so days stay comparable and a warming stands out: a midwinter core sits
+// near −80 °C, a warming can push the pole above −30 °C
+const VMAP_TEMP_MIN   = -90, VMAP_TEMP_MAX = -10;
 const VMAP_SPEED      = 1.1e-4;  // globe radii per frame per m/s
 const VMAP_MAX_AGE    = 90;      // frames before a particle respawns
 const VMAP_TRAIL      = 0.96;    // share of the previous frame kept each frame
@@ -25,7 +30,7 @@ const vmap = {
   hemi: null, data: null, dataCache: {}, land: null,
   wrap: null, bg: null, fx: null, ov: null,
   w: 0, h: 0, cx: 0, cy: 0, R: 0, discR: 0,
-  particles: [], raf: null, paused: false, visible: false,
+  particles: [], raf: null, paused: false, visible: false, mode: 'speed',
   reduceMotion: window.matchMedia('(prefers-reduced-motion: reduce)'),
 };
 
@@ -84,12 +89,24 @@ function vmapVelocity(x, y) {
     vx: k * (u * cd - v * sinPhi * s * sd),
     vy: k * (-u * s * sd - v * sinPhi * cd),
     speed: Math.hypot(u, v),
+    temp: vmap.mode === 'temperature' ? vmapSample(vmap.data.t, absLat, lon) : null,
   };
 }
 
-// Same teal → cyan → white ramp as the live currents map in speed mode
-function vmapColor(speed, alpha) {
-  const t = Math.min(1, speed / VMAP_MAX_SPEED);
+// Temperature: blue → grey → orange, the live currents map's cold/warm colours
+// (--temp-low-chart / --temp-high-chart, dark theme) with a neutral midpoint
+const VMAP_TEMP_STOPS = [[56, 189, 248], [176, 184, 200], [251, 146, 60]];
+
+function vmapColor(vel, alpha) {
+  if (vmap.mode === 'temperature') {
+    const t = Math.min(1, Math.max(0, (vel.temp - VMAP_TEMP_MIN) / (VMAP_TEMP_MAX - VMAP_TEMP_MIN))) * 2;
+    const i = Math.min(1, Math.floor(t)), f = t - i;
+    const [a, b] = [VMAP_TEMP_STOPS[i], VMAP_TEMP_STOPS[i + 1]];
+    const c = a.map((x, k) => Math.round(x + (b[k] - x) * f));
+    return `rgba(${c[0]},${c[1]},${c[2]},${0.85 * alpha})`;
+  }
+  // Speed: same teal → cyan → white ramp as the live currents map in speed mode
+  const t = Math.min(1, vel.speed / VMAP_MAX_SPEED);
   const r = Math.round(40 + t * 215), g = Math.round(130 + t * 125), b = Math.round(160 + t * 95);
   return `rgba(${r},${g},${b},${(0.3 + t * 0.7) * alpha})`;
 }
@@ -113,7 +130,7 @@ function vmapFrame() {
     ctx.beginPath();
     ctx.moveTo(x0, y0);
     ctx.lineTo(p.x, p.y);
-    ctx.strokeStyle = vmapColor(vel.speed, alpha);
+    ctx.strokeStyle = vmapColor(vel, alpha);
     ctx.stroke();
   }
 }
@@ -148,7 +165,7 @@ function vmapDrawStill() {
       const x0 = p.x, y0 = p.y;
       p.x += vel.vx * 2; p.y += vel.vy * 2;
       ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(p.x, p.y);
-      ctx.strokeStyle = vmapColor(vel.speed, (k + 1) / 20);
+      ctx.strokeStyle = vmapColor(vel, (k + 1) / 20);
       ctx.stroke();
     }
   }
@@ -260,7 +277,7 @@ function vmapDrawOverlay() {
       }
     }
   }
-  ctx.strokeStyle = VMAP_COLORS.contour;
+  ctx.strokeStyle = vmap.mode === 'temperature' ? VMAP_COLORS.contourTemp : VMAP_COLORS.contour;
   ctx.lineWidth = 1.2;
   ctx.stroke();
 
@@ -310,7 +327,8 @@ function vmapRedraw() {
   if (!vmap.data || !vmap.w) return;
   vmapDrawBase();
   vmapDrawOverlay();
-  if (vmap.reduceMotion.matches) vmapDrawStill();
+  // Paused or reduced motion: nothing will repaint the particles, so show a still frame
+  if (vmap.reduceMotion.matches || vmap.paused) vmapDrawStill();
   else vmap.fx.getContext('2d').clearRect(0, 0, vmap.w, vmap.h);
 }
 
@@ -322,13 +340,15 @@ function vmapFmtLon(lon) {
 }
 
 function vmapDescribe() {
-  const { width, height, latMin, step, u, v, z, time } = vmap.data;
+  const { width, height, latMin, step, u, v, z, t, time } = vmap.data;
   const s = vmapSign();
-  let maxS = -1, maxI = 0, minZ = Infinity, minI = 0;
+  let maxS = -1, maxI = 0, minZ = Infinity, minI = 0, minT = Infinity, minTI = 0, maxT = -Infinity, maxTI = 0;
   for (let i = 0; i < u.length; i++) {
     const sp = Math.hypot(u[i], v[i]);
     if (sp > maxS) { maxS = sp; maxI = i; }
     if (z[i] < minZ) { minZ = z[i]; minI = i; }
+    if (t[i] < minT) { minT = t[i]; minTI = i; }
+    if (t[i] > maxT) { maxT = t[i]; maxTI = i; }
   }
   const at = i => `${vmapFmtLat(s * (latMin + Math.floor(i / width) * step))} ${vmapFmtLon(-180 + (i % width) * step)}`;
   const coreRow = Math.floor(minI / width);
@@ -345,6 +365,10 @@ function vmapDescribe() {
   } else {
     const core = coreRow >= height - 1 ? 'centred over the pole' : `centred near ${at(minI)}`;
     now = `Vortex core ${core}. Strongest wind ${Math.round(maxS)} m/s near ${at(maxI)}.`;
+  }
+  if (vmap.mode === 'temperature') {
+    const deg = x => `${Math.round(x)}`.replace('-', '−') + ' °C';
+    now += ` Coldest ${deg(minT)} near ${at(minTI)}, warmest ${deg(maxT)} near ${at(maxTI)}.`;
   }
   document.getElementById('vortexMapNow').textContent = now;
   document.getElementById('vortexMapTime').textContent = `ECMWF · ${when}`;
@@ -370,12 +394,33 @@ function vmapInitDom() {
   document.addEventListener('visibilitychange', vmapUpdateRunning);
   vmap.reduceMotion.addEventListener('change', () => { vmapRedraw(); vmapUpdatePlayBtn(); vmapUpdateRunning(); });
 
+  document.querySelectorAll('#vortexMapModeBar .currents-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => vmapSetMode(btn.dataset.mode));
+  });
+
   document.getElementById('vortexMapPlayBtn').addEventListener('click', () => {
     vmap.paused = !vmap.paused;
     vmapUpdatePlayBtn();
     vmapUpdateRunning();
   });
   vmapUpdatePlayBtn();
+}
+
+function vmapSetMode(mode) {
+  if (mode === vmap.mode) return;
+  vmap.mode = mode;
+  const isTemp = mode === 'temperature';
+  document.querySelectorAll('#vortexMapModeBar .currents-mode-btn').forEach(b => {
+    const on = b.dataset.mode === mode;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on);
+  });
+  document.getElementById('vortexMapSpeedKey').hidden = isTemp;
+  document.getElementById('vortexMapTempKey').hidden = !isTemp;
+  document.getElementById('vortexMapContourSwatch').classList.toggle('vortex-map-swatch-contour-temp', isTemp);
+  if (!vmap.data) return;
+  vmapDescribe();
+  vmapRedraw(); // clears the old-colour trails and redraws the contours in the new colour
 }
 
 function vmapUpdatePlayBtn() {
