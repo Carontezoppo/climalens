@@ -207,6 +207,7 @@ async function loadVortexData() {
 
   const hemi = currentLocation.lat >= 0 ? 'n' : 's';
   document.getElementById('vortexDesc').innerHTML = VORTEX_DESC[hemi];
+  loadVortexMap(hemi); // independent of the chart: either can fail without hiding the other
   // First load of this hemisphere: show the stats row, chart card and note at
   // their final size, so the block doesn't grow (and push later sections
   // down, breaking #section- links) when the data arrives

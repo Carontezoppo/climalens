@@ -173,6 +173,36 @@
         <div class="climate-note" id="vortexNote"></div>
       </div>
     </div>
+
+    <div class="vortex-map-grid">
+      <div class="vortex-map-card">
+        <div class="vortex-map-wrap" id="vortexMapWrap">
+          <canvas id="vortexMapBase" aria-hidden="true"></canvas>
+          <canvas id="vortexMapCanvas" role="img" aria-label="Map of winds at 10 hPa over the pole"></canvas>
+          <canvas id="vortexMapOverlay" aria-hidden="true"></canvas>
+          <div class="vortex-map-status" id="vortexMapStatus" aria-live="polite">Loading wind data&hellip;</div>
+        </div>
+      </div>
+      <div class="vortex-map-side">
+        <div>
+          <div class="chart-title">Winds 30 km up</div>
+          <div class="chart-subtitle">The vortex seen from above the pole</div>
+        </div>
+        <p class="vortex-map-text">A strong vortex is a tight, round ring of fast winds circling the pole. Before a sudden stratospheric warming it is pushed off the pole or pinched in two, and the ring of fast winds breaks up.</p>
+        <div class="vortex-map-key">
+          <div class="vortex-map-key-label">Wind speed</div>
+          <div class="vortex-map-ramp" aria-hidden="true"></div>
+          <div class="vortex-map-ticks" aria-hidden="true"><span>0</span><span>20</span><span>40</span><span>60</span><span>80+ m/s</span></div>
+        </div>
+        <div class="vortex-map-key-row"><span class="vortex-map-swatch vortex-map-swatch-contour" aria-hidden="true"></span><span>Height of the 10 hPa surface, <span id="vortexMapContour">every 400 m</span>. The innermost, lowest ring is the vortex core.</span></div>
+        <div class="vortex-map-key-row"><span class="vortex-map-swatch vortex-map-swatch-ring" aria-hidden="true"></span><span><span id="vortexMapRing">60°N</span>, where the strength chart above is measured</span></div>
+        <p class="vortex-map-now" id="vortexMapNow" aria-live="polite">&nbsp;</p>
+        <div class="vortex-map-foot">
+          <button class="sst-play-btn" id="vortexMapPlayBtn" type="button">&#9208; Pause</button>
+          <div class="vortex-map-source"><span id="vortexMapTime">ECMWF</span> · via Open-Meteo</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="section-sep"></div>
@@ -275,6 +305,8 @@
 <script src="js/range.js"></script>
 <script src="js/jet-stream.js"></script>
 <script src="js/polar-vortex.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="js/polar-vortex-map.js"></script>
 <script src="js/init-history.js"></script>
 <script src="/js/cookies.js"></script>
 <script src="js/theme.js"></script>
