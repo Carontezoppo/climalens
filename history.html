@@ -175,6 +175,7 @@
     </div>
 
     <div class="vortex-map-grid">
+      <div class="vortex-map-main">
       <div class="vortex-map-card">
         <div class="vortex-map-wrap" id="vortexMapWrap">
           <canvas id="vortexMapBase" aria-hidden="true"></canvas>
@@ -182,6 +183,15 @@
           <canvas id="vortexMapOverlay" aria-hidden="true"></canvas>
           <div class="vortex-map-status" id="vortexMapStatus" aria-live="polite">Loading wind data&hellip;</div>
         </div>
+      </div>
+      <div class="sst-controls-card">
+        <div class="sst-top-row">
+          <div class="sst-date-display" id="vortexMapDate">&mdash;</div>
+          <div class="vortex-map-source">ECMWF · via Open-Meteo</div>
+        </div>
+        <input type="range" class="sst-slider" id="vortexMapSlider" min="0" max="10" value="0" step="1" aria-label="Forecast day for the polar vortex map">
+        <div class="sst-tick-row vortex-map-tick-row" id="vortexMapTicks" aria-hidden="true"></div>
+      </div>
       </div>
       <div class="vortex-map-side">
         <div>
@@ -212,7 +222,6 @@
         <p class="vortex-map-now" id="vortexMapNow" aria-live="polite">&nbsp;</p>
         <div class="vortex-map-foot">
           <button class="sst-play-btn" id="vortexMapPlayBtn" type="button">&#9208; Pause</button>
-          <div class="vortex-map-source"><span id="vortexMapTime">ECMWF</span> · via Open-Meteo</div>
         </div>
       </div>
     </div>

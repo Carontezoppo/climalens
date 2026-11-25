@@ -3,6 +3,8 @@
 // over the polar cap (30°–pole), seen from directly above the pole.
 // Data: /api/polar-vortex-map (Open-Meteo ECMWF). Hemisphere follows the selected
 // city, like the strength chart; loadVortexData() in polar-vortex.js calls loadVortexMap().
+// A slider steps through daily ECMWF forecast frames (today + 10 days); the
+// particles keep moving across a frame change, so the flow morphs into the new day.
 
 // The map is a fixed dark surface in both themes, like the live currents map,
 // so its palette is set here rather than read from the theme.
@@ -27,7 +29,7 @@ const VMAP_MAX_AGE    = 90;      // frames before a particle respawns
 const VMAP_TRAIL      = 0.96;    // share of the previous frame kept each frame
 
 const vmap = {
-  hemi: null, data: null, dataCache: {}, land: null,
+  hemi: null, data: null, dataCache: {}, land: null, frame: 0, // data = grid meta + the current frame
   wrap: null, bg: null, fx: null, ov: null,
   w: 0, h: 0, cx: 0, cy: 0, R: 0, discR: 0,
   particles: [], raf: null, paused: false, visible: false, mode: 'speed',
@@ -366,30 +368,86 @@ function vmapDescribe() {
   }
   const at = i => `${vmapFmtLat(s * (latMin + Math.floor(i / width) * step))} ${vmapFmtLon(-180 + (i % width) * step)}`;
   const coreRow = Math.floor(minI / width);
+  // Same measure as the strength chart: zonal-mean (west→east) wind at 60°
+  const row60 = (60 - latMin) / step;
+  const mean60 = u.slice(row60 * width, (row60 + 1) * width).reduce((a, b) => a + b, 0) / width;
 
   const month = +time.slice(5, 7);
   const active = typeof VORTEX_SEASON === 'undefined' || VORTEX_SEASON[vmap.hemi].active.includes(month);
   const date = new Date(time);
   const when = `${date.getUTCDate()} ${VORTEX_MONTHS[date.getUTCMonth()]} ${String(date.getUTCHours()).padStart(2, '0')}:00 UTC`;
+  const ahead = vmap.frame === 0 ? '' : vmap.frame === 1 ? ' (forecast, 1 day ahead)' : ` (forecast, ${vmap.frame} days ahead)`;
   const region = vmap.hemi === 'n' ? 'the Arctic' : 'Antarctica';
 
   let now;
   if (!active) {
     now = 'Summer circulation: the vortex has broken down for the year, so winds are light and the contours show no closed low over the pole.';
+  } else if (mean60 < 0) {
+    // Easterly on average at 60°: no westerly ring left, so there is no core to name
+    now = `The vortex has broken down: on average, winds around ${s > 0 ? '60°N' : '60°S'} blow from the east. Strongest wind ${Math.round(maxS)} m/s near ${at(maxI)}.`;
   } else {
     const core = coreRow >= height - 1 ? 'centred over the pole' : `centred near ${at(minI)}`;
     now = `Vortex core ${core}. Strongest wind ${Math.round(maxS)} m/s near ${at(maxI)}.`;
   }
+  now += ` Average west–east wind around ${s > 0 ? '60°N' : '60°S'} (the chart's measure): ${mean60.toFixed(1).replace('-', '−')} m/s.`;
   if (vmap.mode === 'temperature') {
     const deg = x => `${Math.round(x)}`.replace('-', '−') + ' °C';
     now += ` Coldest ${deg(minT)} near ${at(minTI)}, warmest ${deg(maxT)} near ${at(maxTI)}.`;
   }
   document.getElementById('vortexMapNow').textContent = now;
-  document.getElementById('vortexMapTime').textContent = `ECMWF · ${when}`;
+  const day = `${VMAP_WEEKDAYS[date.getUTCDay()]} ${date.getUTCDate()} ${VORTEX_MONTHS[date.getUTCMonth()]}`;
+  const dateText = vmap.frame === 0 ? `Now · ${day}` : `+${vmap.frame} day${vmap.frame > 1 ? 's' : ''} · ${day}`;
+  document.getElementById('vortexMapDate').textContent = dateText;
+  document.getElementById('vortexMapSlider').setAttribute('aria-valuetext', dateText);
   document.getElementById('vortexMapContour').textContent = `every ${vmapContourStep(z)} m`;
   document.getElementById('vortexMapRing').textContent = s > 0 ? '60°N' : '60°S';
   document.getElementById('vortexMapCanvas').setAttribute('aria-label',
-    `Map of winds at 10 hPa, about 30 km up, over ${region} on ${when}. ${now}`);
+    `Map of winds at 10 hPa, about 30 km up, over ${region} on ${when}${ahead}. ${now}`);
+}
+
+/* ── Forecast frames ────────────────────────────────────────────────────── */
+const VMAP_WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+// Same filled-track look as the SST and sea ice sliders (updateSliderFill in sst.js,
+// which history.html doesn't load)
+function vmapSliderFill(el) {
+  const pct = ((+el.value - +el.min) / (+el.max - +el.min)) * 100;
+  el.style.background = `linear-gradient(to right,#6366f1 ${pct}%,#2a3148 ${pct}%)`;
+}
+
+function vmapApplyFrame() {
+  const raw = vmap.dataCache[vmap.hemi];
+  const { frames, ...meta } = raw;
+  vmap.frame = Math.min(vmap.frame, frames.length - 1);
+  vmap.data = { ...meta, ...frames[vmap.frame] };
+}
+
+function vmapSetupSlider() {
+  const frames = vmap.dataCache[vmap.hemi].frames;
+  const slider = document.getElementById('vortexMapSlider');
+  slider.max = frames.length - 1;
+  slider.value = vmap.frame;
+  vmapSliderFill(slider);
+  // Labels every other day: Today, then dates
+  const last = frames.length - 1;
+  let html = '';
+  for (let i = 0; i <= last; i += 2) {
+    const d = new Date(frames[i].time);
+    const label = i === 0 ? 'Today' : `${d.getUTCDate()} ${VORTEX_MONTHS[d.getUTCMonth()]}`;
+    html += `<span style="left:${(i / last) * 100}%">${label}</span>`;
+  }
+  document.getElementById('vortexMapTicks').innerHTML = html;
+}
+
+function vmapOnSlide() {
+  const slider = document.getElementById('vortexMapSlider');
+  vmapSliderFill(slider);
+  if (+slider.value === vmap.frame || !vmap.data) return;
+  vmap.frame = +slider.value;
+  vmapApplyFrame();
+  vmapDescribe();
+  vmapDrawOverlay(); // land doesn't change; particles carry on into the new field
+  if (vmap.reduceMotion.matches || vmap.paused) vmapDrawStill();
 }
 
 /* ── Public entry points ───────────────────────────────────────────────── */
@@ -411,6 +469,8 @@ function vmapInitDom() {
   document.querySelectorAll('#vortexMapModeBar .currents-mode-btn').forEach(btn => {
     btn.addEventListener('click', () => vmapSetMode(btn.dataset.mode));
   });
+
+  document.getElementById('vortexMapSlider').addEventListener('input', vmapOnSlide);
 
   document.getElementById('vortexMapPlayBtn').addEventListener('click', () => {
     vmap.paused = !vmap.paused;
@@ -471,7 +531,9 @@ async function loadVortexMap(hemi) {
       }
     }
     if (vmap.hemi !== hemi) return; // the city changed hemisphere while loading
-    vmap.data = vmap.dataCache[hemi];
+    vmapApplyFrame(); // keeps the chosen day when switching hemisphere
+    vmapSetupSlider();
+    document.getElementById('vortexMapSlider').disabled = false;
     status.hidden = true;
     vmapDescribe();
     vmapResize();
@@ -480,6 +542,8 @@ async function loadVortexMap(hemi) {
     if (vmap.hemi !== hemi) return;
     vmap.data = null;
     vmapUpdateRunning();
+    document.getElementById('vortexMapSlider').disabled = true;
+    document.getElementById('vortexMapDate').textContent = '—';
     for (const c of [vmap.bg, vmap.fx, vmap.ov]) c.getContext('2d').clearRect(0, 0, vmap.w, vmap.h);
     status.textContent = 'Wind map unavailable: ' + err.message;
     status.style.color = 'var(--negative)';

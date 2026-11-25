@@ -1435,7 +1435,13 @@
 .vortex-map-grid {
   display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-top: 16px;
 }
+.vortex-map-main { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .vortex-map-card { background: #141821; border-radius: 12px; overflow: hidden; }
+.vortex-map-main .sst-slider:disabled { opacity: 0.4; cursor: not-allowed; }
+.vortex-map-tick-row { position: relative; height: 16px; margin-bottom: 0; }
+.vortex-map-tick-row span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.vortex-map-tick-row span:first-child { transform: none; }
+.vortex-map-tick-row span:last-child { transform: translateX(-100%); }
 .vortex-map-wrap { position: relative; width: 100%; aspect-ratio: 1; max-height: 700px; }
 .vortex-map-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .vortex-map-status {
