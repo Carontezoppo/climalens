@@ -8,7 +8,7 @@ Live at **[climalens.org](https://climalens.org)**.
 
 | Page | What it shows |
 |---|---|
-| **Weather** (`index.html`) | Current conditions, a 9-day forecast with hourly breakdown, temperature chart, air quality and a live wind map |
+| **Weather** (`index.html`) | Current conditions, a 9-day forecast with hourly breakdown, temperature chart, air quality (with a European AQI chart covering the past week and the next few days) and a live wind map |
 | **History** (`history.html`) | Climate trend since 1981, jet stream position (NAO / SAM), polar vortex strength and the animated polar vortex map, historical statistics and a monthly breakdown for the selected city |
 | **Sea** (`sea.html`) | Global mean sea level and city water-level map, sea surface temperature, El Niño / La Niña, Arctic and Antarctic sea ice, live ocean currents |
 | **Land Cover** (`forest.html`) | ESA WorldCover land cover globe and a MODIS land cover animation from 2001 to 2024 |
@@ -32,6 +32,19 @@ On the History page, below the polar vortex strength chart, an animated map show
 **Data:** ECMWF IFS open data via [Open-Meteo](https://open-meteo.com). Open-Meteo bills each grid point and allows 600 per minute, so the server function (`functions/api/polar-vortex-map.js`) requests about 440 points, fewer towards the pole, and converts them into a regular 5° grid covering 30° to 85°. Responses are cached for 6 hours, with a 30-day fallback copy if Open-Meteo is unavailable.
 
 **Rendering:** `js/polar-vortex-map.js` draws on plain canvas with no map library. Leaflet's Mercator projection can't show the pole, so the map uses an orthographic projection centred on it. Particles move in screen coordinates, because stepping in latitude and longitude breaks down near the pole.
+
+## European AQI chart
+
+The Air Pollution section of the Weather page includes a chart of the European Air Quality Index for the selected city. It covers the past 7 days, hour by hour, and the forecast for as far ahead as CAMS goes (about 5 days).
+
+- **One line, two styles:** solid for past values and dashed for the forecast, with a dotted "Now" marker between them.
+- **Six faint background bands** show the EEA levels, from Good to Extremely poor, in the same colours as the AQI card above the chart. Each band's name is written in the right margin, so the levels can be read without relying on colour and the line never covers them.
+- **Fixed scale** from 0 to 100, so the bands keep their proportions from city to city. The scale only extends above 100 when a value goes beyond it.
+- **Accessibility:** hovering or tapping shows the exact value and level for each hour, and screen readers get a text summary of the chart.
+
+This is the same style as the polar vortex strength chart on the History page, and new charts that compare a value against levels or ranges should follow it.
+
+**Data:** CAMS air quality via [Open-Meteo](https://open-meteo.com), through `functions/api/air-quality.js`, which requests 7 past days and 5 forecast days. Responses are cached for 30 minutes.
 
 ## How it's built
 
