@@ -2,7 +2,8 @@
  * GET /api/ecmwf-pm25
  *
  * Proxies ECMWF ecCharts WMS tile requests for CAMS NRT atmospheric
- * composition data (PM2.5), injecting the API token from env.
+ * composition data, injecting the API token from env. The endpoint name is
+ * historical: the layer comes from the caller's LAYERS param.
  *
  * All WMS params (SERVICE, REQUEST, LAYERS, STYLES, BBOX, WIDTH, HEIGHT,
  * CRS, FORMAT …) are forwarded verbatim. If no TIME param is present the
@@ -14,7 +15,8 @@
  *   2. Log in → your profile → API key
  *   3. Add ECMWF_TOKEN to .dev.vars and Cloudflare Pages env secrets
  *
- * Layer: composition_pm2p5_surface  (CAMS NRT surface PM2.5, µg m⁻³)
+ * Layer: set by the caller. footprint.html requests composition_aod550
+ *        (CAMS NRT aerosol optical depth at 550 nm, style sh_BuYlRd_aod)
  * Env:   ECMWF_TOKEN — API key from api.ecmwf.int
  * KV:    CLIMATE_CACHE (1-hour tile cache)
  */

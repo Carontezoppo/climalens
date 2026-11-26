@@ -12,7 +12,7 @@ Live at **[climalens.org](https://climalens.org)**.
 | **History** (`history.html`) | Climate trend since 1981, jet stream position (NAO / SAM), polar vortex strength and the animated polar vortex map, historical statistics and a monthly breakdown for the selected city |
 | **Sea** (`sea.html`) | Global mean sea level and city water-level map, sea surface temperature, El Niño / La Niña, Arctic and Antarctic sea ice, live ocean currents |
 | **Land Cover** (`forest.html`) | ESA WorldCover land cover globe and a MODIS land cover animation from 2001 to 2024 |
-| **Footprint** (`footprint.html`) | Air pollution (PM2.5) and light pollution seen from space |
+| **Footprint** (`footprint.html`) | Air pollution (aerosol optical depth) and light pollution seen from space |
 | **About** (`about.html`) | The project, and credits for every data source |
 
 The Weather and History pages follow the city chosen in the header, and the choice is remembered between visits.
@@ -50,18 +50,22 @@ Then open <http://localhost:8788>.
 
 The `/api/*` endpoints are Cloudflare Functions, so they only work under `wrangler pages dev`. A plain static server (Live Server, `python -m http.server`) loads the pages, but every data request returns 404.
 
-The sea ice and sea surface temperature endpoints need a Copernicus Marine account. Put the credentials in a `.dev.vars` file, which is gitignored:
+Some endpoints need credentials. Put them in a `.dev.vars` file, which is gitignored:
 
 ```
 CMEMS_USERNAME=...
 CMEMS_PASSWORD=...
+ECMWF_TOKEN=...
 ```
+
+- `CMEMS_USERNAME` / `CMEMS_PASSWORD`: a free [Copernicus Marine](https://marine.copernicus.eu) account, for the sea ice and sea surface temperature maps.
+- `ECMWF_TOKEN`: an API key from [api.ecmwf.int](https://api.ecmwf.int), for the Footprint page's air pollution layer. Without it, that layer returns 503.
 
 KV caching is skipped locally, so every request goes to the upstream API. Some providers rate-limit repeated requests. Open-Meteo, for example, slows responses down once its per-minute allowance is used up.
 
 ## Deployment
 
-A push to `main` deploys automatically through Cloudflare Pages. There is no CI pipeline. The Pages project needs the `CLIMATE_CACHE` KV namespace bound and the Copernicus Marine credentials set as secrets.
+A push to `main` deploys automatically through Cloudflare Pages. There is no CI pipeline. The Pages project needs the `CLIMATE_CACHE` KV namespace bound and the same three credentials set as secrets.
 
 ## Data sources
 
