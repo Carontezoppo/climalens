@@ -29,7 +29,7 @@ const VMAP_MAX_AGE    = 90;      // frames before a particle respawns
 const VMAP_TRAIL      = 0.96;    // share of the previous frame kept each frame
 
 const vmap = {
-  hemi: null, data: null, dataCache: {}, land: null, frame: 0, // data = grid meta + the current frame
+  hemi: null, data: null, dataCache: {}, land: null, frame: 0, dayTimer: null, // data = grid meta + the current frame
   wrap: null, bg: null, fx: null, ov: null,
   w: 0, h: 0, cx: 0, cy: 0, R: 0, discR: 0,
   particles: [], raf: null, paused: false, visible: false, mode: 'speed',
@@ -407,6 +407,7 @@ function vmapDescribe() {
 
 /* ── Forecast frames ────────────────────────────────────────────────────── */
 const VMAP_WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const VMAP_DAY_MS   = 1500; // per day when playing: long enough for the particles to trace the new flow
 
 // Same filled-track look as the SST and sea ice sliders (updateSliderFill in sst.js,
 // which history.html doesn't load)
@@ -450,6 +451,24 @@ function vmapOnSlide() {
   if (vmap.reduceMotion.matches || vmap.paused) vmapDrawStill();
 }
 
+// Play steps through the days and loops, like the SST map's Play. Dragging the
+// slider while playing carries on from the new day.
+function vmapStepDay() {
+  const slider = document.getElementById('vortexMapSlider');
+  slider.value = (vmap.frame + 1) % (+slider.max + 1);
+  vmapOnSlide();
+}
+
+function vmapSetDayPlaying(on) {
+  clearInterval(vmap.dayTimer);
+  vmap.dayTimer = on ? setInterval(vmapStepDay, VMAP_DAY_MS) : null;
+  const btn = document.getElementById('vortexMapDayBtn');
+  btn.textContent = on ? '⏸ Pause' : '▶ Play';
+  btn.setAttribute('aria-label', on ? 'Pause forecast days' : 'Play forecast days');
+  // Don't announce the summary every 1.5 s while the days play
+  document.getElementById('vortexMapNow').setAttribute('aria-live', on ? 'off' : 'polite');
+}
+
 /* ── Public entry points ───────────────────────────────────────────────── */
 function vmapInitDom() {
   if (vmap.wrap) return;
@@ -471,6 +490,7 @@ function vmapInitDom() {
   });
 
   document.getElementById('vortexMapSlider').addEventListener('input', vmapOnSlide);
+  document.getElementById('vortexMapDayBtn').addEventListener('click', () => vmapSetDayPlaying(!vmap.dayTimer));
 
   document.getElementById('vortexMapPlayBtn').addEventListener('click', () => {
     vmap.paused = !vmap.paused;
@@ -500,7 +520,7 @@ function vmapSetMode(mode) {
 function vmapUpdatePlayBtn() {
   const btn = document.getElementById('vortexMapPlayBtn');
   btn.hidden = vmap.reduceMotion.matches; // nothing moves, so nothing to pause
-  btn.textContent = vmap.paused ? '▶ Play' : '⏸ Pause';
+  btn.textContent = vmap.paused ? '▶ Play wind' : '⏸ Pause wind';
   btn.setAttribute('aria-label', vmap.paused ? 'Play wind animation' : 'Pause wind animation');
 }
 
@@ -534,6 +554,7 @@ async function loadVortexMap(hemi) {
     vmapApplyFrame(); // keeps the chosen day when switching hemisphere
     vmapSetupSlider();
     document.getElementById('vortexMapSlider').disabled = false;
+    document.getElementById('vortexMapDayBtn').disabled = false;
     status.hidden = true;
     vmapDescribe();
     vmapResize();
@@ -542,7 +563,9 @@ async function loadVortexMap(hemi) {
     if (vmap.hemi !== hemi) return;
     vmap.data = null;
     vmapUpdateRunning();
+    vmapSetDayPlaying(false);
     document.getElementById('vortexMapSlider').disabled = true;
+    document.getElementById('vortexMapDayBtn').disabled = true;
     document.getElementById('vortexMapDate').textContent = '—';
     for (const c of [vmap.bg, vmap.fx, vmap.ov]) c.getContext('2d').clearRect(0, 0, vmap.w, vmap.h);
     status.textContent = 'Wind map unavailable: ' + err.message;

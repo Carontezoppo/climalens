@@ -187,7 +187,7 @@
       <div class="sst-controls-card">
         <div class="sst-top-row">
           <div class="sst-date-display" id="vortexMapDate">&mdash;</div>
-          <div class="vortex-map-source">ECMWF · via Open-Meteo</div>
+          <button class="sst-play-btn" id="vortexMapDayBtn" type="button" aria-label="Play forecast days">&#9654; Play</button>
         </div>
         <input type="range" class="sst-slider" id="vortexMapSlider" min="0" max="10" value="0" step="1" aria-label="Forecast day for the polar vortex map">
         <div class="sst-tick-row vortex-map-tick-row" id="vortexMapTicks" aria-hidden="true"></div>
@@ -199,12 +199,15 @@
           <div class="chart-subtitle">The vortex seen from above the pole</div>
         </div>
         <p class="vortex-map-text">A strong vortex is a tight, round ring of fast winds circling the pole. Before a sudden stratospheric warming it is pushed off the pole or pinched in two, and the ring of fast winds breaks up.</p>
-        <div>
-          <div class="vortex-map-key-label" id="vortexMapModeLabel">Colour by</div>
-          <div class="currents-mode-bar" id="vortexMapModeBar" role="group" aria-labelledby="vortexMapModeLabel">
-            <button class="currents-mode-btn active" type="button" data-mode="speed" aria-pressed="true">Speed</button>
-            <button class="currents-mode-btn" type="button" data-mode="temperature" aria-pressed="false">Temperature</button>
+        <div class="vortex-map-wind-row">
+          <div>
+            <div class="vortex-map-key-label" id="vortexMapModeLabel">Colour by</div>
+            <div class="currents-mode-bar" id="vortexMapModeBar" role="group" aria-labelledby="vortexMapModeLabel">
+              <button class="currents-mode-btn active" type="button" data-mode="speed" aria-pressed="true">Speed</button>
+              <button class="currents-mode-btn" type="button" data-mode="temperature" aria-pressed="false">Temperature</button>
+            </div>
           </div>
+          <button class="sst-play-btn" id="vortexMapPlayBtn" type="button">&#9208; Pause wind</button>
         </div>
         <div class="vortex-map-key" id="vortexMapSpeedKey">
           <div class="vortex-map-key-label">Wind speed</div>
@@ -221,7 +224,7 @@
         <div class="vortex-map-key-row"><span class="vortex-map-swatch vortex-map-swatch-ring" aria-hidden="true"></span><span><span id="vortexMapRing">60°N</span>, where the strength chart above is measured</span></div>
         <p class="vortex-map-now" id="vortexMapNow" aria-live="polite">&nbsp;</p>
         <div class="vortex-map-foot">
-          <button class="sst-play-btn" id="vortexMapPlayBtn" type="button">&#9208; Pause</button>
+          <div class="vortex-map-source">ECMWF · via Open-Meteo</div>
         </div>
       </div>
     </div>

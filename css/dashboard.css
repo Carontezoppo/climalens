@@ -1437,7 +1437,8 @@
 }
 .vortex-map-main { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .vortex-map-card { background: #141821; border-radius: 12px; overflow: hidden; }
-.vortex-map-main .sst-slider:disabled { opacity: 0.4; cursor: not-allowed; }
+.vortex-map-main .sst-slider:disabled,
+.vortex-map-main .sst-play-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .vortex-map-tick-row { position: relative; height: 16px; margin-bottom: 0; }
 .vortex-map-tick-row span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
 .vortex-map-tick-row span:first-child { transform: none; }
@@ -1453,7 +1454,13 @@
 .vortex-map-status[hidden] { display: none; }
 .vortex-map-side {
   background: var(--bg-card); border-radius: 12px; padding: 20px 24px;
-  display: flex; flex-direction: column; gap: 16px;
+  display: flex; flex-direction: column; gap: 24px;
+}
+/* The two map-key rows (contours, 60° ring) read as one group */
+.vortex-map-key-row + .vortex-map-key-row { margin-top: -12px; }
+/* Colour-by toggle with the wind Pause beside it: both act on the particles */
+.vortex-map-wind-row {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap;
 }
 .vortex-map-text { font-size: 13px; line-height: 1.6; color: var(--text-secondary); }
 .vortex-map-key-label {
