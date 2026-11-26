@@ -4,14 +4,9 @@
 // ============================================================
 let aqVisible = true;
 
+let aqiChartInstance = null;
+
 async function fetchAirQuality() {
-  const qs = [
-    `latitude=${currentLocation.lat}`,
-    `longitude=${currentLocation.lon}`,
-    'hourly=pm10,pm2_5,nitrogen_dioxide,ozone,uv_index,european_aqi,alder_pollen,birch_pollen,grass_pollen',
-    'forecast_days=2',
-    'timezone=auto',
-  ].join('&');
   const res = await fetch(`/api/air-quality?lat=${currentLocation.lat}&lon=${currentLocation.lon}`);
   const text = await res.text();
   let json;
@@ -51,9 +46,15 @@ function pollenCat(val) {
   return              { label:'V.High',  color:_aqC('verypoor') };
 }
 
+// Local "now" at the location as 'YYYY-MM-DDTHH' (hourly.time is local time, timezone=auto)
+function aqLocalNow(json) {
+  return new Date(Date.now() + json.utc_offset_seconds * 1000).toISOString().slice(0, 13);
+}
+
 function renderAirQuality(json) {
   const hourly = json.hourly;
-  const todayStr = hourly.time[0].slice(0, 10);
+  // The response starts 7 days back (for the chart), so today comes from the clock, not hourly.time[0]
+  const todayStr = aqLocalNow(json).slice(0, 10);
   const todayIdx = hourly.time.reduce((acc, t, i) => { if (t.startsWith(todayStr)) acc.push(i); return acc; }, []);
 
   const getVals = k => todayIdx.map(i => hourly[k]?.[i]).filter(v => v != null && !isNaN(v));
@@ -105,6 +106,22 @@ function renderAirQuality(json) {
 
   h += '</div>'; // end aq-grid
 
+  // AQI over time: past 7 days + forecast
+  h += `<div class="chart-card full-width aq-chart-card">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">European AQI over time</div>
+        <div class="chart-subtitle">Past 7 days and the next few days, hourly</div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dash" style="border-top-style:solid;border-color:var(--text-primary)"></div>Past</div>
+        <div class="legend-item"><div class="legend-dash" style="border-color:var(--text-primary)"></div>Forecast</div>
+      </div>
+    </div>
+    <div class="chart-container" style="height:260px;"><canvas id="aqiChart" role="img" aria-label="European AQI over the past 7 days and the forecast"></canvas></div>
+    <div class="climate-note">CAMS via Open-Meteo · European Air Quality Index (EEA) · Hourly values, local time</div>
+  </div>`;
+
   h += '<div class="aq-bottom-row">';
 
   // Pollen card
@@ -142,7 +159,145 @@ function renderAirQuality(json) {
 
   const aqContent = document.getElementById('aqContent');
   aqContent.removeAttribute('style');
+  if (aqiChartInstance) { aqiChartInstance.destroy(); aqiChartInstance = null; }
   aqContent.innerHTML = h;
+  renderAqiChart(json);
+}
+
+// Same six EEA levels and colours as the AQI card (aqiCat)
+const AQI_BANDS = [
+  { from: 0,   to: 20,  key: 'good',     label: 'Good' },
+  { from: 20,  to: 40,  key: 'fair',     label: 'Fair' },
+  { from: 40,  to: 60,  key: 'moderate', label: 'Moderate' },
+  { from: 60,  to: 80,  key: 'poor',     label: 'Poor' },
+  { from: 80,  to: 100, key: 'verypoor', label: 'Very poor' },
+  { from: 100, to: Infinity, key: 'extreme', label: 'Extremely poor' },
+];
+const AQ_DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const AQ_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function renderAqiChart(json) {
+  const canvas = document.getElementById('aqiChart');
+  if (!canvas) return;
+  const times = json.hourly.time, all = json.hourly.european_aqi || [];
+  // Drop the empty hours at the end, where the CAMS forecast runs out
+  let last = all.length - 1;
+  while (last >= 0 && all[last] == null) last--;
+  if (last < 0) { canvas.closest('.aq-chart-card').hidden = true; return; }
+  const labels = times.slice(0, last + 1);
+  const values = all.slice(0, last + 1);
+
+  const nowKey = aqLocalNow(json);
+  let nowIdx = labels.findIndex(t => t.slice(0, 13) === nowKey);
+  if (nowIdx < 0) nowIdx = labels.length - 1;
+  const past     = values.map((v, i) => i <= nowIdx ? v : null);
+  const forecast = values.map((v, i) => i >= nowIdx ? v : null);
+
+  const css   = getComputedStyle(document.documentElement);
+  const line  = css.getPropertyValue('--text-primary').trim();
+  const muted = css.getPropertyValue('--text-muted').trim();
+  const grid  = css.getPropertyValue('--border').trim();
+  const band  = Object.fromEntries(AQI_BANDS.map(b => [b.key, _aqC(b.key)]));
+  const tint  = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+
+  const peak = Math.max(...values.filter(v => v != null));
+  const yMax = Math.max(100, Math.ceil(peak / 20) * 20); // fixed 0–100 so the bands keep their proportions
+
+  const day   = t => { const d = new Date(t + ':00Z'); return `${AQ_DAYS[d.getUTCDay()]} ${d.getUTCDate()}`; };
+  const stamp = t => { const d = new Date(t + ':00Z'); return `${AQ_DAYS[d.getUTCDay()]} ${d.getUTCDate()} ${AQ_MONTHS[d.getUTCMonth()]}, ${t.slice(11, 16)}`; };
+
+  // Background bands, their names on the right, and the "now" marker
+  const bandsPlugin = {
+    id: 'aqiBands',
+    beforeDatasetsDraw(chart) {
+      const { ctx, chartArea: a, scales: { x, y } } = chart;
+      ctx.save();
+      for (const b of AQI_BANDS) {
+        const top = y.getPixelForValue(Math.min(b.to, yMax)), bottom = y.getPixelForValue(b.from);
+        if (bottom <= a.top) continue;
+        ctx.fillStyle = tint(band[b.key], 0.13);
+        ctx.fillRect(a.left, Math.max(top, a.top), a.right - a.left, bottom - Math.max(top, a.top));
+        ctx.fillStyle = band[b.key];
+        ctx.font = "10px 'DM Mono', monospace";
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        // In the right margin, so the line never runs through a label
+        ctx.fillText(b.label, a.right + 8, (Math.max(top, a.top) + bottom) / 2);
+      }
+      const nx = x.getPixelForValue(nowIdx);
+      ctx.strokeStyle = muted;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(nx, a.top); ctx.lineTo(nx, a.bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = muted;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText('Now', nx + 4, a.top + 4);
+      ctx.restore();
+    },
+  };
+
+  aqiChartInstance = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Past',     data: past,     borderColor: line, borderWidth: 2, pointRadius: 0, tension: 0.25, spanGaps: false },
+        { label: 'Forecast', data: forecast, borderColor: line, borderWidth: 2, borderDash: [5, 4], pointRadius: 0, tension: 0.25, spanGaps: false },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      interaction: { mode: 'index', intersect: false },
+      layout: { padding: { right: peak > 100 ? 96 : 68 } }, // room for the band names
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: {
+            autoSkip: false, maxRotation: 0, font: { size: 11 },
+            // One label per day, at midnight; every 2nd day under 600px, every 3rd under 450px
+            callback: function (_, i) {
+              if (!labels[i].endsWith('T00:00')) return '';
+              const every = this.chart.width < 450 ? 3 : this.chart.width < 600 ? 2 : 1;
+              if (Math.round(i / 24) % every) return '';
+              return day(labels[i]);
+            },
+          },
+        },
+        y: {
+          min: 0, max: yMax,
+          grid: { color: grid },
+          ticks: { stepSize: 20, font: { size: 11 } },
+          title: { display: true, text: 'AQI', font: { size: 11 } },
+        },
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          // At "now" both datasets have a value; show it once
+          filter: item => item.parsed.y != null && !(item.datasetIndex === 1 && item.dataIndex === nowIdx),
+          callbacks: {
+            title: items => stamp(labels[items[0].dataIndex]) + (items[0].dataIndex > nowIdx ? ' · forecast' : ''),
+            label: item => `European AQI ${Math.round(item.parsed.y)} · ${aqiCat(item.parsed.y).label}`,
+          },
+        },
+      },
+    },
+    plugins: [bandsPlugin],
+  });
+
+  // Text summary for screen readers
+  const peakOf = (from, to) => {
+    let best = -1, at = -1;
+    for (let i = from; i <= to; i++) if (values[i] != null && values[i] > best) { best = values[i]; at = i; }
+    return at < 0 ? null : { v: Math.round(best), t: labels[at] };
+  };
+  const nowV = values[nowIdx], pastPeak = peakOf(0, nowIdx), fcPeak = peakOf(nowIdx + 1, values.length - 1);
+  let summary = `European AQI for ${currentLocation.name}, hourly, past 7 days and forecast.`;
+  if (nowV != null) summary += ` Now ${Math.round(nowV)}, ${aqiCat(nowV).label}.`;
+  if (pastPeak) summary += ` Past-week peak ${pastPeak.v} (${aqiCat(pastPeak.v).label}) on ${stamp(pastPeak.t)}.`;
+  if (fcPeak) summary += ` Forecast peak ${fcPeak.v} (${aqiCat(fcPeak.v).label}) on ${stamp(fcPeak.t)}.`;
+  canvas.setAttribute('aria-label', summary);
 }
 
 async function loadAirQuality() {

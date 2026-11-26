@@ -3,6 +3,10 @@
  *
  * Proxies the Open-Meteo air quality API (CAMS) with a 30-minute cache.
  * AQ data updates a few times per day so 30 min is a sensible TTL.
+ *
+ * Hourly values for the past 7 days and today + 4 days (CAMS's forecast runs
+ * ~5 days, so later hours would be empty anyway). The past days feed the AQI
+ * chart; the cards use today's hours only.
  */
 
 const UPSTREAM  = 'https://air-quality-api.open-meteo.com/v1/air-quality';
@@ -21,7 +25,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     const latN = parseFloat(lat).toFixed(4);
     const lonN = parseFloat(lon).toFixed(4);
 
-    const cacheKey = `aq_${latN}_${lonN}_${halfHourKey()}`;
+    const cacheKey = `aq_v2_${latN}_${lonN}_${halfHourKey()}`;
 
     if (env.CLIMATE_CACHE) {
       const cached = await env.CLIMATE_CACHE.get(cacheKey);
@@ -32,14 +36,16 @@ export async function onRequestGet({ request, env, waitUntil }) {
       latitude:      latN,
       longitude:     lonN,
       hourly:        'pm10,pm2_5,nitrogen_dioxide,ozone,uv_index,european_aqi,alder_pollen,birch_pollen,grass_pollen',
-      forecast_days: '2',
+      past_days:     '7',
+      forecast_days: '5',
       timezone:      'auto',
     });
 
     const upstream = await fetch(`${UPSTREAM}?${params}`);
     const body     = await upstream.text();
 
-    if (!upstream.ok) return json(body, upstream.status, { 'X-Cache': 'MISS' });
+    // Always 503 on upstream failure: Cloudflare replaces 502 responses with its own error page
+    if (!upstream.ok) return json({ error: `Open-Meteo returned HTTP ${upstream.status}` }, 503, { 'X-Cache': 'MISS' });
 
     if (env.CLIMATE_CACHE) {
       waitUntil(env.CLIMATE_CACHE.put(cacheKey, body, { expirationTtl: CACHE_TTL }));
@@ -48,7 +54,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json(body, 200, { 'X-Cache': 'MISS' });
 
   } catch (err) {
-    return json({ error: err.message }, 500);
+    return json({ error: err.message }, 503);
   }
 }
 

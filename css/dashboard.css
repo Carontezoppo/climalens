@@ -783,6 +783,7 @@
     position: relative; overflow: hidden;
   }
   .aq-bar-fill { position: absolute; top:0; left:0; bottom:0; border-radius: 2px; transition: width 0.5s ease; }
+  .aq-chart-card { margin-bottom: 16px; }
   .aq-bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .aq-card {
     background: var(--bg-card); border: 0px solid var(--border);
