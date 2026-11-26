@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://climalens.alessandromolinaro.com/sitemap.xml
+Sitemap: https://climalens.org/sitemap.xml
