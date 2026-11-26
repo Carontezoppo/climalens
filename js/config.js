@@ -51,7 +51,7 @@ const LOCATION_GROUPS = [
     { name: 'Los Angeles, USA',           lat:  34.05,  lon: -118.24, tz: 'America/Los_Angeles'           },
     { name: 'Las Vegas, USA',              lat:  36.17,  lon: -115.14, tz: 'America/Los_Angeles'           },
     { name: 'La Paz, Bolivia',              lat: -16.50,  lon:  -68.15, tz: 'America/La_Paz'               },
-    { name: 'lima, Peru',                 lat: -12.04,  lon:  -77.03, tz: 'America/Lima'                },
+    { name: 'Lima, Peru',                 lat: -12.04,  lon:  -77.03, tz: 'America/Lima'                },
     { name: 'New Orleans, USA',           lat:  29.95,  lon:  -90.07, tz: 'America/Chicago'               },
     { name: 'New York, USA',              lat:  40.71,  lon:  -74.01, tz: 'America/New_York'              },
     { name: 'Quebec City, Canada',          lat:  46.81,  lon:  -71.21, tz: 'America/Toronto'               },
