@@ -40,7 +40,8 @@ function initLandCoverGlobe() {
   }
 }
 
-// Forest cover map — MODIS IGBP Land Cover 2001–2024 · NASA GIBS
+// Forest cover map — MODIS IGBP Land Cover 2001–2024 · NASA GIBS, pre-rendered
+// in the globe's WorldCover colours by scripts/build_modis_landcover_frames.py
 
 const FOREST_YEAR_MIN = 2001;
 const FOREST_YEAR_MAX = 2024;
@@ -53,15 +54,10 @@ let forestCurrentYear = FOREST_YEAR_MAX;
 let forestPlaying = false;
 
 const FOREST_IMG_BOUNDS = [[-85.051, -180], [85.051, 180]];
-const FOREST_IMG_BBOX   = '-20037508.342789244,-20037508.342789244,20037508.342789244,20037508.342789244';
 const FRAME_MIN_MS      = 800;
 
 function forestImageUrl(year) {
-  return `/api/forest-wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap` +
-    `&LAYERS=MODIS_Combined_L3_IGBP_Land_Cover_Type_Annual` +
-    `&FORMAT=image%2Fpng&TRANSPARENT=FALSE` +
-    `&CRS=EPSG%3A3857&BBOX=${FOREST_IMG_BBOX}` +
-    `&WIDTH=4096&HEIGHT=4096&TIME=${year}-01-01`;
+  return `/img/modis-landcover/${year}.png`;
 }
 
 function forestSliderFill(el) {
@@ -71,9 +67,12 @@ function forestSliderFill(el) {
 
 function forestGetBuffer() { return forestActiveSide === 'A' ? forestLayerB : forestLayerA; }
 
+// The new frame fades in on top while the old one stays opaque underneath, so
+// nothing behind the map shows through mid-fade.
 function forestSwapLayers() {
-  (forestActiveSide === 'A' ? forestLayerA : forestLayerB).setOpacity(0);
-  (forestActiveSide === 'A' ? forestLayerB : forestLayerA).setOpacity(0.92);
+  const next = forestGetBuffer();
+  next.bringToFront();
+  next.setOpacity(1);
   forestActiveSide = forestActiveSide === 'A' ? 'B' : 'A';
 }
 
@@ -87,13 +86,8 @@ function initForestMap() {
     maxBoundsViscosity: 1.0,
   });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-    subdomains: 'abcd', maxZoom: 19, opacity: 0.6,
-  }).addTo(forestMap);
-
   const latestUrl = forestImageUrl(FOREST_YEAR_MAX);
-  forestLayerA = L.imageOverlay(latestUrl, FOREST_IMG_BOUNDS, { opacity: 0.92 }).addTo(forestMap);
+  forestLayerA = L.imageOverlay(latestUrl, FOREST_IMG_BOUNDS, { opacity: 1 }).addTo(forestMap);
   forestLayerB = L.imageOverlay(latestUrl, FOREST_IMG_BOUNDS, { opacity: 0   }).addTo(forestMap);
 
   const slider        = document.getElementById('forestSlider');
@@ -159,6 +153,7 @@ function initForestMap() {
     let done         = false;
 
     buffer.off('load');
+    buffer.setOpacity(0); // hidden under the visible frame, ready to fade in
     const imgEl = buffer.getElement();
     if (imgEl) imgEl.onerror = null;
 

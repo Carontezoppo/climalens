@@ -66,31 +66,37 @@
     Global Land Cover — Current State
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Global · 2020 · ESA WorldCover · 10 m</span>
   </h2>
-  <div class="chart-subtitle" style="margin-bottom:12px;">A rotating 3D view of global land cover for 2020 at 10 m resolution, from ESA's Sentinel-1/2-derived WorldCover map. Drag to rotate, scroll to zoom — green is tree cover, yellow and tan are grassland and cropland, grey is bare ground or built-up, blue is water, and white marks snow and ice.</div>
-
-  <div class="sst-section">
-    <div class="sst-map-card">
-      <div class="landcover-globe-wrap" id="landcoverGlobe" role="img" aria-label="Rotating 3D globe showing global land cover classification for 2020 from ESA WorldCover satellite data"></div>
+  <div class="vortex-map-grid" style="margin-top:0;margin-bottom:36px;">
+    <div class="vortex-map-main">
+      <div class="vortex-map-card">
+        <div class="landcover-globe-wrap" id="landcoverGlobe" role="img" aria-label="Rotating 3D globe showing global land cover classification for 2020 from ESA WorldCover satellite data"></div>
+      </div>
     </div>
-    <div class="sst-controls-card">
-      <div class="sst-top-row">
-        <div class="sst-legend-label">Auto-rotate</div>
+    <div class="vortex-map-side">
+      <p class="vortex-map-text">A rotating 3D view of global land cover for 2020 at 10&nbsp;m resolution, from ESA's Sentinel-1/2-derived WorldCover map. Drag to rotate, scroll to zoom.</p>
+      <div class="vortex-map-wind-row" style="align-items:center;">
+        <div class="vortex-map-key-label" style="margin-bottom:0;">Auto-rotate</div>
         <button class="sst-play-btn playing" id="landcoverRotateBtn" aria-pressed="true">&#9646;&#9646; Pause</button>
       </div>
-      <div class="forest-legend">
-        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#006400"></span>Tree cover</div>
-        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#ffbb22"></span>Shrubland</div>
-        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#ffff4c"></span>Grassland</div>
-        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#f096ff"></span>Cropland</div>
-        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#fa0000"></span>Built-up</div>
-        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#b4b4b4"></span>Bare / sparse vegetation</div>
-        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#f0f0f0"></span>Snow and ice</div>
-        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#0064c8"></span>Water</div>
-        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#0096a0"></span>Herbaceous wetland</div>
-        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#00cf75"></span>Mangroves</div>
-        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#fae6a0"></span>Moss and lichen</div>
+      <div>
+        <div class="vortex-map-key-label">Land cover</div>
+        <div class="forest-legend">
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#006400"></span>Tree cover</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#ffbb22"></span>Shrubland</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#ffff4c"></span>Grassland (incl. pasture)</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#f096ff"></span>Cropland</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#fa0000"></span>Built-up</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#b4b4b4"></span>Bare / sparse vegetation</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#f0f0f0"></span>Snow and ice</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#0064c8"></span>Water</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#0096a0"></span>Herbaceous wetland</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#00cf75"></span>Mangroves</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#fae6a0"></span>Moss and lichen</div>
+        </div>
       </div>
-      <div class="sst-source">ESA WorldCover 10m v100 · 2020 · Sentinel-1/2 · CC-BY 4.0</div>
+      <div class="vortex-map-foot">
+        <div class="vortex-map-source">ESA WorldCover 10m v100 · 2020 · Sentinel-1/2 · CC-BY 4.0</div>
+      </div>
     </div>
   </div>
 
@@ -101,7 +107,7 @@
     Land Cover Change — 2001 to 2024
     <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Global · 2001–2024 · MODIS IGBP · 500 m</span>
   </h2>
-  <div class="chart-subtitle" style="margin-bottom:12px;">Annual land cover classification from MODIS satellite data. Dark greens are forest — watch the Amazon, Congo Basin, and Southeast Asia as cropland and urban areas expand across two decades.</div>
+  <div class="chart-subtitle section-desc">Annual land cover classification from MODIS satellite data. Same colours as the globe above: dark green is forest — watch the Amazon, Congo Basin, and Southeast Asia as cropland (pink) and urban areas (red) expand across two decades.</div>
 
   <div class="forest-gate" id="forestGate">
     <div class="forest-gate-inner">
@@ -128,16 +134,20 @@
         <input type="range" class="sst-slider" id="forestSlider" min="2001" max="2024" value="2024" aria-label="Select year for land cover animation">
         <div class="sst-tick-row" id="forestTickRow"></div>
         <div class="forest-legend">
-          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#1a6b1a"></span>Evergreen forest</div>
-          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#56a356"></span>Deciduous forest</div>
-          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#a0c060"></span>Mixed / woody savanna</div>
-          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#c8a828"></span>Grassland / savanna</div>
-          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#906428"></span>Shrubland</div>
-          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#d8b040"></span>Cropland</div>
-          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#b01800"></span>Urban</div>
-          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#1040a0"></span>Water</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#006400"></span>Tree cover</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#5a9a1e"></span>Woody savanna</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#c2dc3a"></span>Savanna</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#ffbb22"></span>Shrubland</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#ffff4c"></span>Grassland (incl. pasture)</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#f096ff"></span>Cropland</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#f8cfff"></span>Cropland / natural mosaic</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#fa0000"></span>Built-up</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#b4b4b4"></span>Bare / sparse vegetation</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#f0f0f0"></span>Snow and ice</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#0064c8"></span>Water</div>
+          <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#0096a0"></span>Wetland</div>
         </div>
-        <div class="sst-source">MODIS Combined Terra + Aqua · IGBP Land Cover Type 1 · 500 m · Annual 2001–2024 · NASA GIBS / LP DAAC</div>
+        <div class="sst-source">MODIS Combined Terra + Aqua · IGBP Land Cover Type 1 · 500 m · Annual 2001–2024 · NASA GIBS / LP DAAC · recoloured to match WorldCover</div>
       </div>
     </div>
   </div>

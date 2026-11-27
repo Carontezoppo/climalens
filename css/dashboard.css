@@ -635,6 +635,9 @@
   .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .chart-title { font-size: 18px; font-weight: 600; }
   .chart-subtitle { font-size: 14px; color: var(--text-muted); margin-top: 2px; line-height: 1.618; }
+  /* Section description under an h2.section-title, before the section's first card */
+  .section-desc { margin-bottom: 24px; }
+  .section-desc:empty { display: none; } /* jetStreamDesc before load / for tropical cities */
   .chart-legend { display: flex; gap: 16px; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
   .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
@@ -1655,15 +1658,23 @@
   border: 1px solid rgba(255,255,255,0.1);
 }
 /* ========= LAND COVER GLOBE ========= */
+/* Same 2/3 + 1/3 grid as the polar vortex map (.vortex-map-grid): the globe
+   is round, so a full-width card left empty strips either side of it */
 .landcover-globe-wrap {
-  height: 800px; background: #0a0e17; isolation: isolate;
+  width: 100%; aspect-ratio: 1; max-height: 700px; background: #0a0e17; isolation: isolate;
   display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
 
 @media (max-width: 768px) {
   .forest-map-wrap { height: 320px; }
-  .landcover-globe-wrap { height: 320px; }
 }
+
+/* In the side key the legend is a list, at the size of the vortex map's key rows */
+.vortex-map-side .forest-legend { flex-direction: column; gap: 8px; margin-bottom: 0; }
+.vortex-map-side .forest-legend-item {
+  font-family: inherit; font-size: 12px; color: var(--text-secondary); gap: 10px;
+}
+.vortex-map-side .forest-legend-swatch { width: 14px; height: 14px; }
 
 /* ========= FOREST ANIMATION GATE ========= */
 .forest-gate {
