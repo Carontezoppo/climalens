@@ -19,5 +19,14 @@ function init() {
   forestLoadBtn.addEventListener('click', triggerForestLoad);
 
   if (sessionStorage.getItem('modisLoaded')) triggerForestLoad();
+
+  // ── Grassland map: two ~1.3 MB images, so only once it nears the viewport ──
+  const grassEl = document.getElementById('grassMap');
+  const grassObs = new IntersectionObserver(entries => {
+    if (!entries[0].isIntersecting) return;
+    grassObs.disconnect();
+    initGrassMap();
+  }, { rootMargin: '400px' });
+  grassObs.observe(grassEl);
 }
 init();

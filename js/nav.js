@@ -47,7 +47,8 @@
     ] },
     { href: 'forest.html', label: 'Land Cover', short: 'Land', icon: 'tree', sections: [
       ['section-landcover', 'Current state'],
-      ['section-landcover-change', 'Change 2001–2024']
+      ['section-landcover-change', 'Change 2001–2024'],
+      ['section-grassland', 'Grassland']
     ] },
     { href: 'footprint.html', label: 'Footprint', short: 'Footprint', icon: 'industry', sections: [] },
     { href: 'about.html', label: 'About', short: 'About', icon: 'info-circle', sections: [] }

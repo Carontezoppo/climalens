@@ -152,6 +152,41 @@
     </div>
   </div>
 
+  <!-- ── Grassland: natural vs cultivated ─────────────────── -->
+  <div class="section-sep"></div>
+
+  <h2 id="section-grassland" class="section-title">
+    Grassland — Natural vs Cultivated
+    <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;color:var(--text-muted);margin-left:10px;text-transform:uppercase;">Global · 2000 / 2024 · Global Pasture Watch · 30 m</span>
+  </h2>
+  <div class="chart-subtitle section-desc">The land cover maps above can't tell pasture from wild grassland. Global Pasture Watch can: cultivated grassland is planted or heavily managed for livestock, while natural and semi-natural grassland covers steppe, prairie and tundra. Colour shows which of the two dominates, brightness how much of the area is grassland. Switch between 2000 and 2024 and zoom into Brazil to see pasture spreading into the Amazon and the Cerrado.</div>
+
+  <div class="sst-section">
+    <div class="sst-map-card">
+      <div class="forest-map-wrap" id="grassMap" role="img" aria-label="World map of natural and cultivated grassland from Global Pasture Watch"></div>
+    </div>
+    <div class="sst-controls-card">
+      <div class="sst-top-row">
+        <div class="forest-year-display" id="grassYearDisplay" aria-live="polite">2024</div>
+        <div class="currents-mode-bar" id="grassYearBar" role="group" aria-label="Year shown on the grassland map">
+          <button class="currents-mode-btn" type="button" data-year="2000" aria-pressed="false">2000</button>
+          <button class="currents-mode-btn active" type="button" data-year="2024" aria-pressed="true">2024</button>
+        </div>
+      </div>
+      <div class="forest-legend">
+        <div class="forest-legend-item"><span class="grass-ramp grass-ramp-nat" aria-hidden="true"></span>Natural / semi-natural grassland</div>
+        <div class="forest-legend-item"><span class="grass-ramp grass-ramp-cult" aria-hidden="true"></span>Cultivated grassland (pasture)</div>
+        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#244a2e"></span>Forest</div>
+        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#5c5448"></span>Cropland</div>
+        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#343946"></span>Other land / not mapped</div>
+        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#f0f0f0"></span>Snow and ice</div>
+        <div class="forest-legend-item"><span class="forest-legend-swatch" style="background:#0064c8"></span>Water</div>
+      </div>
+      <p class="grass-note">Brighter means more of the area is grassland; where there is little, the muted forest and cropland from the MODIS map above show through (2001 stands in for 2000, the first MODIS year). Global Pasture Watch counts tundra and steppe as grassland, so its yellow covers more than the Grassland class above. It is an early release: known errors include cropland mapped as grassland in parts of North Africa, Western Australia and Mato Grosso, and grassland missed in south-eastern Africa and eastern Australia. Not mapped beyond 56°S and 76°N.</p>
+      <div class="sst-source">Global Pasture Watch v2 · cultivated and natural grassland probability, 30 m, averaged · Parente et al. 2024 · Land &amp; Carbon Lab / OpenGeoHub · CC-BY 4.0</div>
+    </div>
+  </div>
+
   </main>
 
   <footer class="footer">

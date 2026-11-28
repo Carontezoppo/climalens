@@ -1676,6 +1676,19 @@
 }
 .vortex-map-side .forest-legend-swatch { width: 14px; height: 14px; }
 
+/* Grassland map legend: each ramp runs from the map's neutral land colour to
+   full strength, as in scripts/build_grassland_frames.py (on the map the
+   colours also blend over the muted forest and cropland context) */
+.grass-ramp {
+  width: 36px; height: 12px; border-radius: 2px; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.grass-ramp-nat  { background: linear-gradient(to right, #343946, #ffff4c); }
+.grass-ramp-cult { background: linear-gradient(to right, #343946, #a78bfa); }
+.grass-note {
+  font-size: 12px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 12px;
+}
+
 /* ========= FOREST ANIMATION GATE ========= */
 .forest-gate {
   border: 0px solid var(--border); border-radius: 12px;

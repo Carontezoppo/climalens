@@ -223,3 +223,55 @@ function initForestMap() {
     forestMap.setView([15, 10], Math.max(2, coverZoom));
   }, 200);
 }
+
+// Grassland map — Global Pasture Watch, natural vs cultivated, 2000 / 2024.
+// Pre-rendered by scripts/build_grassland_frames.py on the same 4096² Mercator
+// grid as the MODIS frames, so it uses the same bounds.
+
+const GRASS_YEARS = [2000, 2024];
+let grassMap = null;
+
+function initGrassMap() {
+  if (!window.L || grassMap) return;
+
+  grassMap = L.map('grassMap', {
+    center: [15, 10], zoom: 2, minZoom: 2, maxZoom: 6,
+    zoomSnap: 0.5, worldCopyJump: false, attributionControl: true,
+    maxBounds: [[-90, -180], [90, 180]],
+    maxBoundsViscosity: 1.0,
+  });
+
+  const layers = {};
+  GRASS_YEARS.forEach(y => {
+    layers[y] = L.imageOverlay(`/img/grassland/${y}.png`, FOREST_IMG_BOUNDS, { opacity: y === 2024 ? 1 : 0 }).addTo(grassMap);
+  });
+  layers[2024].bringToFront();
+
+  const yearDisplay = document.getElementById('grassYearDisplay');
+  const buttons = document.querySelectorAll('#grassYearBar .currents-mode-btn');
+  let shown = 2024;
+
+  buttons.forEach(btn => btn.addEventListener('click', () => {
+    const year = +btn.dataset.year;
+    if (year === shown) return;
+    const next = layers[year], prev = layers[shown];
+    // Same fade as the MODIS animation: the new year fades in on top of the
+    // old one, which stays opaque underneath until the fade is done.
+    next.bringToFront();
+    next.setOpacity(1);
+    setTimeout(() => { if (shown === year) prev.setOpacity(0); }, 400);
+    shown = year;
+    yearDisplay.textContent = year;
+    buttons.forEach(b => {
+      const on = +b.dataset.year === year;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+  }));
+
+  setTimeout(() => {
+    grassMap.invalidateSize();
+    const el = grassMap.getContainer();
+    grassMap.setView([15, 10], Math.max(2, Math.log2(Math.max(el.offsetWidth, el.offsetHeight) / 256)));
+  }, 200);
+}

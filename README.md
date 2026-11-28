@@ -11,7 +11,7 @@ Live at **[climalens.org](https://climalens.org)**.
 | **Weather** (`index.html`) | Current conditions, a 9-day forecast with hourly breakdown, temperature chart, air quality (with a European AQI chart covering the past week and the next few days) and a live wind map |
 | **History** (`history.html`) | Climate trend since 1981, jet stream position (NAO / SAM), polar vortex strength and the animated polar vortex map, historical statistics and a monthly breakdown for the selected city |
 | **Sea** (`sea.html`) | Global mean sea level and city water-level map, sea surface temperature, El Niño / La Niña, Arctic and Antarctic sea ice, live ocean currents |
-| **Land Cover** (`forest.html`) | ESA WorldCover land cover globe and a MODIS land cover animation from 2001 to 2024 |
+| **Land Cover** (`forest.html`) | ESA WorldCover land cover globe, a MODIS land cover animation from 2001 to 2024, and natural vs cultivated grassland in 2000 and 2024 (Global Pasture Watch) |
 | **Footprint** (`footprint.html`) | Air pollution (aerosol optical depth) and light pollution seen from space |
 | **About** (`about.html`) | The project, and credits for every data source |
 
@@ -82,4 +82,4 @@ A push to `main` deploys automatically through Cloudflare Pages. There is no CI 
 
 ## Data sources
 
-Full credits are on the [About page](https://climalens.org/about.html). The main sources are MET Norway (forecast), NASA POWER / MERRA-2 (historical climate), NASA GSFC (polar vortex strength), Open-Meteo (ECMWF data for the polar vortex map, CAMS air quality, ERA5 marine data), NOAA (jet stream indices, El Niño, ocean currents), the University of Colorado (sea level), Copernicus Marine and NASA GIBS (sea ice, sea surface temperature), ESA WorldCover and MODIS (land cover), and NASA Black Marble (light pollution).
+Full credits are on the [About page](https://climalens.org/about.html). The main sources are MET Norway (forecast), NASA POWER / MERRA-2 (historical climate), NASA GSFC (polar vortex strength), Open-Meteo (ECMWF data for the polar vortex map, CAMS air quality, ERA5 marine data), NOAA (jet stream indices, El Niño, ocean currents), the University of Colorado (sea level), Copernicus Marine and NASA GIBS (sea ice, sea surface temperature), ESA WorldCover and MODIS (land cover), Global Pasture Watch (grassland), and NASA Black Marble (light pollution).
