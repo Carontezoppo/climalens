@@ -1676,6 +1676,10 @@
 }
 .vortex-map-side .forest-legend-swatch { width: 14px; height: 14px; }
 
+/* Legend link to the Grassland section below (both land cover legends) */
+.section-link { color: var(--accent-text); text-decoration: underline; text-underline-offset: 2px; }
+.section-link:hover { color: var(--text-primary); }
+
 /* Grassland map legend: each ramp runs from the map's neutral land colour to
    full strength, as in scripts/build_grassland_frames.py (on the map the
    colours also blend over the muted forest and cropland context) */

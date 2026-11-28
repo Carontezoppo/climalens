@@ -244,6 +244,16 @@
     });
   });
 
+  // In-page links to a section (a.section-link) scroll the same way. Delegated,
+  // because this script runs before the page content exists.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a.section-link[href^="#"]');
+    var target = a && document.getElementById(a.getAttribute('href').slice(1));
+    if (!target) return;
+    e.preventDefault();
+    scrollToSection(target);
+  });
+
   // ── Wire-up ───────────────────────────────────────────────────────────────
   applyMode();
   if (mqDrawer.addEventListener) {
